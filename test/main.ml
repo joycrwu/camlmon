@@ -44,11 +44,11 @@ let cmp_demo =
   [
     ( "order is irrelevant" >:: fun _ ->
       assert_equal ~cmp:cmp_set_like_lists ~printer:(pp_list pp_string)
-        [ "foo"; "bar" ] [ "bar"; "foo" ] );
+        [ "foo"; "bar" ] [ "bar"; "foo" ] )
     (* Uncomment this test to see what happens when a test case fails.
        "duplicates not allowed" >:: (fun _ -> assert_equal
        ~cmp:cmp_set_like_lists ~printer:(pp_list pp_string) ["foo";
-       "foo"] ["foo"]); *)
+       "foo"] ["foo"]); *);
   ]
 
 (********************************************************************
@@ -69,9 +69,7 @@ let cmp_demo =
    modules. *)
 
 let adventure_tests = []
-
 let command_tests = []
-
 let state_tests = []
 
 let suite =
