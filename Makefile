@@ -28,3 +28,6 @@ clean:
 
 doc:
 	dune build @doc
+
+cloc: clean
+	cloc --by-file --include-lang=OCaml .
