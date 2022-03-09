@@ -7,6 +7,8 @@ type t = {
   inbattle : bool;
   location : int * int;
   alive : bool;
+  fought : string list;
 }
 
 let init_state lvl = raise (Failure "Unimplemented")
+let fought lvl = raise (Failure "Unimplemented")
