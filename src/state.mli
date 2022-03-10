@@ -1,4 +1,5 @@
 open Level
+open Character
 
 type t
 (** The abstract type of values representing the game state. *)
@@ -11,8 +12,11 @@ val init_state : Level.t -> t
 val current_tile_id : t -> int * int
 (** [current_tile_id st] is the identifier of the tile in which the
     adventurer currently is located in state [st]. Location is
-    represented in coordniate form, where int * int is (x * y) *)
+    represented in coordinate form, where int * int is (x * y) *)
 
 val fought : t -> string list
 (** [fought st] is the list of all the character ids that the user has
     fought *)
+
+val current_character : t -> Character.t
+(** [current_character st] is the current in-battle character.*)
