@@ -1,5 +1,4 @@
 open Level
-open Character
 
 type t
 (** The abstract type of values representing the game state. *)
@@ -17,6 +16,3 @@ val current_tile_id : t -> int * int
 val fought : t -> string list
 (** [fought st] is the list of all the character ids that the user has
     fought *)
-
-val current_character : t -> Character.t
-(** [current_character st] is the current in-battle character.*)
