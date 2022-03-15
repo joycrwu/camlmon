@@ -32,10 +32,6 @@ let from_json json =
       json |> member "actions" |> to_list |> List.map get_action_json;
   }
 
-let check_action character action =
-  try List.find (fun r -> r.name = action) character.actions
-  with not_found -> raise (UnknownAction action)
-
 let get_id character = character.id
 let get_hp character = character.hp
 let get_atk character = character.atk
@@ -43,3 +39,7 @@ let get_affinity character = character.affinity
 
 let get_action_effect character which =
   (List.nth character.actions which).effect
+
+let check_action character action =
+  try List.find (fun r -> r.name = action) character.actions
+  with not_found -> raise (UnknownAction action)
