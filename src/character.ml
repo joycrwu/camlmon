@@ -16,7 +16,7 @@ type t = {
   actions : action list;
 }
 
-let get_action json =
+let get_action_json json =
   {
     name = json |> member "name" |> to_string;
     effect = json |> member "name" |> to_int;
@@ -37,3 +37,10 @@ let check_action character action =
 
 let get_id character = character.id
 let get_hp character = character.hp
+let get_atk character = character.atk
+let get_affinity character = character.affinity
+let get_actions character = character.actions
+let get_action character which = List.nth character.actions which
+
+let get_action_effect character nth =
+  (List.nth character.actions nth).effect
