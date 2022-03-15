@@ -1,9 +1,17 @@
 type t = {
-  character : string;
+  character : Character.t;
   character_hp : int;
   enemy : string;
   enemy_hp : int;
 }
+
+let init c =
+  {
+    character = c;
+    character_hp = Character.get_hp c;
+    enemy = "test";
+    enemy_hp = 100;
+  }
 
 let character_turn bat atk =
   {
