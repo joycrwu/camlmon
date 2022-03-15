@@ -1,0 +1,11 @@
+{
+    "id": "Larry",
+    "hp": 100,
+    "attack": 50,
+    "affinity": "Cascadilla Hall",
+    "actions": [
+        "Thunderbolt",
+        "Flamethrower",
+        "Ice Beam"
+    ]
+}
