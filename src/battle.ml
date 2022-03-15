@@ -21,6 +21,7 @@ let enemy_turn bat =
     enemy_hp = bat.enemy_hp;
   }
 
+let damage bat = raise (Failure "Unimplemented")
 let character bat = bat.character
 
 (** return true if we won the battle, false if we lost, meaning that our
