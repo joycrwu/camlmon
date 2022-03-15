@@ -19,7 +19,9 @@ val from_json : Yojson.Basic.t -> t
     valid JSON battle representation. *)
 
 val get_id : t -> string
-(**[get_id c] is the id of character [c]*)
-
 val get_hp : t -> int
-(**[get_hp c] is the hp of character [c]*)
+val get_atk : t -> int
+val get_affinity : t -> int
+val get_actions : t -> int
+val get_action : t -> int
+val get_action_effect : t -> int
