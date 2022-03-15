@@ -21,7 +21,5 @@ val from_json : Yojson.Basic.t -> t
 val get_id : t -> string
 val get_hp : t -> int
 val get_atk : t -> int
-val get_affinity : t -> int
-val get_actions : t -> int
-val get_action : t -> int
+val get_affinity : t -> string
 val get_action_effect : t -> int
