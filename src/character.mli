@@ -22,4 +22,4 @@ val get_id : t -> string
 val get_hp : t -> int
 val get_atk : t -> int
 val get_affinity : t -> string
-val get_action_effect : t -> int
+val get_action_effect : t -> int -> int
