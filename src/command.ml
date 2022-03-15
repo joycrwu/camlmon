@@ -4,12 +4,9 @@ type command =
 
 exception Invalid_input
 
-let input (st : State.t) =
+let input (bat : Battle.t) =
   let k = Graphics.read_key () in
   match k with
-  | '1' -> Attack Character.attack (State.current_character st) 1
-  | '2' -> Attack Character.attack (State.current_character st) 2
-  | '3' -> Attack Character.attack (State.current_character st) 3
-  | '4' -> Attack Character.attack (State.current_character st) 4
+  | '1' -> Attack "test"
   | 'r' -> Run
   | _ -> raise Invalid_input
