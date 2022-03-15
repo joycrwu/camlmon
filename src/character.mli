@@ -17,3 +17,9 @@ exception UnknownAction of string
 val from_json : Yojson.Basic.t -> t
 (** [from_json j] is the battle that [j] represents. Requires: [j] is a
     valid JSON battle representation. *)
+
+val get_id : t -> string
+(**[get_id c] is the id of character [c]*)
+
+val get_hp : t -> int
+(**[get_hp c] is the hp of character [c]*)
