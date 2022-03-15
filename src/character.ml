@@ -34,3 +34,6 @@ let from_json json =
 let check_action character action =
   try List.find (fun r -> r.name = action) character.actions
   with not_found -> raise (UnknownAction action)
+
+let get_id character = character.id
+let get_hp character = character.hp
