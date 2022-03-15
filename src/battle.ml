@@ -1,17 +1,9 @@
 type t = {
-  character : Character.t;
+  character : string;
   character_hp : int;
   enemy : string;
   enemy_hp : int;
 }
-
-let init c =
-  {
-    character = c;
-    character_hp = Character.get_hp c;
-    enemy = "test";
-    enemy_hp = 100;
-  }
 
 let character_turn bat atk =
   {
@@ -30,3 +22,7 @@ let enemy_turn bat =
   }
 
 let character bat = bat.character
+
+(** return true if we won the battle, false if we lost, meaning that our
+    health reached zero first*)
+let wonbattle bat = raise (Failure "Unimplemented")
