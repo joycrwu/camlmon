@@ -8,5 +8,5 @@ type command =
 exception Invalid_input
 (** Raised when an invalid input is keypressed. *)
 
-val input : State.t -> command
+val input : Battle.t -> command
 (** [input s] pattern matches the pressed key to a [command]. *)
