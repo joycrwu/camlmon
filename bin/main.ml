@@ -31,16 +31,17 @@ let () = interactive ()
 let () = flush_kp ()
 
 let rec wait (bat : Battle.t) =
+  flush_kp ();
+  Graphics.moveto 0 0;
+  Graphics.draw_string (string_of_int bat.character_hp);
+  Graphics.moveto 10 10;
+  Graphics.draw_string (string_of_int bat.enemy_hp);
   let character = Game.Battle.character bat in
   let player_input = Game.Command.input bat character in
   match player_input with
-  | Attack x -> Game.Battle.character_turn bat x
-  | Run ->
-      flush_kp ();
-      wait bat
-  | Invalid_input ->
-      flush_kp ();
-      wait bat
+  | Attack x -> wait (Game.Battle.character_turn bat x)
+  | Run -> wait bat
+  | Invalid_input -> wait bat
 
 let victory_text () =
   Graphics.open_graph "";
