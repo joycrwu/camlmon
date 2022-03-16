@@ -5,6 +5,10 @@ val init_battle : Character.t -> Character.t -> t
 (**[init_battle c e ] is the type [t] for a battle, with character [c]
    and enemy [e]. *)
 
+val character_hp : t -> int
+val enemy_hp : t -> int
+val character : t -> Character.t
+
 val character_turn : t -> int -> t
 (** [character_turn b] is the character turn in battle [b]*)
 

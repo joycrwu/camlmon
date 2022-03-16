@@ -30,11 +30,12 @@ let exit_battle (bat : Battle.t) =
   if Game.Battle.wonbattle bat then victory_text ()
 
 let rec wait (bat : Battle.t) =
+  exit_battle bat;
   flush_kp ();
   Graphics.moveto 50 50;
-  Graphics.draw_string (string_of_int bat.character_hp);
+  Graphics.draw_string (string_of_int (Game.Battle.character_hp bat));
   Graphics.moveto 10 10;
-  Graphics.draw_string (string_of_int bat.enemy_hp);
+  Graphics.draw_string (string_of_int (Game.Battle.enemy_hp bat));
   let character = Game.Battle.character bat in
   let player_input = Game.Command.input bat character in
   match player_input with
