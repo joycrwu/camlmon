@@ -4,9 +4,7 @@
 type command =
   | Run
   | Attack of int
-
-exception Invalid_input
-(** Raised when an invalid input is keypressed. *)
+  | Invalid_input
 
 val input : Battle.t -> Character.t -> command
 (** [input s] pattern matches the pressed key to a [command]. *)
