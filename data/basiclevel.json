@@ -1,0 +1,9 @@
+{
+  "id": "basiclevel",
+  "start_tile_x": 0,
+  "start_tile_y": 0,
+  "characterid": "Larry",
+  "enemylist": [
+    "ece3150"
+  ]
+}
