@@ -23,11 +23,11 @@ let character_turn bat c_action_eff =
   {
     character = bat.character;
     character_hp =
-      (if c_action_eff > 0 then bat.character_hp + c_action_eff
+      (if c_action_eff > 0 then bat.character_hp - c_action_eff
       else bat.character_hp);
     enemy = bat.enemy;
     enemy_hp =
-      (if c_action_eff < 0 then bat.enemy_hp + c_action_eff
+      (if c_action_eff < 0 then bat.enemy_hp - c_action_eff
       else bat.enemy_hp);
   }
 
@@ -35,11 +35,11 @@ let enemy_turn bat e_action_eff =
   {
     character = bat.character;
     character_hp =
-      (if e_action_eff < 0 then bat.character_hp + e_action_eff
+      (if e_action_eff < 0 then bat.character_hp - e_action_eff
       else bat.character_hp);
     enemy = bat.enemy;
     enemy_hp =
-      (if e_action_eff > 0 then bat.enemy_hp + e_action_eff
+      (if e_action_eff > 0 then bat.enemy_hp - e_action_eff
       else bat.enemy_hp);
   }
 
@@ -47,4 +47,4 @@ let damage bat = raise (Failure "Unimplemented")
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)
-let wonbattle bat = if bat.enemy_hp = 0 then true else false
+let wonbattle bat = if bat.character_hp <= 0 then true else false

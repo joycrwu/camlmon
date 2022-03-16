@@ -22,14 +22,15 @@ let rec interactive () =
 let victory_text () =
   Graphics.open_graph "";
   set_window_title "Victory";
-  Graphics.set_text_size 100;
-  Graphics.moveto 50 50;
+  Graphics.set_text_size 1000;
+  Graphics.moveto 25 25;
   Graphics.draw_string "Poggers!"
 
 let exit_battle (bat : Battle.t) =
   if Game.Battle.wonbattle bat then victory_text ()
 
 let rec wait (bat : Battle.t) =
+  Graphics.clear_graph ();
   exit_battle bat;
   flush_kp ();
   Graphics.moveto 50 50;
@@ -46,10 +47,6 @@ let rec wait (bat : Battle.t) =
 let main () =
   Graphics.open_graph " 1500 x 1500";
   set_window_title "Title";
-  Graphics.set_text_size 300;
-  Graphics.moveto 50 50;
-  Graphics.draw_string "Yo";
-  Graphics.draw_circle 50 50 10;
   wait
     (Game.Battle.init_battle
        ("data" ^ Filename.dir_sep ^ "larry.json"
