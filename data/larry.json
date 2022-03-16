@@ -4,8 +4,20 @@
     "attack": 50,
     "affinity": "Cascadilla Hall",
     "actions": [
-        "Thunderbolt",
-        "Flamethrower",
-        "Ice Beam"
+        {
+            "name": "Thunderbolt",
+            "effect": 10,
+            "description": "Releases a lightning bolt that deals 10 damage."
+        },
+        {
+            "name": "Thunderbolt",
+            "effect": 10,
+            "description": "Releases a lightning bolt that deals 10 damage."
+        },
+        {
+            "name": "Thunderbolt",
+            "effect": 10,
+            "description": "Releases a lightning bolt that deals 10 damage."
+        }
     ]
 }

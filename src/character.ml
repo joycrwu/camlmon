@@ -6,6 +6,7 @@ exception IllegalTarget of string
 type action = {
   name : string;
   effect : int;
+  description : string;
 }
 
 type t = {
@@ -20,13 +21,14 @@ let get_action_json json =
   {
     name = json |> member "name" |> to_string;
     effect = json |> member "effect" |> to_int;
+    description = json |> member "description" |> to_string;
   }
 
 let from_json json =
   {
     id = json |> member "id" |> to_string;
     hp = json |> member "hp" |> to_int;
-    atk = json |> member "atk" |> to_int;
+    atk = json |> member "attack" |> to_int;
     affinity = json |> member "affinity" |> to_string;
     actions =
       json |> member "actions" |> to_list |> List.map get_action_json;

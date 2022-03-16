@@ -51,10 +51,10 @@ let main () =
   Graphics.draw_circle 50 50 10;
   wait
     (Game.Battle.init_battle
-       ("data/larry.json" |> Yojson.Basic.from_file
-      |> Game.Character.from_json)
-       ("data/larry.json" |> Yojson.Basic.from_file
-      |> Game.Character.from_json))
+       ("data" ^ Filename.dir_sep ^ "larry.json"
+       |> Yojson.Basic.from_file |> Game.Character.from_json)
+       ("data" ^ Filename.dir_sep ^ "larry.json"
+       |> Yojson.Basic.from_file |> Game.Character.from_json))
 
 let () = main ()
 let () = interactive ()
