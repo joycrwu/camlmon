@@ -10,14 +10,14 @@
             "description": "Releases a lightning bolt that deals 10 damage."
         },
         {
-            "name": "Thunderbolt",
-            "effect": 10,
-            "description": "Releases a lightning bolt that deals 10 damage."
+            "name": "Fireball",
+            "effect": 11,
+            "description": "Releases a fireball that deals 11 damage."
         },
         {
-            "name": "Thunderbolt",
-            "effect": 10,
-            "description": "Releases a lightning bolt that deals 10 damage."
+            "name": "Ice Chain",
+            "effect": 9,
+            "description": "Releases a chain of ice that deals 9.87 damage, rounded down."
         }
     ]
 }

@@ -1,2 +1,1 @@
-(* TODO: set the value below, then delete this TODO comment. *)
-let hours_worked = 3
+let hours_worked = [ 8; 0; 0; 0 ]
