@@ -3,6 +3,7 @@ open Character
 type command =
   | Run
   | Attack of int
+  | Invalid_input
 
 exception Invalid_input
 
@@ -13,4 +14,4 @@ let input (bat : Battle.t) (character : Character.t) =
   | '2' -> Attack (Character.get_action_effect character 1)
   | '3' -> Attack (Character.get_action_effect character 2)
   | 'r' -> Run
-  | _ -> raise Invalid_input
+  | _ -> Invalid_input
