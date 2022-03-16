@@ -1,4 +1,8 @@
+open String
+open Yojson.Basic.Util
+
 type t = {
+  level_id : string;
   start_tile : int * int;
   characterid : string;
   enemylist : string list;

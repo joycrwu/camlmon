@@ -7,7 +7,7 @@ let flush_kp () =
   done
 
 let main () =
-  Graphics.open_graph "";
+  Graphics.open_graph " 1500 x 1500";
   set_window_title "Title";
   Graphics.set_text_size 300;
   Graphics.moveto 50 500;
@@ -18,7 +18,7 @@ let main () =
     https://stackoverflow.com/questions/36263152/simple-ocaml-graphics-progam-that-close-before-its-window-is-displayed*)
 let rec interactive () =
   let event = wait_next_event [ Key_pressed ] in
-  if event.key == 'q' then exit 0 else print_char event.key;
+  if event.key == 'p' then exit 0 else print_char event.key;
   Graphics.clear_graph ();
   Graphics.auto_synchronize true;
   interactive ()
