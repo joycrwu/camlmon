@@ -44,4 +44,4 @@ let character bat = bat.character
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)
-let wonbattle bat = raise (Failure "Unimplemented")
+let wonbattle bat = if bat.enemy_hp = 0 then true else false
