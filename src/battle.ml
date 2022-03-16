@@ -47,4 +47,4 @@ let damage bat = raise (Failure "Unimplemented")
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)
-let wonbattle bat = if bat.enemy_hp = 0 then true else false
+let wonbattle bat = if bat.character_hp = 0 then true else false
