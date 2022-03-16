@@ -7,16 +7,9 @@ let flush_kp () =
     ()
   done
 
-let main () =
-  Graphics.open_graph " 1500 x 1500";
-  set_window_title "Title";
-  Graphics.set_text_size 300;
-  Graphics.moveto 50 500;
-  Graphics.draw_string "Yo";
-  Graphics.draw_circle 50 50 10
-
 (** this code was copied from stackoverflow
     https://stackoverflow.com/questions/36263152/simple-ocaml-graphics-progam-that-close-before-its-window-is-displayed*)
+
 let rec interactive () =
   let event = wait_next_event [ Key_pressed ] in
   if event.key == 'p' then exit 0 else print_char event.key;
@@ -26,13 +19,19 @@ let rec interactive () =
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 
-let () = main ()
-let () = interactive ()
-let () = flush_kp ()
+let victory_text () =
+  Graphics.open_graph "";
+  set_window_title "Victory";
+  Graphics.set_text_size 100;
+  Graphics.moveto 50 50;
+  Graphics.draw_string "Poggers!"
+
+let exit_battle (bat : Battle.t) =
+  if Game.Battle.wonbattle bat then victory_text ()
 
 let rec wait (bat : Battle.t) =
   flush_kp ();
-  Graphics.moveto 0 0;
+  Graphics.moveto 50 50;
   Graphics.draw_string (string_of_int bat.character_hp);
   Graphics.moveto 10 10;
   Graphics.draw_string (string_of_int bat.enemy_hp);
@@ -43,12 +42,20 @@ let rec wait (bat : Battle.t) =
   | Run -> wait bat
   | Invalid_input -> wait bat
 
-let victory_text () =
-  Graphics.open_graph "";
-  set_window_title "Victory";
-  Graphics.set_text_size 100;
-  Graphics.moveto 50 500;
-  Graphics.draw_string "Poggers!"
+let main () =
+  Graphics.open_graph " 1500 x 1500";
+  set_window_title "Title";
+  Graphics.set_text_size 300;
+  Graphics.moveto 50 50;
+  Graphics.draw_string "Yo";
+  Graphics.draw_circle 50 50 10;
+  wait
+    (Game.Battle.init_battle
+       ("data/larry.json" |> Yojson.Basic.from_file
+      |> Game.Character.from_json)
+       ("data/larry.json" |> Yojson.Basic.from_file
+      |> Game.Character.from_json))
 
-let exit_battle (bat : Battle.t) =
-  if Game.Battle.wonbattle bat then victory_text ()
+let () = main ()
+let () = interactive ()
+let () = flush_kp ()
