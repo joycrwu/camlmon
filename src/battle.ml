@@ -40,7 +40,6 @@ let enemy_turn bat e_action_eff =
   }
 
 let damage bat = raise (Failure "Unimplemented")
-let character bat = bat.character
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)
