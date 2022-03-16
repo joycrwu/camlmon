@@ -1,4 +1,5 @@
 open Graphics
+open Game
 
 let flush_kp () =
   while key_pressed () do
@@ -28,3 +29,25 @@ let rec interactive () =
 let () = main ()
 let () = interactive ()
 let () = flush_kp ()
+
+let rec wait (bat : Battle.t) =
+  let character = Game.Battle.character bat in
+  let player_input = Game.Command.input bat character in
+  match player_input with
+  | Attack x -> Game.Battle.character_turn bat x
+  | Run ->
+      flush_kp ();
+      wait bat
+  | Invalid_input ->
+      flush_kp ();
+      wait bat
+
+let victory_text () =
+  Graphics.open_graph "";
+  set_window_title "Victory";
+  Graphics.set_text_size 100;
+  Graphics.moveto 50 500;
+  Graphics.draw_string "Poggers!"
+
+let exit_battle (bat : Battle.t) =
+  if Game.Battle.wonbattle bat then victory_text ()
