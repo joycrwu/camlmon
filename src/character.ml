@@ -19,7 +19,7 @@ type t = {
 let get_action_json json =
   {
     name = json |> member "name" |> to_string;
-    effect = json |> member "name" |> to_int;
+    effect = json |> member "effect" |> to_int;
   }
 
 let from_json json =

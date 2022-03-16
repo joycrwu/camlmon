@@ -3,9 +3,17 @@ open Character
 type t = {
   character : Character.t;
   character_hp : int;
-  enemy : string;
+  enemy : Character.t;
   enemy_hp : int;
 }
+
+let init_battle (character : Character.t) (enemy : Character.t) =
+  {
+    character;
+    character_hp = Character.get_hp character;
+    enemy;
+    enemy_hp = Character.get_hp enemy;
+  }
 
 let character_turn bat c_action_eff =
   {
