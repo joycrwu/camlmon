@@ -1,3 +1,5 @@
+open Character
+
 type t = {
   character : Character.t;
   character_hp : int;
