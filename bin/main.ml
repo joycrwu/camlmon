@@ -1,5 +1,11 @@
 open Graphics
 
+let flush_kp () =
+  while key_pressed () do
+    let _ = read_key () in
+    ()
+  done
+
 let main () =
   Graphics.open_graph "";
   set_window_title "Title";
@@ -17,14 +23,7 @@ let rec interactive () =
   Graphics.auto_synchronize true;
   interactive ()
 
-(* flush_kp : unit -> unit *)
-
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
-let flush_kp () =
-  while key_pressed () do
-    let _ = read_key () in
-    ()
-  done
 
 let () = main ()
 let () = interactive ()
