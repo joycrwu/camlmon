@@ -25,5 +25,8 @@ val get_atk : t -> int
 val get_affinity : t -> string
 (** [get_affinity c] is the affinity of the character [c].*)
 
+val get_action : t -> int -> string
+(** [get_action c n] is the action name of the [n]th ability of the character [c].*)
+
 val get_action_effect : t -> int -> int
 (** [get_action_effect c n] is the effect int of the [n]th ability of the character [c].*)

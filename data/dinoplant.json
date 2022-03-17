@@ -1,8 +1,8 @@
 {
-    "id": "Larry",
+    "id": "Dinoplant",
     "hp": 100,
     "attack": 50,
-    "affinity": "Cascadilla Hall",
+    "affinity": "Grass",
     "actions": [
         {
             "name": "Thunderbolt",
