@@ -18,6 +18,7 @@ let init_battle (character : Character.t) (enemy : Character.t) =
 let character_hp bat = bat.character_hp
 let enemy_hp bat = bat.enemy_hp
 let character bat = bat.character
+let enemy bat = bat.enemy
 
 let character_turn bat c_action_eff =
   {

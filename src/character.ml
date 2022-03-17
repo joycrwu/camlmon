@@ -38,6 +38,7 @@ let get_id character = character.id
 let get_hp character = character.hp
 let get_atk character = character.atk
 let get_affinity character = character.affinity
+let get_action character which = (List.nth character.actions which).name
 
 let get_action_effect character which =
   (List.nth character.actions which).effect
