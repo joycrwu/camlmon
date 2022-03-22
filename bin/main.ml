@@ -38,6 +38,8 @@ let draw_battle_text bat () =
     ^ Game.Character.get_action (Game.Battle.character bat) 2);
   Graphics.moveto 400 50;
   Graphics.draw_string "Press r to run!";
+  Graphics.moveto 400 20;
+  Graphics.draw_string "Press q to quit";
   Graphics.moveto 450 370;
   Graphics.draw_string
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id));
@@ -49,7 +51,13 @@ let draw_battle_text bat () =
   Graphics.draw_string
     ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
 
-let draw_failed_run () = Graphics.set_color (rgb 255 255 0)
+let draw_failed_run () =
+  Graphics.set_color (rgb 100 100 0);
+  Graphics.fill_rect 0 0 600 500;
+  Graphics.set_color (rgb 0 0 255);
+  Graphics.set_text_size 10000000;
+  Graphics.moveto 250 200;
+  Graphics.draw_string "You failed to run away"
 
 let victory_text () =
   Graphics.open_graph "";
@@ -61,7 +69,19 @@ let victory_text () =
   Graphics.moveto 250 200;
   Graphics.draw_string "Poggers!"
 
-let exit_battle bat = if Game.Battle.wonbattle bat then victory_text ()
+let lose_text () =
+  Graphics.open_graph "";
+  set_window_title "Game Over";
+  Graphics.set_color (rgb 255 0 0);
+  Graphics.fill_rect 0 0 600 500;
+  Graphics.set_color (rgb 0 0 255);
+  Graphics.set_text_size 10000000;
+  Graphics.moveto 250 200;
+  Graphics.draw_string "Sadge D:"
+
+let exit_battle bat =
+  if Game.Battle.wonbattle bat then victory_text ()
+  else if Game.Battle.losebattle bat then lose_text ()
 
 let rec wait (bat : Battle.t) =
   Graphics.clear_graph ();
@@ -69,12 +89,14 @@ let rec wait (bat : Battle.t) =
   flush_kp ();
   draw_battle_text bat ();
   let character = Game.Battle.character bat in
+  let enemy = Game.Battle.enemy bat in
   let player_input = Game.Command.input bat character in
   match player_input with
   | Attack x ->
       bat
       |> Game.Battle.character_turn x
-      |> Game.Battle.enemy_turn (Random.int 3)
+      |> Game.Battle.enemy_turn
+           (Game.Character.get_action_effect enemy (Random.int 3))
       |> wait
   | Run ->
       if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat then
@@ -85,7 +107,11 @@ let rec wait (bat : Battle.t) =
         then exit 0
         else (
           draw_failed_run ();
-          bat |> Game.Battle.enemy_turn (Random.int 3) |> wait)
+          bat
+          |> Game.Battle.enemy_turn
+               (Game.Character.get_action_effect enemy (Random.int 3))
+          |> wait)
+  | Exit -> exit 0
   | Invalid_input -> wait bat
 
 let charArray =

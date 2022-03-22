@@ -18,3 +18,4 @@ val enemy_turn : int -> t -> t
 
 val damage : 'a -> 'b
 val wonbattle : t -> bool
+val losebattle : t -> bool

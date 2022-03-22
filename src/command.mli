@@ -2,8 +2,9 @@
 
 (** The type [command] represents a player's command. *)
 type command =
-  | Run
   | Attack of int
+  | Run
+  | Exit
   | Invalid_input
 
 val input : Battle.t -> Character.t -> command
