@@ -19,29 +19,7 @@ let rec interactive () =
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 
-let victory_text () =
-  Graphics.open_graph "";
-  set_window_title "Victory";
-  Graphics.set_color (rgb 255 255 0);
-  Graphics.fill_rect 0 0 600 500;
-  Graphics.set_color (rgb 0 0 255);
-  Graphics.set_text_size 10000000;
-  Graphics.moveto 250 200;
-  Graphics.draw_string "Poggers!";
-  Graphics.sound 740 500;
-  Graphics.sound 622 500;
-  Graphics.sound 659 500;
-  Graphics.sound 988 500;
-  Graphics.sound 932 500;
-  Graphics.sound 988 500
-
-let exit_battle (bat : Battle.t) =
-  if Game.Battle.wonbattle bat then victory_text ()
-
-let rec wait (bat : Battle.t) =
-  Graphics.clear_graph ();
-  exit_battle bat;
-  flush_kp ();
+let draw_battle_text bat () =
   Graphics.set_color (rgb 0 0 0);
   Graphics.moveto 50 70;
   Graphics.draw_string
@@ -69,12 +47,33 @@ let rec wait (bat : Battle.t) =
     ("HP: " ^ string_of_int (Game.Battle.character_hp bat));
   Graphics.moveto 450 350;
   Graphics.draw_string
-    ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat));
+    ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
 
+let victory_text () =
+  Graphics.open_graph "";
+  set_window_title "Victory";
+  Graphics.set_color (rgb 255 255 0);
+  Graphics.fill_rect 0 0 600 500;
+  Graphics.set_color (rgb 0 0 255);
+  Graphics.set_text_size 10000000;
+  Graphics.moveto 250 200;
+  Graphics.draw_string "Poggers!"
+
+let exit_battle bat = if Game.Battle.wonbattle bat then victory_text ()
+
+let rec wait (bat : Battle.t) =
+  Graphics.clear_graph ();
+  exit_battle bat;
+  flush_kp ();
+  draw_battle_text bat ();
   let character = Game.Battle.character bat in
   let player_input = Game.Command.input bat character in
   match player_input with
-  | Attack x -> wait (Game.Battle.character_turn bat x)
+  | Attack x ->
+      bat
+      |> Game.Battle.character_turn x
+      |> Game.Battle.enemy_turn (Random.int 3)
+      |> wait
   | Run -> exit 0
   | Invalid_input -> wait bat
 

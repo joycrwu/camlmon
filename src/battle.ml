@@ -20,7 +20,7 @@ let enemy_hp bat = bat.enemy_hp
 let character bat = bat.character
 let enemy bat = bat.enemy
 
-let character_turn bat c_action_eff =
+let character_turn c_action_eff bat =
   {
     character = bat.character;
     character_hp =
@@ -32,7 +32,7 @@ let character_turn bat c_action_eff =
       else bat.enemy_hp);
   }
 
-let enemy_turn bat e_action_eff =
+let enemy_turn e_action_eff bat =
   {
     character = bat.character;
     character_hp =
@@ -48,4 +48,4 @@ let damage bat = raise (Failure "Unimplemented")
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)
-let wonbattle bat = if bat.enemy_hp <= 0 then true else false
+let wonbattle bat = bat.enemy_hp <= 0

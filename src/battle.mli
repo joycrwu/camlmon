@@ -10,10 +10,10 @@ val enemy_hp : t -> int
 val character : t -> Character.t
 val enemy : t -> Character.t
 
-val character_turn : t -> int -> t
+val character_turn : int -> t -> t
 (** [character_turn b] is the character turn in battle [b]*)
 
-val enemy_turn : t -> int -> t
+val enemy_turn : int -> t -> t
 (** [enemy_turn b] is the enemy turn in battle [b]*)
 
 val damage : 'a -> 'b
