@@ -24,11 +24,14 @@ let character_turn c_action_eff bat =
   {
     character = bat.character;
     character_hp =
-      (if c_action_eff < 0 then bat.character_hp - c_action_eff
+      (if c_action_eff < 0 then
+       bat.character_hp
+       - (Character.get_atk bat.character * c_action_eff)
       else bat.character_hp);
     enemy = bat.enemy;
     enemy_hp =
-      (if c_action_eff > 0 then bat.enemy_hp - c_action_eff
+      (if c_action_eff > 0 then
+       bat.enemy_hp - (Character.get_atk bat.character * c_action_eff)
       else bat.enemy_hp);
   }
 
@@ -36,11 +39,13 @@ let enemy_turn e_action_eff bat =
   {
     character = bat.character;
     character_hp =
-      (if e_action_eff > 0 then bat.character_hp - e_action_eff
+      (if e_action_eff > 0 then
+       bat.character_hp - (Character.get_atk bat.enemy * e_action_eff)
       else bat.character_hp);
     enemy = bat.enemy;
     enemy_hp =
-      (if e_action_eff < 0 then bat.enemy_hp - e_action_eff
+      (if e_action_eff < 0 then
+       bat.enemy_hp - (Character.get_atk bat.enemy * e_action_eff)
       else bat.enemy_hp);
   }
 

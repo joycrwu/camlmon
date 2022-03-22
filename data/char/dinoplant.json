@@ -1,22 +1,22 @@
 {
     "id": "Dinoplant",
     "hp": 100,
-    "attack": 50,
+    "attack": 5,
     "affinity": "Grass",
     "actions": [
         {
             "name": "Thunderbolt",
-            "effect": 10,
+            "effect": 2,
             "description": "Releases a lightning bolt that deals 10 damage."
         },
         {
             "name": "Fireball",
-            "effect": 11,
+            "effect": 3,
             "description": "Releases a fireball that deals 11 damage."
         },
         {
             "name": "Ice Chain",
-            "effect": 9,
+            "effect": 1,
             "description": "Releases a chain of ice that deals 9.87 damage, rounded down."
         }
     ]

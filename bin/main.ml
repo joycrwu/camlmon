@@ -1,6 +1,8 @@
 open Graphics
 open Game
 
+let _ = Random.self_init ()
+
 let flush_kp () =
   while key_pressed () do
     let _ = read_key () in
@@ -51,7 +53,9 @@ let draw_battle_text bat () =
   Graphics.draw_string
     ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
 
+(** not currently functional*)
 let draw_failed_run () =
+  Graphics.open_graph "";
   Graphics.set_color (rgb 100 100 0);
   Graphics.fill_rect 0 0 600 500;
   Graphics.set_color (rgb 0 0 255);
@@ -62,7 +66,7 @@ let draw_failed_run () =
 let victory_text () =
   Graphics.open_graph "";
   set_window_title "Victory";
-  Graphics.set_color (rgb 255 255 0);
+  Graphics.set_color (rgb 0 255 0);
   Graphics.fill_rect 0 0 600 500;
   Graphics.set_color (rgb 0 0 255);
   Graphics.set_text_size 10000000;
@@ -101,23 +105,32 @@ let rec wait (bat : Battle.t) =
   | Run ->
       if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat then
         if Random.bool () then exit 0
-        else if
-          Random.int 100
-          < Game.Battle.character_hp bat - Game.Battle.enemy_hp bat + 50
-        then exit 0
         else (
           draw_failed_run ();
           bat
           |> Game.Battle.enemy_turn
                (Game.Character.get_action_effect enemy (Random.int 3))
           |> wait)
+      else if
+        Random.int 100
+        < Game.Battle.character_hp bat - Game.Battle.enemy_hp bat + 50
+      then exit 0
+      else (
+        draw_failed_run ();
+        bat
+        |> Game.Battle.enemy_turn
+             (Game.Character.get_action_effect enemy (Random.int 3))
+        |> wait)
   | Exit -> exit 0
   | Invalid_input -> wait bat
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
-let randomChar =
+let randomChar1 =
+  charArray |> Array.length |> Random.int |> Array.get charArray
+
+let randomChar2 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
 let main () =
@@ -126,10 +139,10 @@ let main () =
   let bat =
     Game.Battle.init_battle
       ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-       ^ randomChar
+       ^ randomChar1
       |> Yojson.Basic.from_file |> Game.Character.from_json)
       ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-       ^ randomChar
+       ^ randomChar2
       |> Yojson.Basic.from_file |> Game.Character.from_json)
   in
   wait bat
