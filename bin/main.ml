@@ -49,6 +49,8 @@ let draw_battle_text bat () =
   Graphics.draw_string
     ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
 
+let draw_failed_run () = Graphics.set_color (rgb 255 255 0)
+
 let victory_text () =
   Graphics.open_graph "";
   set_window_title "Victory";
@@ -74,17 +76,34 @@ let rec wait (bat : Battle.t) =
       |> Game.Battle.character_turn x
       |> Game.Battle.enemy_turn (Random.int 3)
       |> wait
-  | Run -> exit 0
+  | Run ->
+      if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat then
+        if Random.bool () then exit 0
+        else if
+          Random.int 100
+          < Game.Battle.character_hp bat - Game.Battle.enemy_hp bat + 50
+        then exit 0
+        else (
+          draw_failed_run ();
+          bat |> Game.Battle.enemy_turn (Random.int 3) |> wait)
   | Invalid_input -> wait bat
+
+let charArray =
+  Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
+
+let randomChar =
+  charArray |> Array.length |> Random.int |> Array.get charArray
 
 let main () =
   Graphics.open_graph " 1500 x 1500";
   set_window_title "Title";
   let bat =
     Game.Battle.init_battle
-      ("data" ^ Filename.dir_sep ^ "larry.json"
+      ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+       ^ randomChar
       |> Yojson.Basic.from_file |> Game.Character.from_json)
-      ("data" ^ Filename.dir_sep ^ "dinoplant.json"
+      ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+       ^ randomChar
       |> Yojson.Basic.from_file |> Game.Character.from_json)
   in
   wait bat
