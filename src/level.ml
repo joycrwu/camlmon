@@ -1,5 +1,17 @@
 open String
 open Yojson.Basic.Util
+open Character
+
+type direction =
+  | Left
+  | Right
+  | Up
+  | Down
+
+type action =
+  | Move of direction
+  | Fight
+  | Heal
 
 type t = {
   level_id : string;
@@ -8,8 +20,7 @@ type t = {
   enemylist : string list;
 }
 
-let currentlvl_character (lvl : t) = raise (Failure "Unimplemented")
-let get_characterid (lvl : t) = raise (Failure "Unimplemented")
-let start_location (lvl : t) = raise (Failure "Unimplemented")
-let get_map (lvl : t) = raise (Failure "Unimplemented")
-let get_health (lvl : t) = raise (Failure "Unimplemented")
+let currentlvl_character (lvl : t) = lvl.characterid
+let get_characterid (lvl : t) = lvl.characterid
+let start_location (lvl : t) = lvl.start_tile
+let get_map (lvl : t) = lvl.level_id

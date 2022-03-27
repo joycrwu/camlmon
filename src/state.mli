@@ -13,6 +13,7 @@ val current_tile_id : t -> int * int
     adventurer currently is located in state [st]. Location is
     represented in coordinate form, where int * int is (x * y) *)
 
-val fought : t -> string list
+val fought : t -> string -> t
 (** [fought st] is the list of all the character ids that the user has
-    fought *)
+    fought. Adds [ene], which is the id of the enemy the character has
+    fought against. Does not check wins*)

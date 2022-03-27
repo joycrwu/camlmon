@@ -3,7 +3,7 @@ open Character
 open Battle
 
 type t = {
-  character_id : Character.t;
+  character : Character.t;
   map_id : string;
   health : int;
   inbattle : bool;
@@ -17,7 +17,7 @@ let current_character st = raise (Failure "Unimplemented")
 let init_state (lvl : Level.t) =
   let t =
     {
-      character_id = current_character lvl;
+      character = current_character lvl;
       map_id = get_map lvl;
       health = get_health lvl;
       inbattle = false;
@@ -28,6 +28,19 @@ let init_state (lvl : Level.t) =
   in
   t
 
-let fought st = raise (Failure "Unimplemented")
+let fought (st : t) ene =
+  let t =
+    {
+      character = st.character;
+      map_id = st.map_id;
+      health = st.health;
+      inbattle = false;
+      location = st.location;
+      alive = true;
+      fought = ene :: st.fought;
+    }
+  in
+  t
+
 let health st = raise (Failure "Unimplemented")
 let current_tile_id st = raise (Failure "Unimplemented")
