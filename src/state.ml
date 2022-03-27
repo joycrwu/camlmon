@@ -2,6 +2,17 @@ open Level
 open Character
 open Battle
 
+type direction =
+  | Left
+  | Right
+  | Up
+  | Down
+
+type action =
+  | Move of direction
+  | Fight
+  | Heal
+
 type t = {
   character : Character.t;
   map_id : string;
