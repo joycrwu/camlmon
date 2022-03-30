@@ -20,33 +20,53 @@ let rec interactive () =
   interactive ()
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
+let bottom_bar () =
+  Graphics.open_graph "";
+  Graphics.set_color (rgb 230 251 255);
+  Graphics.fill_rect 0 90 600 490;
+
+  Graphics.set_color (rgb 255 186 82);
+  Graphics.fill_ellipse 150 95 140 60;
+
+  Graphics.set_color (rgb 255 186 82);
+  Graphics.fill_ellipse 460 270 140 60;
+
+  Graphics.set_color (rgb 128 170 255);
+  Graphics.fill_rect 0 0 600 90;
+  Graphics.set_color (rgb 179 242 255);
+  Graphics.fill_rect 10 5 280 80;
+  Graphics.set_color (rgb 179 242 255);
+  Graphics.fill_rect 310 5 280 80;
+
+  Graphics.set_color (rgb 0 0 0)
 
 let draw_battle_text bat () =
   Graphics.set_color (rgb 0 0 0);
-  Graphics.moveto 50 70;
+  bottom_bar ();
+  Graphics.moveto 50 100;
   Graphics.draw_string
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id));
-  Graphics.moveto 400 140;
+  Graphics.moveto 315 60;
   Graphics.draw_string
     ("Press 1 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 0);
-  Graphics.moveto 400 110;
+  Graphics.moveto 315 40;
   Graphics.draw_string
     ("Press 2 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 1);
-  Graphics.moveto 400 80;
+  Graphics.moveto 315 20;
   Graphics.draw_string
     ("Press 3 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 2);
-  Graphics.moveto 400 50;
+  Graphics.moveto 485 55;
   Graphics.draw_string "Press r to run!";
-  Graphics.moveto 400 20;
+  Graphics.moveto 485 25;
   Graphics.draw_string "Press q to quit";
   Graphics.moveto 450 370;
   Graphics.draw_string
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id));
   Graphics.set_color (rgb 255 0 0);
-  Graphics.moveto 50 50;
+  Graphics.moveto 50 90;
   Graphics.draw_string
     ("HP: " ^ string_of_int (Game.Battle.character_hp bat));
   Graphics.moveto 450 350;
@@ -82,10 +102,6 @@ let lose_text () =
   Graphics.set_text_size 10000000;
   Graphics.moveto 250 200;
   Graphics.draw_string "Sadge D:"
-
-let health_bar () =
-  Graphics.open_graph "";
-  Graphics.set_color (rgb 255 0 0)
 
 let exit_battle bat =
   if Game.Battle.wonbattle bat then victory_text ()
