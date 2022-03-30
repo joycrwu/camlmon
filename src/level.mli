@@ -21,5 +21,6 @@ val get_map : t -> string
 (** [get_map st] is the list of all the character ids that the user has
     fought *)
 
+val get_tile : int -> int -> t -> tile
 val init_lvl : int -> int -> t
 val draw_lvl : t -> unit

@@ -166,7 +166,7 @@ let randomChar2 =
 let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
-let main2 () =
+let battle_start () =
   Graphics.open_graph " 1500 x 1500";
   set_window_title "Battle";
   let bat =
@@ -198,27 +198,51 @@ let rec map_wait st lvl =
   Game.Level.draw_lvl lvl;
   let location = Game.State.current_tile_id st in
   Graphics.set_color red;
-  Graphics.draw_circle (fst location) (snd location) 5;
+  Graphics.fill_circle (fst location) (snd location) 5;
   let player_input = Graphics.read_key in
   match Game.Command.map_input (player_input ()) with
-  | Up ->
+  | Up -> (
       let x = fst location in
       let y = snd location + 10 in
-      map_wait (Game.State.move st x y) lvl
-  | Down ->
+      match Game.Level.get_tile (x / 10) (y / 10) lvl with
+      | Grass -> map_wait (Game.State.move st x y) lvl
+      | Water ->
+          map_wait
+            (Game.State.move st (fst location) (snd location))
+            lvl
+      | Road -> map_wait (Game.State.move st x y) lvl)
+  | Down -> (
       let x = fst location in
       let y = snd location - 10 in
-      map_wait (Game.State.move st x y) lvl
-  | Left ->
+      match Game.Level.get_tile (x / 10) (y / 10) lvl with
+      | Grass -> map_wait (Game.State.move st x y) lvl
+      | Water ->
+          map_wait
+            (Game.State.move st (fst location) (snd location))
+            lvl
+      | Road -> map_wait (Game.State.move st x y) lvl)
+  | Left -> (
       let x = fst location - 10 in
       let y = snd location in
-      map_wait (Game.State.move st x y) lvl
-  | Right ->
+      match Game.Level.get_tile (x / 10) (y / 10) lvl with
+      | Grass -> map_wait (Game.State.move st x y) lvl
+      | Water ->
+          map_wait
+            (Game.State.move st (fst location) (snd location))
+            lvl
+      | Road -> map_wait (Game.State.move st x y) lvl)
+  | Right -> (
       let x = fst location + 10 in
       let y = snd location in
-      map_wait (Game.State.move st x y) lvl
+      match Game.Level.get_tile (x / 10) (y / 10) lvl with
+      | Grass -> map_wait (Game.State.move st x y) lvl
+      | Water ->
+          map_wait
+            (Game.State.move st (fst location) (snd location))
+            lvl
+      | Road -> map_wait (Game.State.move st x y) lvl)
   | Exit -> exit 0
-  | Invalid_input -> map_wait st lvl
+  | Invalid_input -> battle_start
 
 let main () =
   Graphics.open_graph " 1500 x 1500";
@@ -231,6 +255,6 @@ let main () =
   in
   map_wait (Game.State.init_state lvl c) lvl
 
-let () = main ()
+let () = main () ()
 let () = interactive ()
 let () = flush_kp ()

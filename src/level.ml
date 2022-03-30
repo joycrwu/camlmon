@@ -34,7 +34,9 @@ let get_map lvl = lvl.level_id
 let create_grid width height =
   Array.init width (fun _ ->
       Array.init height (fun _ ->
-          if Random.bool () then Grass else Water))
+          if Random.bool () then Road
+          else if Random.bool () then Water
+          else Grass))
 
 let init_lvl width height =
   { grid = create_grid width height; level_id = "test"; width; height }
@@ -48,15 +50,15 @@ let draw_lvl lvl =
       match get_tile i j lvl with
       | Grass ->
           Graphics.set_color green;
-          Graphics.draw_rect (i * tile_width) (j * tile_width)
+          Graphics.fill_rect (i * tile_width) (j * tile_width)
             tile_width tile_height
       | Water ->
           Graphics.set_color blue;
-          Graphics.draw_rect (i * tile_width) (j * tile_width)
+          Graphics.fill_rect (i * tile_width) (j * tile_width)
             tile_width tile_height
       | Road ->
           Graphics.set_color white;
-          Graphics.draw_rect (i * tile_width) (j * tile_width)
+          Graphics.fill_rect (i * tile_width) (j * tile_width)
             tile_width tile_height
     done
   done
