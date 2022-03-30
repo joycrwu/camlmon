@@ -4,7 +4,7 @@ open Team
 type t = {
   character : Character.t;
   character_hp : int;
-  team : string list;
+  team : Character.t list;
   enemy : Character.t;
   enemy_hp : int;
 }
@@ -12,7 +12,7 @@ type t = {
 let init_battle
     (character : Character.t)
     (enemy : Character.t)
-    (team : string list) =
+    (team : Character.t list) =
   {
     character;
     character_hp = Character.get_hp character;
@@ -27,14 +27,22 @@ let character bat = bat.character
 let enemy bat = bat.enemy
 let team bat = bat.team
 
+let rec character_cycle team c =
+  match team with
+  | h :: t -> if h = c then List.hd t else character_cycle t c
+  | _ -> c
+
 let character_turn c_action_eff bat =
   {
-    character = bat.character;
+    character = character_cycle bat.team bat.character;
     character_hp =
       (if c_action_eff < 0 then
        bat.character_hp
        - Character.get_atk bat.character
-         * (Team.partner_check bat.character bat.team + c_action_eff)
+         * ((Team.partner_check bat.character
+               (List.map (fun x -> Character.get_id x) bat.team)
+            + c_action_eff)
+           / 2)
       else bat.character_hp);
     team = bat.team;
     enemy = bat.enemy;
@@ -42,7 +50,9 @@ let character_turn c_action_eff bat =
       (if c_action_eff > 0 then
        bat.enemy_hp
        - Character.get_atk bat.character
-         * (Team.partner_check bat.character bat.team + c_action_eff)
+         * (Team.partner_check bat.character
+              (List.map (fun x -> Character.get_id x) bat.team)
+           + c_action_eff)
       else bat.enemy_hp);
   }
 

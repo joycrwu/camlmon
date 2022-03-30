@@ -54,7 +54,10 @@ let draw_battle_text bat () =
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id));
   Graphics.moveto 50 370;
   Graphics.draw_string
-    ("Team: " ^ (bat |> Game.Battle.team |> print_list));
+    ("Team: "
+    ^ (bat |> Game.Battle.team
+      |> List.map (fun x -> Game.Character.get_id x)
+      |> print_list));
   Graphics.moveto 400 140;
   Graphics.moveto 315 60;
   Graphics.draw_string
@@ -178,16 +181,14 @@ let battle_start () =
        ^ randomChar2
       |> Yojson.Basic.from_file |> Game.Character.from_json)
       ([
-         Character.get_id
-           ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-            ^ randomChar1
-           |> Yojson.Basic.from_file |> Game.Character.from_json);
+         "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+         ^ randomChar1
+         |> Yojson.Basic.from_file |> Game.Character.from_json;
        ]
       @ [
-          Character.get_id
-            ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-             ^ randomChar3
-            |> Yojson.Basic.from_file |> Game.Character.from_json);
+          "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+          ^ randomChar3
+          |> Yojson.Basic.from_file |> Game.Character.from_json;
         ])
   in
   wait bat
