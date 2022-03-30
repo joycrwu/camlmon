@@ -40,6 +40,16 @@ let bottom_bar () =
 
   Graphics.set_color (rgb 0 0 0)
 
+let health_bar_ally () =
+  (* Graphics.open_graph ""; *)
+  Graphics.set_color (rgb 0 0 0);
+  Graphics.fill_rect 50 115 100 10
+
+let health_bar_enemy () =
+  (* Graphics.open_graph ""; *)
+  Graphics.set_color (rgb 0 0 0);
+  Graphics.fill_rect 450 390 100 10
+
 let rec print_list (list : string list) =
   match list with
   | h :: t ->
@@ -49,6 +59,8 @@ let rec print_list (list : string list) =
 let draw_battle_text bat () =
   Graphics.set_color (rgb 0 0 0);
   bottom_bar ();
+  health_bar_ally ();
+  health_bar_enemy ();
   Graphics.moveto 50 100;
   Graphics.draw_string
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id));
