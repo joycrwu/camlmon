@@ -1,4 +1,7 @@
-open Character
+type tile =
+  | Grass
+  | Water
+  | Road
 
 type t
 (** The abstract type of values representing the map of a level. *)
@@ -17,3 +20,6 @@ val start_location : t -> int * int
 val get_map : t -> string
 (** [get_map st] is the list of all the character ids that the user has
     fought *)
+
+val init_lvl : int -> int -> t
+val draw_lvl : t -> unit

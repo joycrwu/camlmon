@@ -1,14 +1,33 @@
 open Character
+open Graphics
 
-type command =
+exception Invalid_input
+
+type map_command =
+  | Up
+  | Down
+  | Left
+  | Right
+  | Exit
+  | Invalid_input
+
+let map_input =
+  let k = Graphics.read_key () in
+  match k with
+  | 'w' -> Up
+  | 's' -> Down
+  | 'a' -> Left
+  | 'd' -> Right
+  | 'q' -> Exit
+  | _ -> Invalid_input
+
+type battle_command =
   | Attack of int
   | Run
   | Exit
   | Invalid_input
 
-exception Invalid_input
-
-let input (bat : Battle.t) (character : Character.t) =
+let battle_input (bat : Battle.t) (character : Character.t) =
   let k = Graphics.read_key () in
   match k with
   | '1' -> Attack (Character.get_action_effect character 0)

@@ -17,3 +17,5 @@ val fought : t -> string -> t
 (** [fought st] is the list of all the character ids that the user has
     fought. Adds [ene], which is the id of the enemy the character has
     fought against. Does not check wins*)
+
+val move : t -> int -> int -> t

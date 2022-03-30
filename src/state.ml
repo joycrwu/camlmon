@@ -54,4 +54,15 @@ let fought (st : t) ene =
   t
 
 let health st = raise (Failure "Unimplemented")
-let current_tile_id st = raise (Failure "Unimplemented")
+let current_tile_id st = st.location
+
+let move st x y =
+  {
+    character = st.character;
+    map_id = st.map_id;
+    health = st.health;
+    inbattle = st.inbattle;
+    location = (x, y);
+    alive = st.alive;
+    fought = st.fought;
+  }
