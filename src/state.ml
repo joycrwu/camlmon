@@ -23,12 +23,10 @@ type t = {
   fought : string list;
 }
 
-let current_character st = raise (Failure "Unimplemented")
-
-let init_state (lvl : Level.t) =
+let init_state (lvl : Level.t) character =
   let t =
     {
-      character = current_character lvl;
+      character;
       map_id = get_map lvl;
       health = 0;
       inbattle = false;

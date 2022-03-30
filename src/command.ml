@@ -11,8 +11,7 @@ type map_command =
   | Exit
   | Invalid_input
 
-let map_input =
-  let k = Graphics.read_key () in
+let map_input k =
   match k with
   | 'w' -> Up
   | 's' -> Down
@@ -27,8 +26,7 @@ type battle_command =
   | Exit
   | Invalid_input
 
-let battle_input (bat : Battle.t) (character : Character.t) =
-  let k = Graphics.read_key () in
+let battle_input (bat : Battle.t) (character : Character.t) k =
   match k with
   | '1' -> Attack (Character.get_action_effect character 0)
   | '2' -> Attack (Character.get_action_effect character 1)

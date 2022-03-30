@@ -3,7 +3,7 @@ open Level
 type t
 (** The abstract type of values representing the game state. *)
 
-val init_state : Level.t -> t
+val init_state : Level.t -> Character.t -> t
 (** [init_state a] is the initial state of the game when playing on a
     level [a]. In that state the character is currently located in the
     starting tile, and they have visited only that tile. *)

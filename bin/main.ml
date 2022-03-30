@@ -124,8 +124,8 @@ let rec wait (bat : Battle.t) =
   draw_battle_text bat ();
   let character = Game.Battle.character bat in
   let enemy = Game.Battle.enemy bat in
-  let player_input = Game.Command.battle_input bat character in
-  match player_input with
+  let player_input = Graphics.read_key in
+  match Game.Command.battle_input bat character (player_input ()) with
   | Attack x ->
       bat
       |> Game.Battle.character_turn x
@@ -163,14 +163,10 @@ let randomChar1 =
 let randomChar2 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
-<<<<<<< HEAD
-let main2 () =
-=======
 let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
-let main () =
->>>>>>> 867ed0fd012c3898035e9b40bd15c9047c540c68
+let main2 () =
   Graphics.open_graph " 1500 x 1500";
   set_window_title "Battle";
   let bat =
@@ -203,8 +199,8 @@ let rec map_wait st lvl =
   let location = Game.State.current_tile_id st in
   Graphics.set_color red;
   Graphics.draw_circle (fst location) (snd location) 5;
-  let player_input = Game.Command.map_input in
-  match player_input with
+  let player_input = Graphics.read_key in
+  match Game.Command.map_input (player_input ()) with
   | Up ->
       let x = fst location in
       let y = snd location + 10 in
@@ -229,7 +225,11 @@ let main () =
   set_window_title "Title";
   let lvl = Game.Level.init_lvl 100 100 in
   Game.Level.draw_lvl lvl;
-  map_wait (Game.State.init_state lvl) lvl
+  let c =
+    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ randomChar1
+    |> Yojson.Basic.from_file |> Game.Character.from_json
+  in
+  map_wait (Game.State.init_state lvl c) lvl
 
 let () = main ()
 let () = interactive ()

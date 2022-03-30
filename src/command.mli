@@ -10,7 +10,7 @@ type map_command =
   | Exit
   | Invalid_input
 
-val map_input : map_command
+val map_input : char -> map_command
 (** [input s] pattern matches the pressed key to a [map_command]. *)
 
 (** The type [battle_command] represents a player's command when in
@@ -21,5 +21,5 @@ type battle_command =
   | Exit
   | Invalid_input
 
-val battle_input : Battle.t -> Character.t -> battle_command
+val battle_input : Battle.t -> Character.t -> char -> battle_command
 (** [battle_input s] pattern matches the pressed key to a [command]. *)
