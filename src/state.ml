@@ -30,7 +30,7 @@ let init_state (lvl : Level.t) =
     {
       character = current_character lvl;
       map_id = get_map lvl;
-      health = get_health lvl;
+      health = 0;
       inbattle = false;
       location = start_location lvl;
       alive = true;

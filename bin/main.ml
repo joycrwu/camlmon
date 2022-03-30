@@ -83,6 +83,10 @@ let lose_text () =
   Graphics.moveto 250 200;
   Graphics.draw_string "Sadge D:"
 
+let health_bar () =
+  Graphics.open_graph "";
+  Graphics.set_color (rgb 255 0 0)
+
 let exit_battle bat =
   if Game.Battle.wonbattle bat then victory_text ()
   else if Game.Battle.losebattle bat then lose_text ()
