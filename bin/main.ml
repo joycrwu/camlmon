@@ -40,12 +40,22 @@ let bottom_bar () =
 
   Graphics.set_color (rgb 0 0 0)
 
+let rec print_list (list : string list) =
+  match list with
+  | h :: t ->
+      if List.length list > 1 then h ^ ", " ^ print_list t else h
+  | [] -> "none"
+
 let draw_battle_text bat () =
   Graphics.set_color (rgb 0 0 0);
   bottom_bar ();
   Graphics.moveto 50 100;
   Graphics.draw_string
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id));
+  Graphics.moveto 50 370;
+  Graphics.draw_string
+    ("Team: " ^ (bat |> Game.Battle.team |> print_list));
+  Graphics.moveto 400 140;
   Graphics.moveto 315 60;
   Graphics.draw_string
     ("Press 1 for "
@@ -153,7 +163,14 @@ let randomChar1 =
 let randomChar2 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
+<<<<<<< HEAD
 let main2 () =
+=======
+let randomChar3 =
+  charArray |> Array.length |> Random.int |> Array.get charArray
+
+let main () =
+>>>>>>> 867ed0fd012c3898035e9b40bd15c9047c540c68
   Graphics.open_graph " 1500 x 1500";
   set_window_title "Battle";
   let bat =
@@ -164,6 +181,18 @@ let main2 () =
       ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
        ^ randomChar2
       |> Yojson.Basic.from_file |> Game.Character.from_json)
+      ([
+         Character.get_id
+           ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+            ^ randomChar1
+           |> Yojson.Basic.from_file |> Game.Character.from_json);
+       ]
+      @ [
+          Character.get_id
+            ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+             ^ randomChar3
+            |> Yojson.Basic.from_file |> Game.Character.from_json);
+        ])
   in
   wait bat
 

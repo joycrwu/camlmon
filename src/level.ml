@@ -9,6 +9,17 @@ type tile =
   | Water
   | Road
 
+type direction =
+  | Left
+  | Right
+  | Up
+  | Down
+
+type action =
+  | Move of direction
+  | Fight
+  | Heal
+
 type t = {
   grid : tile array array;
   level_id : string;
@@ -16,6 +27,7 @@ type t = {
   height : int;
 }
 
+<<<<<<< HEAD
 let get_characterid lvl = "lvl.current_character"
 let start_location lvl = (5, 5)
 let get_map lvl = lvl.level_id
@@ -49,3 +61,9 @@ let draw_lvl lvl =
             tile_width tile_height
     done
   done
+=======
+let currentlvl_character (lvl : t) = lvl.characterid
+let get_characterid (lvl : t) = lvl.characterid
+let start_location (lvl : t) = lvl.start_tile
+let get_map (lvl : t) = lvl.level_id
+>>>>>>> 867ed0fd012c3898035e9b40bd15c9047c540c68
