@@ -17,7 +17,3 @@ val start_location : t -> int * int
 val get_map : t -> string
 (** [get_map st] is the list of all the character ids that the user has
     fought *)
-
-val get_affinity_order : t -> string list
-(**[get_affinity_order lvl] is the order in which the affinities are
-   stronger or weaker to each other.*)

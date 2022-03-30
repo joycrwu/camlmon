@@ -9,10 +9,11 @@ type action = {
   description : string;
 }
 
+type affinity_order = { aff : string }
+
 type partner = {
   id : string;
   parteffect : int;
-  onteam : bool;
 }
 
 type t = {
@@ -34,8 +35,7 @@ let get_action_json json =
 let get_partner_json json =
   {
     id = json |> member "id" |> to_string;
-    parteffect = json |> member "effect" |> to_int;
-    onteam = json |> member "onteam" |> to_bool;
+    parteffect = json |> member "parteffect" |> to_int;
   }
 
 let from_json json =
@@ -58,9 +58,8 @@ let get_action character which = (List.nth character.actions which).name
 let get_action_effect character which =
   (List.nth character.actions which).effect
 
-let get_partner character = character.partner
+let get_partner character = character.partner.id
 let get_partner_effect character = character.partner.parteffect
-let get_onteam character = character.partner.onteam
 
 let check_action character action =
   try List.find (fun r -> r.name = action) character.actions

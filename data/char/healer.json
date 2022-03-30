@@ -19,5 +19,9 @@
             "effect": -5,
             "description": "Releases a chain of ice that deals 9.87 damage, rounded down."
         }
-    ]
+    ],
+    "partner": {
+        "id": "Dinoplant",
+        "parteffect": 1
+    }
 }

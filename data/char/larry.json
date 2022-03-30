@@ -19,5 +19,9 @@
             "effect": 1,
             "description": "Releases a chain of ice that deals 9.87 damage, rounded down."
         }
-    ]
+    ],
+    "partner": {
+        "id": "Not here",
+        "parteffect": 3
+    }
 }
