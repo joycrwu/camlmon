@@ -27,14 +27,9 @@ let character bat = bat.character
 let enemy bat = bat.enemy
 let team bat = bat.team
 
-let rec character_cycle team c =
-  match team with
-  | h :: t -> if h = c then List.hd t else character_cycle t c
-  | _ -> c
-
 let character_turn c_action_eff bat =
   {
-    character = character_cycle bat.team bat.character;
+    character = bat.character;
     character_hp =
       (if c_action_eff < 0 then
        bat.character_hp
