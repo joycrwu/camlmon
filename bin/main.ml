@@ -40,15 +40,33 @@ let bottom_bar () =
 
   Graphics.set_color (rgb 0 0 0)
 
-let health_bar_ally () =
+let health_bar_ally bat () =
   (* Graphics.open_graph ""; *)
-  Graphics.set_color (rgb 0 0 0);
-  Graphics.fill_rect 50 115 100 10
+  let character = Battle.character bat in
+  let character_maxhp = float_of_int (Character.get_hp character) in
+  let character_currhp = float_of_int (Battle.character_hp bat) in
+  let percent_health = character_currhp /. character_maxhp in
+  let num_health = int_of_float (percent_health *. 100.) in
+  if num_health > Character.get_hp character then (
+    Graphics.set_color (rgb 0 0 0);
+    Graphics.fill_rect 50 115 100 10)
+  else (
+    Graphics.set_color (rgb 0 0 0);
+    Graphics.fill_rect 50 115 num_health 10)
 
-let health_bar_enemy () =
+let health_bar_enemy bat () =
   (* Graphics.open_graph ""; *)
-  Graphics.set_color (rgb 0 0 0);
-  Graphics.fill_rect 450 390 100 10
+  let enemy = Battle.enemy bat in
+  let enemy_maxhp = float_of_int (Character.get_hp enemy) in
+  let enemy_currhp = float_of_int (Battle.enemy_hp bat) in
+  let percent_health = enemy_currhp /. enemy_maxhp in
+  let num_health = int_of_float (percent_health *. 100.) in
+  if num_health > Character.get_hp enemy then (
+    Graphics.set_color (rgb 0 0 0);
+    Graphics.fill_rect 450 390 100 10)
+  else (
+    Graphics.set_color (rgb 0 0 0);
+    Graphics.fill_rect 450 390 num_health 10)
 
 let rec print_list (list : string list) =
   match list with
@@ -59,8 +77,8 @@ let rec print_list (list : string list) =
 let draw_battle_text bat () =
   Graphics.set_color (rgb 0 0 0);
   bottom_bar ();
-  health_bar_ally ();
-  health_bar_enemy ();
+  health_bar_ally bat ();
+  health_bar_enemy bat ();
   Graphics.moveto 50 100;
   Graphics.draw_string
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id));
