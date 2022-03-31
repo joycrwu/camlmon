@@ -24,56 +24,40 @@ let bottom_bar () =
   Graphics.open_graph "";
   Graphics.set_color (rgb 230 251 255);
   Graphics.fill_rect 0 90 600 490;
-
   Graphics.set_color (rgb 0 153 230);
   Graphics.fill_rect 20 420 560 10;
-
   Graphics.set_color (rgb 25 178 255);
   Graphics.fill_rect 20 400 560 10;
   Graphics.set_color (rgb 77 195 255);
   Graphics.fill_rect 20 380 560 10;
   Graphics.set_color (rgb 128 212 255);
   Graphics.fill_rect 20 360 560 10;
-
   Graphics.set_color (rgb 153 221 255);
   Graphics.fill_rect 20 340 560 10;
-
   Graphics.set_color (rgb 153 221 255);
   Graphics.fill_rect 20 320 560 10;
-
   Graphics.set_color (rgb 179 229 255);
   Graphics.fill_rect 20 300 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 280 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 260 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 240 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 220 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 200 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 180 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 160 560 10;
-
   Graphics.set_color (rgb 204 238 255);
   Graphics.fill_rect 20 140 560 10;
-
   Graphics.set_color (rgb 230 247 255);
   Graphics.fill_rect 20 120 560 10;
-
   Graphics.set_color (rgb 230 247 255);
   Graphics.fill_rect 20 100 560 10;
-
   Graphics.set_color (rgb 255 186 82);
   Graphics.fill_ellipse 150 95 140 60;
   Graphics.set_color (rgb 255 186 82);
