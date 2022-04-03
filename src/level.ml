@@ -1,4 +1,5 @@
 open Graphics
+open Raylib
 
 let _ = Random.self_init ()
 let tile_width = 10

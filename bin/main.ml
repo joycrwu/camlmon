@@ -1,5 +1,8 @@
 open Graphics
 open Game
+open Raylib
+
+(* old stuff *)
 
 let _ = Random.self_init ()
 
@@ -307,9 +310,12 @@ let rec map_wait st lvl =
   | Exit -> exit 0
   | Invalid_input -> battle_start
 
+let setup () =
+  Raylib.init_window 1720 1000 "raylib [core] example - basic window";
+  Raylib.set_target_fps 60
+
 let main () =
-  Graphics.open_graph " 1500 x 1500";
-  set_window_title "Title";
+  setup ();
   let lvl = Game.Level.init_lvl 100 100 in
   Game.Level.draw_lvl lvl;
   let c =
@@ -318,6 +324,24 @@ let main () =
   in
   map_wait (Game.State.init_state lvl c) lvl
 
-let () = main () ()
-let () = interactive ()
-let () = flush_kp ()
+(* let main () = Graphics.open_graph " 1500 x 1500"; set_window_title
+   "Title"; let lvl = Game.Level.init_lvl 100 100 in Game.Level.draw_lvl
+   lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^
+   randomChar1 |> Yojson.Basic.from_file |> Game.Character.from_json in
+   map_wait (Game.State.init_state lvl c) lvl *)
+
+let rec loop () =
+  match Raylib.window_should_close () with
+  | true -> Raylib.close_window ()
+  | false ->
+      let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      draw_text "Congrats! You created your first window!" 190 200 20
+        Color.lightgray;
+      end_drawing ();
+      loop ()
+
+let () = main () () |> loop
+(* let () = setup () |> loop *)
+(* let () = interactive () let () = flush_kp () *)
