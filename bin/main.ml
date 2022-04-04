@@ -285,27 +285,49 @@ let load path =
   Gc.finalise Raylib.unload_texture tex;
   tex
 
-let femchar x y =
-  let chara = Raylib.load_texture "assets/trchar001.png" in
+let initx = ref 0.
+let inity = ref 0.
+
+(* clear_background Color.raywhite *)
+
+let up () : unit = inity := !inity -. 1.
+let down () : unit = inity := !inity +. 1.
+let left () : unit = initx := !initx -. 1.
+let right () : unit = initx := !initx +. 1.
+
+let matchcommand input =
+  match Game.Command.map_input (input ()) with
+  | Up -> up ()
+  | Down -> down ()
+  | Left -> left ()
+  | Right -> right ()
+  | Exit -> exit 0
+  | Invalid_input -> exit 0
+
+let femchar () =
+  (* let player_input = Raylib.get_char_pressed in match
+     Game.Command.map_input (player_input ()) with | Up -> up () | Down
+     -> down () | Left -> left () | Right -> right () | Exit -> exit 0 |
+     Invalid_input -> exit 0; *)
+  let chara = Raylib.load_texture "assets/girl_run_large.png" in
   Raylib.draw_texture_rec chara
-    (Rectangle.create 0. 0. (256. /. 4.) (256. /. 4.))
-    (Vector2.create x y) Color.white
+    (Rectangle.create 15. 15. (512. /. 4.) (512. /. 4.))
+    (Vector2.create !initx !inity)
+    Color.white
 
 let rec loop () =
-  let initx = 0. in
-  let inity = 0. in
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
       let open Raylib in
       begin_drawing ();
-      femchar initx inity;
-      if is_key_down Key.D then
-        let initx = initx +. 20. in
-        femchar initx inity
-      else femchar initx inity;
-      (* clear_background Color.raywhite; *)
-      end_drawing ();
+      femchar ();
+      let key = get_key_pressed () in
+      if is_key_down Key.D then right ()
+      else if is_key_down Key.W then up ()
+      else if is_key_down Key.A then left ()
+      else if is_key_down Key.S then down ();
+      (* clear_background Color.raywhite; *) end_drawing ();
       loop ()
 
 let () = setup () |> loop
