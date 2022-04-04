@@ -279,12 +279,31 @@ let setup () =
   Game.Level.draw_lvl lvl;
   Raylib.set_target_fps 60
 
+(* duplicate code *)
+let load path =
+  let tex = Raylib.load_texture path in
+  Gc.finalise Raylib.unload_texture tex;
+  tex
+
+let femchar x y =
+  let chara = Raylib.load_texture "assets/trchar001.png" in
+  Raylib.draw_texture_rec chara
+    (Rectangle.create 0. 0. (256. /. 4.) (256. /. 4.))
+    (Vector2.create x y) Color.white
+
 let rec loop () =
+  let initx = 0. in
+  let inity = 0. in
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
       let open Raylib in
       begin_drawing ();
+      femchar initx inity;
+      if is_key_down Key.D then
+        let initx = initx +. 20. in
+        femchar initx inity
+      else femchar initx inity;
       (* clear_background Color.raywhite; *)
       end_drawing ();
       loop ()

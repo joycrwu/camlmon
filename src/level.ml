@@ -45,6 +45,7 @@ let init_lvl width height =
 let get_tile x y lvl = Array.get (Array.get lvl.grid y) x
 let set_tile x y lvl tile = Array.set (Array.get lvl.grid y) x tile
 
+(* taken from somewhere *)
 let load path =
   let tex = Raylib.load_texture path in
   Gc.finalise Raylib.unload_texture tex;
