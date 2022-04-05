@@ -1,7 +1,8 @@
 open Graphics
 open Raylib
+open Yojson.Basic.Util
 
-let _ = Random.self_init ()
+(* let _ = Random.self_init () *)
 let tile_width = 96
 let tile_height = 96
 
@@ -27,6 +28,11 @@ type t = {
   width : int;
   height : int;
 }
+
+(* let from_json json = { grid = json |> member "tiles" |> to_list |>
+   List.map (string list); level_id = json |> member "id" |> to_string;
+   width = json |> member "width" |> to_int; height = json |> member
+   "height" |> to_int; } *)
 
 let get_characterid lvl = "lvl.current_character"
 let start_location lvl = (48, 48)

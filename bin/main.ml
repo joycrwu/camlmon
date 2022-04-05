@@ -82,8 +82,7 @@ let rec print_list (list : string list) =
 let draw_battle_text bat () =
   (* Graphics.set_color (rgb 0 0 0); *)
   (* bottom_bar (); *)
-  health_bar_ally bat ();
-  health_bar_enemy bat ();
+  (* health_bar_ally bat (); health_bar_enemy bat (); *)
   (* draw_text text pos_x pos_y font_size color *)
   Raylib.draw_text
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id))
@@ -142,7 +141,7 @@ let exit_battle bat =
   else if Game.Battle.losebattle bat then lose_text ()
 
 let rec wait (bat : Battle.t) =
-  exit_battle bat;
+  (* exit_battle bat; *)
   (* flush_kp (); *)
   draw_battle_text bat ();
   let character = Game.Battle.character bat in
@@ -190,6 +189,7 @@ let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
 let battle_start () =
+  clear_background Color.raywhite;
   set_window_title "Battle";
   let bat =
     Game.Battle.init_battle
@@ -302,35 +302,32 @@ let matchcommand input =
   | Left -> left ()
   | Right -> right ()
   | Exit -> exit 0
-  | Invalid_input -> exit 0
+  | Invalid_input -> battle_start ()
 
-let femchar () =
-  (* let player_input = Raylib.get_char_pressed in match
-     Game.Command.map_input (player_input ()) with | Up -> up () | Down
-     -> down () | Left -> left () | Right -> right () | Exit -> exit 0 |
-     Invalid_input -> exit 0; *)
+let femchard x y =
   let chara = Raylib.load_texture "assets/girl_run_large.png" in
   Raylib.draw_texture_rec chara
-    (Rectangle.create 15. 15. (512. /. 4.) (512. /. 4.))
-    (Vector2.create !initx !inity)
-    Color.white
+    (Rectangle.create 0. 0. (410. /. 4.) (410. /. 4.))
+    (Vector2.create x y) Color.white
 
 let rec loop () =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
+      femchard !initx !inity;
       let open Raylib in
-      begin_drawing ();
-      femchar ();
-      let key = get_key_pressed () in
+      (* let key = get_key_pressed () in *)
       if is_key_down Key.D then right ()
       else if is_key_down Key.W then up ()
       else if is_key_down Key.A then left ()
-      else if is_key_down Key.S then down ();
-      (* clear_background Color.raywhite; *) end_drawing ();
+      else if is_key_down Key.S then down ()
+      else if is_key_down Key.F then battle_start ();
+
+      (* clear_background Color.raywhite; *)
+      end_drawing ();
       loop ()
 
 let () = setup () |> loop
-
+(* levels are 10 x 17 *)
 (* let () = setup () |> loop *)
 (* let () = interactive () let () = flush_kp () *)
