@@ -24,15 +24,39 @@ type action =
 
 type t = {
   grid : tile array array;
+  (* grid : string list list; *)
   level_id : string;
   width : int;
   height : int;
 }
 
-(* let from_json json = { grid = json |> member "tiles" |> to_list |>
-   List.map (string list); level_id = json |> member "id" |> to_string;
-   width = json |> member "width" |> to_int; height = json |> member
-   "height" |> to_int; } *)
+let from_json_tiles json =
+  json |> member "tiles" |> to_list |> List.map to_list
+  |> List.map (List.map to_string)
+
+let rec match_tiles list acc =
+  match list with
+  | [] -> acc
+  | h :: t ->
+      if h = "grass" then acc @ [ Grass ] @ match_tiles t acc
+      else if h = "water" then acc @ [ Water ] @ match_tiles t acc
+      else acc @ [ Road ] @ match_tiles t acc
+
+let rec getlist list =
+  let newlist = [] in
+  match list with
+  | [] -> newlist
+  | h :: t -> (match_tiles h [] :: getlist t) @ newlist
+
+let from_json json =
+  {
+    grid =
+      json |> from_json_tiles |> getlist |> List.map Array.of_list
+      |> Array.of_list;
+    level_id = json |> member "id" |> to_string;
+    width = json |> member "width" |> to_int;
+    height = json |> member "height" |> to_int;
+  }
 
 let get_characterid lvl = "lvl.current_character"
 let start_location lvl = (48, 48)

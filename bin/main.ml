@@ -82,7 +82,8 @@ let rec print_list (list : string list) =
 let draw_battle_text bat () =
   (* Graphics.set_color (rgb 0 0 0); *)
   (* bottom_bar (); *)
-  (* health_bar_ally bat (); health_bar_enemy bat (); *)
+  health_bar_ally bat ();
+  health_bar_enemy bat ();
   (* draw_text text pos_x pos_y font_size color *)
   Raylib.draw_text
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id))
@@ -141,7 +142,7 @@ let exit_battle bat =
   else if Game.Battle.losebattle bat then lose_text ()
 
 let rec wait (bat : Battle.t) =
-  (* exit_battle bat; *)
+  exit_battle bat;
   (* flush_kp (); *)
   draw_battle_text bat ();
   let character = Game.Battle.character bat in
@@ -212,97 +213,15 @@ let battle_start () =
   in
   wait bat
 
-let rec map_wait st lvl =
-  (* Graphics.clear_graph (); flush_kp (); *)
-  Game.Level.draw_lvl lvl;
-  let location = Game.State.current_tile_id st in
-  Raylib.draw_circle (fst location) (snd location) 5. Color.red;
-  let player_input = Raylib.get_char_pressed in
-  match Game.Command.map_input (player_input ()) with
-  | Up -> (
-      let x = fst location in
-      let y = snd location + 10 in
-      match Game.Level.get_tile (x / 96) (y / 96) lvl with
-      | Grass -> map_wait (Game.State.move st x y) lvl
-      | Water ->
-          map_wait
-            (Game.State.move st (fst location) (snd location))
-            lvl
-      | Road -> map_wait (Game.State.move st x y) lvl)
-  | Down -> (
-      let x = fst location in
-      let y = snd location - 10 in
-      match Game.Level.get_tile (x / 10) (y / 10) lvl with
-      | Grass -> map_wait (Game.State.move st x y) lvl
-      | Water ->
-          map_wait
-            (Game.State.move st (fst location) (snd location))
-            lvl
-      | Road -> map_wait (Game.State.move st x y) lvl)
-  | Left -> (
-      let x = fst location - 10 in
-      let y = snd location in
-      match Game.Level.get_tile (x / 10) (y / 10) lvl with
-      | Grass -> map_wait (Game.State.move st x y) lvl
-      | Water ->
-          map_wait
-            (Game.State.move st (fst location) (snd location))
-            lvl
-      | Road -> map_wait (Game.State.move st x y) lvl)
-  | Right -> (
-      let x = fst location + 10 in
-      let y = snd location in
-      match Game.Level.get_tile (x / 10) (y / 10) lvl with
-      | Grass -> map_wait (Game.State.move st x y) lvl
-      | Water ->
-          map_wait
-            (Game.State.move st (fst location) (snd location))
-            lvl
-      | Road -> map_wait (Game.State.move st x y) lvl)
-  | Exit -> exit 0
-  | Invalid_input -> battle_start
-
-(* let main () = let lvl = Game.Level.init_lvl 100 100 in
-   Game.Level.draw_lvl lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^
-   Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
-   Game.Character.from_json in map_wait (Game.State.init_state lvl c)
-   lvl *)
-
-(* let main () = Graphics.open_graph " 1500 x 1500"; set_window_title
-   "Title"; let lvl = Game.Level.init_lvl 100 100 in Game.Level.draw_lvl
-   lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^
-   randomChar1 |> Yojson.Basic.from_file |> Game.Character.from_json in
-   map_wait (Game.State.init_state lvl c) lvl *)
-let setup () =
-  Raylib.init_window 1720 1000 "raylib [core] example - basic window";
-  let lvl = Game.Level.init_lvl 100 100 in
-  Game.Level.draw_lvl lvl;
-  Raylib.set_target_fps 60
-
-(* duplicate code *)
-let load path =
-  let tex = Raylib.load_texture path in
-  Gc.finalise Raylib.unload_texture tex;
-  tex
-
 let initx = ref 0.
 let inity = ref 0.
 
 (* clear_background Color.raywhite *)
 
-let up () : unit = inity := !inity -. 1.
-let down () : unit = inity := !inity +. 1.
-let left () : unit = initx := !initx -. 1.
-let right () : unit = initx := !initx +. 1.
-
-let matchcommand input =
-  match Game.Command.map_input (input ()) with
-  | Up -> up ()
-  | Down -> down ()
-  | Left -> left ()
-  | Right -> right ()
-  | Exit -> exit 0
-  | Invalid_input -> battle_start ()
+let up () : unit = inity := !inity -. 24.
+let down () : unit = inity := !inity +. 24.
+let left () : unit = initx := !initx -. 24.
+let right () : unit = initx := !initx +. 24.
 
 let femchard x y =
   let chara = Raylib.load_texture "assets/girl_run_large.png" in
@@ -310,24 +229,135 @@ let femchard x y =
     (Rectangle.create 0. 0. (410. /. 4.) (410. /. 4.))
     (Vector2.create x y) Color.white
 
+let rec map_wait st lvl =
+  match Raylib.window_should_close () with
+  | true -> Raylib.close_window ()
+  | false -> (
+      let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      femchard !initx !inity;
+      (* Graphics.clear_graph (); flush_kp (); *)
+      Game.Level.draw_lvl lvl;
+      let location = Game.State.current_tile_id st in
+      Raylib.draw_circle (fst location) (snd location) 5. Color.red;
+      let player_input = Raylib.get_char_pressed in
+      match Game.Command.map_input (player_input ()) with
+      | Up -> (
+          let x = fst location in
+          let y = snd location + 24 in
+          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          | Grass ->
+              up ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl
+          | Water ->
+              end_drawing ();
+              map_wait
+                (Game.State.move st (fst location) (snd location))
+                lvl
+          | Road ->
+              up ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl)
+      | Down -> (
+          let x = fst location in
+          let y = snd location - 24 in
+          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          | Grass ->
+              down ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl
+          | Water ->
+              end_drawing ();
+              map_wait
+                (Game.State.move st (fst location) (snd location))
+                lvl
+          | Road ->
+              down ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl)
+      | Left -> (
+          let x = fst location - 24 in
+          let y = snd location in
+          match Game.Level.get_tile (x / 10) (y / 10) lvl with
+          | Grass ->
+              left ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl
+          | Water ->
+              end_drawing ();
+              map_wait
+                (Game.State.move st (fst location) (snd location))
+                lvl
+          | Road ->
+              left ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl)
+      | Right -> (
+          let x = fst location + 24 in
+          let y = snd location in
+          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          | Grass ->
+              right ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl
+          | Water ->
+              end_drawing ();
+              map_wait
+                (Game.State.move st (fst location) (snd location))
+                lvl
+          | Road ->
+              right ();
+              end_drawing ();
+              map_wait (Game.State.move st x y) lvl)
+      | Exit ->
+          end_drawing ();
+          exit 0
+      | Invalid_input ->
+          end_drawing ();
+          battle_start ())
+
+(* let main () = let lvl = Game.Level.init_lvl 100 100 in
+   Game.Level.draw_lvl lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^
+   Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
+   Game.Character.from_json in map_wait (Game.State.init_state lvl c)
+   lvl *)
+
+let main () =
+  Raylib.init_window 1720 1000 "raylib [core] example - basic window";
+  Raylib.set_target_fps 60;
+  let lvl =
+    "data" ^ Filename.dir_sep ^ "basiclevel.json"
+    |> Yojson.Basic.from_file |> Game.Level.from_json
+  in
+  let c =
+    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ randomChar1
+    |> Yojson.Basic.from_file |> Game.Character.from_json
+  in
+  map_wait (Game.State.init_state lvl c) lvl
+(* (* duplicate code *) let load path = let tex = Raylib.load_texture
+   path in Gc.finalise Raylib.unload_texture tex; tex *)
+
+(* move loading textures to outside of this function *)
+
 let rec loop () =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
-      femchard !initx !inity;
       let open Raylib in
+      begin_drawing ();
+      femchard !initx !inity;
       (* let key = get_key_pressed () in *)
       if is_key_down Key.D then right ()
       else if is_key_down Key.W then up ()
       else if is_key_down Key.A then left ()
       else if is_key_down Key.S then down ()
       else if is_key_down Key.F then battle_start ();
-
-      (* clear_background Color.raywhite; *)
       end_drawing ();
       loop ()
 
-let () = setup () |> loop
+let () = main ()
 (* levels are 10 x 17 *)
 (* let () = setup () |> loop *)
 (* let () = interactive () let () = flush_kp () *)
