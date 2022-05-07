@@ -23,6 +23,7 @@ type t = {
   affinity : string;
   actions : action list;
   partner : partner;
+  rarity : int;
 }
 
 let get_action_json json =
@@ -47,6 +48,7 @@ let from_json json =
     actions =
       json |> member "actions" |> to_list |> List.map get_action_json;
     partner = json |> member "partner" |> get_partner_json;
+    rarity = json |> member "rarity" |> to_int;
   }
 
 let get_id character = character.id
