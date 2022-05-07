@@ -24,3 +24,4 @@ val get_map : t -> string
 val get_tile : int -> int -> t -> tile
 val init_lvl : int -> int -> t
 val draw_lvl : t -> unit
+val from_json : Yojson.Basic.t -> t

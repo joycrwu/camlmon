@@ -28,6 +28,9 @@ val get_affinity : t -> string
 val get_action : t -> int -> string
 (** [get_action c n] is the action name of the [n]th ability of the character [c].*)
 
+val get_rarity : t -> int 
+(** [get_rarity c] is the rarity of the character *)
+
 val get_partner : t -> string
 
 val get_partner_effect : t -> int

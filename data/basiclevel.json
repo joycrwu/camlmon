@@ -6,6 +6,8 @@
   "enemylist": [
     "ece3150"
   ],
+  "width": 17,
+  "height": 10,
   "tiles": [
     [
       "grass",
