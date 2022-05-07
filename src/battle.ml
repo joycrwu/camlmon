@@ -27,9 +27,20 @@ let character bat = bat.character
 let enemy bat = bat.enemy
 let team bat = bat.team
 
+(** this code was copied from stackoverflow
+    https://stackoverflow.com/questions/31279920/finding-an-item-in-a-list-and-returning-its-index-ocaml*)
+let rec find x lst =
+  match lst with
+  | [] -> raise (Failure "Not Found")
+  | h :: t -> if x = h then 0 else 1 + find x t
+
+let character_cycle team c =
+  if find c team = List.length team - 1 then List.nth team 0
+  else List.nth team (find c team + 1)
+
 let character_turn c_action_eff bat =
   {
-    character = bat.character;
+    character = character_cycle bat.team bat.character;
     character_hp =
       (if c_action_eff < 0 then
        bat.character_hp

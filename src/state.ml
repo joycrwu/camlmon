@@ -57,7 +57,7 @@ let fought (st : t) ene =
   in
   t
 
-let health st = raise (Failure "Unimplemented")
+let health st = st.health
 let current_tile_id st = st.location
 
 let move st x y =
