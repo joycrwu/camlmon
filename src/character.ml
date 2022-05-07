@@ -60,6 +60,7 @@ let get_action character which = (List.nth character.actions which).name
 let get_action_effect character which =
   (List.nth character.actions which).effect
 
+let get_rarity character = character.rarity
 let get_partner character = character.partner.id
 let get_partner_effect character = character.partner.parteffect
 

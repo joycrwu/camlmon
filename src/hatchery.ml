@@ -12,9 +12,18 @@ type t = {
 let new_hatchery () =
   { normal_char_pool = []; rare_char_pool = []; ssr_char_pool = [] }
 
-let add_char (ch : Character.t) = failwith "Unimplemented"
+let add_char (ch : Character.t) (hat : t) =
+  match get_rarity ch with
+  | 1 -> ch :: hat.normal_char_pool
+  | 2 -> ch :: hat.rare_char_pool
+  | 3 -> ch :: hat.ssr_char_pool
+  | _ -> failwith "Rarity unaccepted"
 
-let gacha hat () =
+let get_normal_char_pool hat = hat.normal_char_pool
+let get_rare_char_pool hat = hat.rare_char_pool
+let ssr_char_pool hat = hat.ssr_char_pool
+
+let gacha hat =
   let ran_num = Random.int 100 in
   let num_normchars = List.length hat.normal_char_pool in
   let num_rarechars = List.length hat.rare_char_pool in
