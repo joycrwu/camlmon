@@ -37,3 +37,6 @@ val get_partner_effect : t -> int
 
 val get_action_effect : t -> int -> int
 (** [get_action_effect c n] is the effect int of the [n]th ability of the character [c].*)
+
+val aff_effect : t -> t -> string list -> int
+(** [get_aff_effect c t al] is the effect float of the character [c] on target [t] based on the affinity order given [al]*)
