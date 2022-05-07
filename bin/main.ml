@@ -241,7 +241,7 @@ let rec map_wait st lvl =
       Game.Level.draw_lvl lvl;
       let location = Game.State.current_tile_id st in
       Raylib.draw_circle (fst location) (snd location) 5. Color.red;
-      let player_input = Raylib.get_char_pressed in
+      let player_input = Raylib.get_key_pressed in
       match Game.Command.map_input (player_input ()) with
       | Up -> (
           let x = fst location in
