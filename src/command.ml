@@ -1,6 +1,7 @@
 open Character
 open Graphics
 open Hatchery
+open Raylib
 
 exception Invalid_input
 
@@ -14,11 +15,11 @@ type map_command =
 
 let map_input k =
   match k with
-  | 'w' -> Up
-  | 's' -> Down
-  | 'a' -> Left
-  | 'd' -> Right
-  | 'q' -> Exit
+  | Key.W -> Up
+  | Key.S -> Down
+  | Key.A -> Left
+  | Key.D -> Right
+  | Key.Q -> Exit
   | _ -> Invalid_input
 
 type battle_command =

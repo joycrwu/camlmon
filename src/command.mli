@@ -1,3 +1,4 @@
+open Raylib
 (** Interprets player commands *)
 
 (** The type [command] represents a player's command when in the
@@ -10,7 +11,7 @@ type map_command =
   | Exit
   | Invalid_input
 
-val map_input : char -> map_command
+val map_input : Key.t -> map_command
 (** [input s] pattern matches the pressed key to a [map_command]. *)
 
 (** The type [battle_command] represents a player's command when in

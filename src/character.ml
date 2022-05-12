@@ -9,8 +9,6 @@ type action = {
   description : string;
 }
 
-type affinity_order = { aff : string }
-
 type partner = {
   id : string;
   parteffect : int;
@@ -21,9 +19,7 @@ type t = {
   hp : int;
   atk : int;
   affinity : string;
-  actions : action list;
-  partner : partner;
-  rarity : int;
+  actions : action list; (* partner : partner; rarity : int; *)
 }
 
 let get_action_json json =
@@ -46,9 +42,9 @@ let from_json json =
     atk = json |> member "attack" |> to_int;
     affinity = json |> member "affinity" |> to_string;
     actions =
-      json |> member "actions" |> to_list |> List.map get_action_json;
-    partner = json |> member "partner" |> get_partner_json;
-    rarity = json |> member "rarity" |> to_int;
+      json |> member "actions" |> to_list |> List.map get_action_json
+      (*partner = json |> member "partner" |> get_partner_json; rarity =
+        json |> member "rarity" |> to_int; *);
   }
 
 let get_id character = character.id
@@ -60,10 +56,25 @@ let get_action character which = (List.nth character.actions which).name
 let get_action_effect character which =
   (List.nth character.actions which).effect
 
-let get_rarity character = character.rarity
-let get_partner character = character.partner.id
-let get_partner_effect character = character.partner.parteffect
+let get_rarity character = failwith "bye"
+
+(* character.rarity *)
+let get_partner character = failwith "bye"
+
+(* character.partner.id *)
+let get_partner_effect character = failwith "bye"
+(* character.partner.parteffect *)
 
 let check_action character action =
   try List.find (fun r -> r.name = action) character.actions
   with not_found -> raise (UnknownAction action)
+
+let rec aff_effect (character : t) (target : t) (aff_list : string list)
+    : int =
+  match aff_list with
+  | h :: t ->
+      if h = character.affinity && List.hd t = target.affinity then 2
+      else if h = target.affinity && List.hd t = character.affinity then
+        1 / 2
+      else aff_effect character target t
+  | _ -> 1
