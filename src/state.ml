@@ -21,7 +21,7 @@ type t = {
   location : int * int;
   alive : bool;
   fought : string list;
-  usable : string list;
+  usable : Character.t list;
   inventory : string list;
 }
 
@@ -35,7 +35,7 @@ let init_state (lvl : Level.t) character =
       location = start_location lvl;
       alive = true;
       fought = [];
-      usable = [];
+      usable = [ character ];
       inventory = [];
     }
   in
@@ -96,6 +96,22 @@ let hatchary st x y =
     map_id = st.map_id;
     health = st.health;
     levelmap = "hatchary";
+    location = (x, y);
+    alive = st.alive;
+    fought = st.fought;
+    usable = st.usable;
+    inventory = st.inventory;
+  }
+
+(*team is the set of characters that the player chooses to use in a
+  battle. Not yet implemented.*)
+
+let team st x y =
+  {
+    character = st.character;
+    map_id = st.map_id;
+    health = st.health;
+    levelmap = "team";
     location = (x, y);
     alive = st.alive;
     fought = st.fought;

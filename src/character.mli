@@ -37,4 +37,7 @@
     
     val get_action_effect : t -> int -> int
     (** [get_action_effect c n] is the effect int of the [n]th ability of the character [c].*)
+
+    val aff_effect :  t -> t -> string list -> int
+
     
