@@ -9,8 +9,6 @@ type action = {
   description : string;
 }
 
-type affinity_order = { aff : string }
-
 type partner = {
   id : string;
   parteffect : int;
@@ -70,3 +68,13 @@ let get_partner_effect character = failwith "bye"
 let check_action character action =
   try List.find (fun r -> r.name = action) character.actions
   with not_found -> raise (UnknownAction action)
+
+let rec aff_effect (character : t) (target : t) (aff_list : string list)
+    : int =
+  match aff_list with
+  | h :: t ->
+      if h = character.affinity && List.hd t = target.affinity then 2
+      else if h = target.affinity && List.hd t = character.affinity then
+        1 / 2
+      else aff_effect character target t
+  | _ -> 1
