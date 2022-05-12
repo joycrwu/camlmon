@@ -262,6 +262,17 @@ let rec map_wait st lvl =
   | Exit -> exit 0
   | Invalid_input -> battle_start
 
+let hatchery_start () = failwith "not sure yet aha~"
+
+let rec hatch_wait (hat : Hatchery.t) =
+  let player_input = Raylib.get_char_pressed in
+  match Game.Command.hatchery_input (player_input ()) with
+  | Roll ->
+      Game.Hatchery.character_outputs (Game.Hatchery.gacha hat) hat
+      |> hatch_wait
+  | Skip -> exit 0
+  | Invalid -> exit 0
+
 (* let main () = let lvl = Game.Level.init_lvl 100 100 in
    Game.Level.draw_lvl lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>

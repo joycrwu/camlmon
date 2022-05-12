@@ -7,12 +7,18 @@ type t = {
   normal_char_pool : Character.t list;
   rare_char_pool : Character.t list;
   ssr_char_pool : Character.t list;
+  output_characters : Character.t list;
 }
 
 let new_hatchery () =
-  { normal_char_pool = []; rare_char_pool = []; ssr_char_pool = [] }
+  {
+    normal_char_pool = [];
+    rare_char_pool = [];
+    ssr_char_pool = [];
+    output_characters = [];
+  }
 
-let add_char (ch : Character.t) (hat : t) =
+let add_char_to_pool (ch : Character.t) (hat : t) =
   match get_rarity ch with
   | 1 -> ch :: hat.normal_char_pool
   | 2 -> ch :: hat.rare_char_pool
@@ -21,7 +27,8 @@ let add_char (ch : Character.t) (hat : t) =
 
 let get_normal_char_pool hat = hat.normal_char_pool
 let get_rare_char_pool hat = hat.rare_char_pool
-let ssr_char_pool hat = hat.ssr_char_pool
+let get_ssr_char_pool hat = hat.ssr_char_pool
+let get_output_characters hat = hat.output_characters
 
 let gacha hat =
   let ran_num = Random.int 100 in
@@ -52,3 +59,6 @@ let gacha hat =
             let new_char_ran_num = char_ran_num mod num_ssrchars in
             Array.get array_ssrchars new_char_ran_num
           else Array.get array_ssrchars char_ran_num)
+
+let character_outputs (ch : Character.t) (hat : t) =
+  { hat with output_characters = ch :: hat.output_characters }
