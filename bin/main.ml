@@ -238,9 +238,19 @@ let rec map_wait st lvl =
       clear_background Color.raywhite;
       Game.Level.draw_lvl lvl;
       femchard !initx !inity;
+      Raylib.draw_text
+        ("charloc:" ^ string_of_float !initx ^ ","
+       ^ string_of_float !inity)
+        0 0 40 Color.black;
       let location = Game.State.current_tile_id st in
       let player_input = Raylib.get_key_pressed () in
       (* Game.Command.map_input ( *)
+      Raylib.draw_text
+        ("stateloc:"
+        ^ string_of_int (fst location)
+        ^ ","
+        ^ string_of_int (snd location))
+        0 50 40 Color.black;
       match player_input with
       | Key.W -> (
           let x = fst location in
