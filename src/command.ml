@@ -1,5 +1,6 @@
 open Character
 open Graphics
+open Hatchery
 open Raylib
 
 exception Invalid_input
@@ -35,3 +36,14 @@ let battle_input (bat : Battle.t) (character : Character.t) k =
   | 'r' -> Run
   | 'q' -> Exit
   | _ -> Invalid_input
+
+type hatchery_command =
+  | Roll
+  | Skip
+  | Invalid
+
+let hatchery_input k =
+  match k with
+  | '1' -> Roll
+  | '2' -> Skip
+  | _ -> Invalid

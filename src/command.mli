@@ -24,3 +24,10 @@ type battle_command =
 
 val battle_input : Battle.t -> Character.t -> char -> battle_command
 (** [battle_input s] pattern matches the pressed key to a [command]. *)
+
+type hatchery_command =
+  | Roll
+  | Skip
+  | Invalid
+
+val hatchery_input : char -> hatchery_command
