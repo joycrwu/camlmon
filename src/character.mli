@@ -1,4 +1,4 @@
-(** Representation of character data.
+(* * Representation of character data.
 
     This module represents the data stored in character files. It
     handles loading of that data from JSON as well as querying the data. *)
@@ -36,4 +36,4 @@ val get_partner : t -> string
 val get_partner_effect : t -> int
 
 val get_action_effect : t -> int -> int
-(** [get_action_effect c n] is the effect int of the [n]th ability of the character [c].*)
+(** [get_action_effect c n] is the effect int of the [n]th ability of the character [c]. *)

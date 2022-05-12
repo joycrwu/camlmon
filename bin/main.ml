@@ -236,14 +236,13 @@ let rec map_wait st lvl =
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      femchard !initx !inity;
-      (* Graphics.clear_graph (); flush_kp (); *)
       Game.Level.draw_lvl lvl;
+      femchard !initx !inity;
       let location = Game.State.current_tile_id st in
-      Raylib.draw_circle (fst location) (snd location) 5. Color.red;
-      let player_input = Raylib.get_key_pressed in
-      match Game.Command.map_input (player_input ()) with
-      | Up -> (
+      let player_input = Raylib.get_key_pressed () in
+      (* Game.Command.map_input ( *)
+      match player_input with
+      | Key.W -> (
           let x = fst location in
           let y = snd location + 24 in
           match Game.Level.get_tile (x / 96) (y / 96) lvl with
@@ -253,14 +252,12 @@ let rec map_wait st lvl =
               map_wait (Game.State.move st x y) lvl
           | Water ->
               end_drawing ();
-              map_wait
-                (Game.State.move st (fst location) (snd location))
-                lvl
+              map_wait st lvl
           | Road ->
               up ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Down -> (
+      | Key.S -> (
           let x = fst location in
           let y = snd location - 24 in
           match Game.Level.get_tile (x / 96) (y / 96) lvl with
@@ -270,31 +267,27 @@ let rec map_wait st lvl =
               map_wait (Game.State.move st x y) lvl
           | Water ->
               end_drawing ();
-              map_wait
-                (Game.State.move st (fst location) (snd location))
-                lvl
+              map_wait st lvl
           | Road ->
               down ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Left -> (
+      | Key.A -> (
           let x = fst location - 24 in
           let y = snd location in
-          match Game.Level.get_tile (x / 10) (y / 10) lvl with
+          match Game.Level.get_tile (x / 96) (y / 96) lvl with
           | Grass ->
               left ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl
           | Water ->
               end_drawing ();
-              map_wait
-                (Game.State.move st (fst location) (snd location))
-                lvl
+              map_wait st lvl
           | Road ->
               left ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Right -> (
+      | Key.D -> (
           let x = fst location + 24 in
           let y = snd location in
           match Game.Level.get_tile (x / 96) (y / 96) lvl with
@@ -304,19 +297,22 @@ let rec map_wait st lvl =
               map_wait (Game.State.move st x y) lvl
           | Water ->
               end_drawing ();
-              map_wait
-                (Game.State.move st (fst location) (snd location))
-                lvl
+              map_wait st lvl
           | Road ->
               right ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Exit ->
+      | Key.B ->
+          end_drawing ();
+          battle_start ()
+      | Key.Q ->
           end_drawing ();
           exit 0
-      | Invalid_input ->
-          end_drawing ();
-          battle_start ())
+      | _ ->
+          Raylib.end_drawing ();
+          map_wait st lvl)
+(* | Exit -> end_drawing (); exit 0 | Invalid_input -> end_drawing ();
+   battle_start ()) *)
 
 (* let main () = let lvl = Game.Level.init_lvl 100 100 in
    Game.Level.draw_lvl lvl; let c = "data" ^ Filename.dir_sep ^ "char" ^
@@ -340,22 +336,13 @@ let main () =
    path in Gc.finalise Raylib.unload_texture tex; tex *)
 
 (* move loading textures to outside of this function *)
-
-let rec loop () =
-  match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
-  | false ->
-      let open Raylib in
-      begin_drawing ();
-      femchard !initx !inity;
-      (* let key = get_key_pressed () in *)
-      if is_key_down Key.D then right ()
-      else if is_key_down Key.W then up ()
-      else if is_key_down Key.A then left ()
-      else if is_key_down Key.S then down ()
-      else if is_key_down Key.F then battle_start ();
-      end_drawing ();
-      loop ()
+(* let rec loop () = match Raylib.window_should_close () with | true ->
+   Raylib.close_window () | false -> let open Raylib in begin_drawing
+   (); femchard !initx !inity; (* let key = get_key_pressed () in *) if
+   is_key_down Key.D then right () else if is_key_down Key.W then up ()
+   else if is_key_down Key.A then left () else if is_key_down Key.S then
+   down () else if is_key_down Key.F then battle_start (); end_drawing
+   (); loop () *)
 
 let () = main ()
 (* levels are 10 x 17 *)

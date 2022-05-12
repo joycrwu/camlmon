@@ -3,6 +3,7 @@
     "hp": 100,
     "attack": 10,
     "affinity": "Cascadilla Hall",
+    "rarity": 2,
     "actions": [
         {
             "name": "Thunderbolt",
