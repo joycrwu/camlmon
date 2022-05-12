@@ -56,6 +56,17 @@ let get_action character which = (List.nth character.actions which).name
 let get_action_effect character which =
   (List.nth character.actions which).effect
 
+let rec get_aff_effect character enemy aff_list =
+  match aff_list with
+  | h :: t ->
+      if h = get_affinity character && List.hd t = get_affinity enemy
+      then 3
+      else if
+        h = get_affinity enemy && List.hd t = get_affinity character
+      then 1 / 3
+      else get_aff_effect character enemy t
+  | _ -> 1
+
 let get_rarity character = failwith "bye"
 
 (* character.rarity *)

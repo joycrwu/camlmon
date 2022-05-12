@@ -38,46 +38,55 @@ let character_cycle team c =
   if find c team = List.length team - 1 then List.nth team 0
   else List.nth team (find c team + 1)
 
+let character_turn_hp c_action_eff bat =
+  if c_action_eff < 0 then
+    bat.character_hp
+    - Character.get_atk bat.character
+      * c_action_eff
+      * Team.partner_check bat.character bat.team
+  else bat.character_hp
+
+let character_turn_enemyhp c_action_eff bat =
+  if c_action_eff > 0 then
+    bat.enemy_hp
+    - Character.get_atk bat.character
+      * c_action_eff
+      * Team.partner_check bat.character bat.team
+      * Character.aff_effect bat.character bat.enemy
+          [ "red"; "green"; "blue"; "red" ]
+  else bat.enemy_hp
+
 let character_turn c_action_eff bat =
   {
     character = character_cycle bat.team bat.character;
-    character_hp =
-      (if c_action_eff < 0 then
-       bat.character_hp
-       - Character.get_atk bat.character
-         * ((Team.partner_check bat.character
-               (List.map (fun x -> Character.get_id x) bat.team)
-            + c_action_eff)
-           / 2)
-      else bat.character_hp);
+    character_hp = character_turn_hp c_action_eff bat;
     team = bat.team;
     enemy = bat.enemy;
-    enemy_hp =
-      (if c_action_eff > 0 then
-       bat.enemy_hp
-       - Character.get_atk bat.character
-         * (Team.partner_check bat.character
-              (List.map (fun x -> Character.get_id x) bat.team)
-           + c_action_eff)
-      else bat.enemy_hp);
+    enemy_hp = character_turn_enemyhp c_action_eff bat;
   }
+
+let enemy_turn_charhp e_action_eff bat =
+  if e_action_eff > 0 then
+    bat.character_hp
+    - Character.get_atk bat.enemy
+      * e_action_eff
+      * Character.aff_effect bat.enemy bat.character
+          [ "red"; "green"; "blue"; "red" ]
+  else bat.character_hp
+
+let enemy_turn_hp e_action_eff bat =
+  if e_action_eff < 0 then
+    bat.enemy_hp - (Character.get_atk bat.enemy * e_action_eff)
+  else bat.enemy_hp
 
 let enemy_turn e_action_eff bat =
   {
     character = bat.character;
-    character_hp =
-      (if e_action_eff > 0 then
-       bat.character_hp - (Character.get_atk bat.enemy * e_action_eff)
-      else bat.character_hp);
+    character_hp = enemy_turn_charhp e_action_eff bat;
     team = bat.team;
     enemy = bat.enemy;
-    enemy_hp =
-      (if e_action_eff < 0 then
-       bat.enemy_hp - (Character.get_atk bat.enemy * e_action_eff)
-      else bat.enemy_hp);
+    enemy_hp = enemy_turn_charhp e_action_eff bat;
   }
-
-let damage bat = raise (Failure "Unimplemented")
 
 (** return true if we won the battle, false if we lost, meaning that our
     health reached zero first*)

@@ -17,6 +17,5 @@ val character_turn : int -> t -> t
 val enemy_turn : int -> t -> t
 (** [enemy_turn b] is the enemy turn in battle [b]*)
 
-val damage : 'a -> 'b
 val wonbattle : t -> bool
 val losebattle : t -> bool
