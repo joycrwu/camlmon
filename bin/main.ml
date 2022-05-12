@@ -141,41 +141,49 @@ let exit_battle bat =
   if Game.Battle.wonbattle bat then victory_text ()
   else if Game.Battle.losebattle bat then lose_text ()
 
-let rec wait (bat : Battle.t) =
-  exit_battle bat;
-  (* flush_kp (); *)
-  draw_battle_text bat ();
-  let character = Game.Battle.character bat in
-  let enemy = Game.Battle.enemy bat in
-  let player_input = Raylib.get_char_pressed in
-  match Game.Command.battle_input bat character (player_input ()) with
-  | Attack x ->
-      bat
-      |> Game.Battle.character_turn x
-      |> Game.Battle.enemy_turn
-           (Game.Character.get_action_effect enemy (Random.int 3))
-      |> wait
-  | Run ->
-      if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat then
-        if Random.bool () then exit 0
-        else (
-          draw_failed_run ();
+let rec bat_wait (bat : Battle.t) =
+  match Raylib.window_should_close () with
+  | true -> Raylib.close_window ()
+  | false -> (
+      exit_battle bat;
+      begin_drawing ();
+      clear_background Color.raywhite;
+      draw_battle_text bat ();
+      let character = Game.Battle.character bat in
+      let enemy = Game.Battle.enemy bat in
+      let player_input = Raylib.get_key_pressed () in
+      match Game.Command.battle_input bat character player_input with
+      | Attack x ->
           bat
+          |> Game.Battle.character_turn x
           |> Game.Battle.enemy_turn
                (Game.Character.get_action_effect enemy (Random.int 3))
-          |> wait)
-      else if
-        Random.int 100
-        < Game.Battle.character_hp bat - Game.Battle.enemy_hp bat + 50
-      then exit 0
-      else (
-        draw_failed_run ();
-        bat
-        |> Game.Battle.enemy_turn
-             (Game.Character.get_action_effect enemy (Random.int 3))
-        |> wait)
-  | Exit -> exit 0
-  | Invalid_input -> wait bat
+          |> bat_wait
+      | Run ->
+          if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
+          then
+            if Random.bool () then exit 0
+            else (
+              draw_failed_run ();
+              bat
+              |> Game.Battle.enemy_turn
+                   (Game.Character.get_action_effect enemy
+                      (Random.int 3))
+              |> bat_wait)
+          else if
+            Random.int 100
+            < Game.Battle.character_hp bat
+              - Game.Battle.enemy_hp bat
+              + 50
+          then exit 0
+          else (
+            draw_failed_run ();
+            bat
+            |> Game.Battle.enemy_turn
+                 (Game.Character.get_action_effect enemy (Random.int 3))
+            |> bat_wait)
+      | Exit -> exit 0
+      | Invalid_input -> bat_wait bat)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -211,17 +219,19 @@ let battle_start () =
           |> Yojson.Basic.from_file |> Game.Character.from_json;
         ])
   in
-  wait bat
+  bat_wait bat
 
 let initx = ref 0.
 let inity = ref 0.
 
 (* clear_background Color.raywhite *)
 
-let up () : unit = inity := !inity -. 24.
-let down () : unit = inity := !inity +. 24.
-let left () : unit = initx := !initx -. 24.
-let right () : unit = initx := !initx +. 24.
+let move_distance = 24
+let tile_size = 96
+let up () : unit = inity := !inity -. float_of_int move_distance
+let down () : unit = inity := !inity +. float_of_int move_distance
+let left () : unit = initx := !initx -. float_of_int move_distance
+let right () : unit = initx := !initx +. float_of_int move_distance
 
 let femchard x y =
   let chara = Raylib.load_texture "assets/girl_run_large.png" in
@@ -251,11 +261,13 @@ let rec map_wait st lvl =
         ^ ","
         ^ string_of_int (snd location))
         0 50 40 Color.black;
-      match player_input with
-      | Key.W -> (
+      match Command.map_input player_input with
+      | Up -> (
           let x = fst location in
-          let y = snd location + 24 in
-          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          let y = snd location - move_distance in
+          match
+            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+          with
           | Grass ->
               up ();
               end_drawing ();
@@ -267,10 +279,12 @@ let rec map_wait st lvl =
               up ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Key.S -> (
+      | Down -> (
           let x = fst location in
-          let y = snd location - 24 in
-          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          let y = snd location + move_distance in
+          match
+            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+          with
           | Grass ->
               down ();
               end_drawing ();
@@ -282,10 +296,12 @@ let rec map_wait st lvl =
               down ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Key.A -> (
-          let x = fst location - 24 in
+      | Left -> (
+          let x = fst location - move_distance in
           let y = snd location in
-          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          match
+            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+          with
           | Grass ->
               left ();
               end_drawing ();
@@ -297,10 +313,12 @@ let rec map_wait st lvl =
               left ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Key.D -> (
-          let x = fst location + 24 in
+      | Right -> (
+          let x = fst location + move_distance in
           let y = snd location in
-          match Game.Level.get_tile (x / 96) (y / 96) lvl with
+          match
+            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+          with
           | Grass ->
               right ();
               end_drawing ();
@@ -312,10 +330,10 @@ let rec map_wait st lvl =
               right ();
               end_drawing ();
               map_wait (Game.State.move st x y) lvl)
-      | Key.B ->
+      | Battle ->
           end_drawing ();
           battle_start ()
-      | Key.Q ->
+      | Exit ->
           end_drawing ();
           exit 0
       | _ ->

@@ -32,11 +32,11 @@ type battle_command =
 
 let battle_input (bat : Battle.t) (character : Character.t) k =
   match k with
-  | '1' -> Attack (Character.get_action_effect character 0)
-  | '2' -> Attack (Character.get_action_effect character 1)
-  | '3' -> Attack (Character.get_action_effect character 2)
-  | 'r' -> Run
-  | 'q' -> Exit
+  | Key.One -> Attack (Character.get_action_effect character 0)
+  | Key.Two -> Attack (Character.get_action_effect character 1)
+  | Key.Three -> Attack (Character.get_action_effect character 2)
+  | Key.R -> Run
+  | Key.Q -> Exit
   | _ -> Invalid_input
 
 type hatchery_command =

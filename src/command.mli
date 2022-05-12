@@ -23,7 +23,7 @@ type battle_command =
   | Exit
   | Invalid_input
 
-val battle_input : Battle.t -> Character.t -> char -> battle_command
+val battle_input : Battle.t -> Character.t -> Key.t -> battle_command
 (** [battle_input s] pattern matches the pressed key to a [command]. *)
 
 type hatchery_command =
