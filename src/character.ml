@@ -19,7 +19,9 @@ type t = {
   hp : int;
   atk : int;
   affinity : string;
-  actions : action list; (* partner : partner; rarity : int; *)
+  actions : action list;
+  partner : partner;
+  rarity : int;
 }
 
 let get_action_json json =
@@ -42,9 +44,9 @@ let from_json json =
     atk = json |> member "attack" |> to_int;
     affinity = json |> member "affinity" |> to_string;
     actions =
-      json |> member "actions" |> to_list |> List.map get_action_json
-      (*partner = json |> member "partner" |> get_partner_json; rarity =
-        json |> member "rarity" |> to_int; *);
+      json |> member "actions" |> to_list |> List.map get_action_json;
+    partner = json |> member "partner" |> get_partner_json;
+    rarity = json |> member "rarity" |> to_int;
   }
 
 let get_id character = character.id
@@ -67,14 +69,9 @@ let rec get_aff_effect character enemy aff_list =
       else get_aff_effect character enemy t
   | _ -> 1
 
-let get_rarity character = failwith "bye"
-
-(* character.rarity *)
-let get_partner character = failwith "bye"
-
-(* character.partner.id *)
-let get_partner_effect character = failwith "bye"
-(* character.partner.parteffect *)
+let get_rarity character = character.rarity
+let get_partner character = character.partner.id
+let get_partner_effect character = character.partner.parteffect
 
 let check_action character action =
   try List.find (fun r -> r.name = action) character.actions

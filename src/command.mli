@@ -8,6 +8,7 @@ type map_command =
   | Down
   | Left
   | Right
+  | Battle
   | Exit
   | Invalid_input
 
