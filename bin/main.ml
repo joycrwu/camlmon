@@ -154,6 +154,7 @@ let rec bat_wait (bat : Battle.t) =
       let player_input = Raylib.get_key_pressed () in
       match Game.Command.battle_input bat character player_input with
       | Attack x ->
+          end_drawing ();
           bat
           |> Game.Battle.character_turn x
           |> Game.Battle.enemy_turn
@@ -165,6 +166,7 @@ let rec bat_wait (bat : Battle.t) =
             if Random.bool () then exit 0
             else (
               draw_failed_run ();
+              end_drawing ();
               bat
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
@@ -182,8 +184,12 @@ let rec bat_wait (bat : Battle.t) =
             |> Game.Battle.enemy_turn
                  (Game.Character.get_action_effect enemy (Random.int 3))
             |> bat_wait)
-      | Exit -> exit 0
-      | Invalid_input -> bat_wait bat)
+      | Exit ->
+          end_drawing ();
+          exit 0
+      | Invalid_input ->
+          end_drawing ();
+          bat_wait bat)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -198,7 +204,6 @@ let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
 let battle_start () =
-  clear_background Color.raywhite;
   set_window_title "Battle";
   let bat =
     Game.Battle.init_battle
