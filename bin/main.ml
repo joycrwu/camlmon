@@ -233,6 +233,9 @@ let inity = ref 0.
 
 let move_distance = 24
 let tile_size = 96
+let randomBattleProbability = 0
+let windowWidth = 1632
+let windowHeight = 960
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
@@ -266,75 +269,92 @@ let rec map_wait st lvl =
         ^ ","
         ^ string_of_int (snd location))
         0 50 40 Color.black;
+      let randomBattleGen = Random.int 100 < randomBattleProbability in
       match Command.map_input player_input with
       | Up -> (
           let x = fst location in
           let y = snd location - move_distance in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              up ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              up ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                up ();
+                end_drawing ();
+                if randomBattleGen then battle_start ()
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                up ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Down -> (
           let x = fst location in
           let y = snd location + move_distance in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              down ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              down ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                down ();
+                end_drawing ();
+                if randomBattleGen then battle_start ()
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                down ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Left -> (
           let x = fst location - move_distance in
           let y = snd location in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              left ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              left ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                left ();
+                end_drawing ();
+                if randomBattleGen then battle_start ()
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                left ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Right -> (
           let x = fst location + move_distance in
           let y = snd location in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              right ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              right ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                right ();
+                end_drawing ();
+                if randomBattleGen then battle_start ()
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                right ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Battle ->
           end_drawing ();
           battle_start ()
@@ -354,7 +374,8 @@ let rec map_wait st lvl =
    lvl *)
 
 let main () =
-  Raylib.init_window 1720 1000 "raylib [core] example - basic window";
+  Raylib.init_window windowWidth windowHeight
+    "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
   let lvl =
     "data" ^ Filename.dir_sep ^ "basiclevel.json"
