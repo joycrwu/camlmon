@@ -24,8 +24,11 @@ type battle_command =
   | Invalid_input
 
 val battle_input : Battle.t -> Character.t -> Key.t -> battle_command
-(** [battle_input s] pattern matches the pressed key to a [command]. *)
+(** [battle_input s] pattern matches the pressed key to a [command] when
+    in the battle state. *)
 
+(** The type [hatchery_command] represents a player's command when in
+    the hatchery. *)
 type hatchery_command =
   | Roll
   | Skip

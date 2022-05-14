@@ -1,12 +1,18 @@
 open Character
 open Team
 
+type status =
+  | Ongoing
+  | Won
+  | Lost
+
 type t = {
   character : Character.t;
   character_hp : int;
   team : Character.t list;
   enemy : Character.t;
   enemy_hp : int;
+  status : status;
 }
 
 let init_battle
@@ -19,6 +25,7 @@ let init_battle
     team;
     enemy;
     enemy_hp = Character.get_hp enemy;
+    status = Ongoing;
   }
 
 let character_hp bat = bat.character_hp
@@ -26,6 +33,43 @@ let enemy_hp bat = bat.enemy_hp
 let character bat = bat.character
 let enemy bat = bat.enemy
 let team bat = bat.team
+
+(** return true if we won the battle, false if we lost, meaning that our
+    health reached zero first*)
+let wonbool bat =
+  match bat.status with
+  | Won -> true
+  | _ -> false
+
+let losebool bat =
+  match bat.status with
+  | Lost -> true
+  | _ -> false
+
+let overbool bat =
+  match bat.status with
+  | Ongoing -> false
+  | _ -> true
+
+let wonbattle bat =
+  {
+    character = bat.character;
+    character_hp = bat.character_hp;
+    team = bat.team;
+    enemy = bat.enemy;
+    enemy_hp = bat.enemy_hp;
+    status = Won;
+  }
+
+let lostbattle bat =
+  {
+    character = bat.character;
+    character_hp = bat.character_hp;
+    team = bat.team;
+    enemy = bat.enemy;
+    enemy_hp = bat.enemy_hp;
+    status = Lost;
+  }
 
 (** this code was copied from stackoverflow
     https://stackoverflow.com/questions/31279920/finding-an-item-in-a-list-and-returning-its-index-ocaml*)
@@ -57,13 +101,16 @@ let character_turn_enemyhp c_action_eff bat =
   else bat.enemy_hp
 
 let character_turn c_action_eff bat =
-  {
-    character = character_cycle bat.team bat.character;
-    character_hp = character_turn_hp c_action_eff bat;
-    team = bat.team;
-    enemy = bat.enemy;
-    enemy_hp = character_turn_enemyhp c_action_eff bat;
-  }
+  if character_turn_enemyhp c_action_eff bat <= 0 then wonbattle bat
+  else
+    {
+      character = character_cycle bat.team bat.character;
+      character_hp = character_turn_hp c_action_eff bat;
+      team = bat.team;
+      enemy = bat.enemy;
+      enemy_hp = character_turn_enemyhp c_action_eff bat;
+      status = Ongoing;
+    }
 
 let enemy_turn_charhp e_action_eff bat =
   if e_action_eff > 0 then
@@ -80,16 +127,13 @@ let enemy_turn_hp e_action_eff bat =
   else bat.enemy_hp
 
 let enemy_turn e_action_eff bat =
-  {
-    character = bat.character;
-    character_hp = enemy_turn_charhp e_action_eff bat;
-    team = bat.team;
-    enemy = bat.enemy;
-    enemy_hp = enemy_turn_charhp e_action_eff bat;
-  }
-
-(** return true if we won the battle, false if we lost, meaning that our
-    health reached zero first*)
-let wonbattle bat = bat.enemy_hp <= 0
-
-let losebattle bat = bat.character_hp <= 0
+  if enemy_turn_charhp e_action_eff bat <= 0 then lostbattle bat
+  else
+    {
+      character = bat.character;
+      character_hp = enemy_turn_charhp e_action_eff bat;
+      team = bat.team;
+      enemy = bat.enemy;
+      enemy_hp = enemy_turn_charhp e_action_eff bat;
+      status = Ongoing;
+    }
