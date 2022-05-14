@@ -6,10 +6,10 @@ type t
 val current_health : t -> int
 (** [current_health st] is the current health level in a given state.*)
 
-val current_tile_id : t -> int
+val current_tile_id : t -> int * int
 (** [current_tile_id st] is the current location in a given state.*)
 
-val current_level : t -> int
+val current_level : t -> string
 (** [current_level st] is the current level in a given state. *)
 
 val current_team : t -> Character.t list
@@ -27,10 +27,6 @@ val init_state : Level.t -> Character.t -> t
 val move : t -> int -> int -> t
 (** [move st x y] changes the current location of the state to the newly
     inputted x and y units. *)
-
-val new_playable_character : t -> Character.t -> t
-(** [new_playable_character st ch] adds [ch] as a new playable character
-    to the character pool. *)
 
 val add_to_team : t -> Character.t -> t
 (** [add_to_team st ch] adds [ch] as a character on the current team if
