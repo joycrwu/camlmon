@@ -137,59 +137,65 @@ let lose_text () =
   Raylib.draw_rectangle 0 0 600 500 Color.black;
   Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
 
-let exit_battle bat =
-  if Game.Battle.wonbattle bat then victory_text ()
-  else if Game.Battle.losebattle bat then lose_text ()
+let draw_exit_battle bat =
+  if Game.Battle.wonbool bat then victory_text ()
+  else if Game.Battle.losebool bat then lose_text ()
+  else ()
 
-let rec bat_wait (bat : Battle.t) =
+let rec bat_wait (st : State.t) bat =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false -> (
-      exit_battle bat;
+      draw_exit_battle bat;
       begin_drawing ();
       clear_background Color.raywhite;
       draw_battle_text bat ();
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
       let player_input = Raylib.get_key_pressed () in
-      match Game.Command.battle_input bat character player_input with
-      | Attack x ->
-          end_drawing ();
-          bat
-          |> Game.Battle.character_turn x
-          |> Game.Battle.enemy_turn
-               (Game.Character.get_action_effect enemy (Random.int 3))
-          |> bat_wait
-      | Run ->
-          if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
-          then
-            if Random.bool () then exit 0
+      if Battle.overbool bat then
+        match Game.Command.battle_input bat character player_input with
+        | _ -> ()
+      else
+        match Game.Command.battle_input bat character player_input with
+        | Attack x ->
+            end_drawing ();
+            bat
+            |> Game.Battle.character_turn x
+            |> Game.Battle.enemy_turn
+                 (Game.Character.get_action_effect enemy (Random.int 3))
+            |> bat_wait st
+        | Run ->
+            if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
+            then
+              if Random.bool () then exit 0
+              else (
+                draw_failed_run ();
+                end_drawing ();
+                bat
+                |> Game.Battle.enemy_turn
+                     (Game.Character.get_action_effect enemy
+                        (Random.int 3))
+                |> bat_wait st)
+            else if
+              Random.int 100
+              < Game.Battle.character_hp bat
+                - Game.Battle.enemy_hp bat
+                + 50
+            then exit 0
             else (
               draw_failed_run ();
-              end_drawing ();
               bat
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
-              |> bat_wait)
-          else if
-            Random.int 100
-            < Game.Battle.character_hp bat
-              - Game.Battle.enemy_hp bat
-              + 50
-          then exit 0
-          else (
-            draw_failed_run ();
-            bat
-            |> Game.Battle.enemy_turn
-                 (Game.Character.get_action_effect enemy (Random.int 3))
-            |> bat_wait)
-      | Exit ->
-          end_drawing ();
-          exit 0
-      | Invalid_input ->
-          end_drawing ();
-          bat_wait bat)
+              |> bat_wait st)
+        | Exit ->
+            end_drawing ();
+            exit 0
+        | Invalid_input ->
+            end_drawing ();
+            bat_wait st bat)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -203,7 +209,7 @@ let randomChar2 =
 let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
-let battle_start () =
+let battle_start st =
   set_window_title "Battle";
   let bat =
     Game.Battle.init_battle
@@ -224,7 +230,7 @@ let battle_start () =
           |> Yojson.Basic.from_file |> Game.Character.from_json;
         ])
   in
-  bat_wait bat
+  bat_wait st bat
 
 let initx = ref 0.
 let inity = ref 0.
@@ -233,7 +239,7 @@ let inity = ref 0.
 
 let move_distance = 24
 let tile_size = 96
-let randomBattleProbability = 0
+let randomBattleProbability = 10
 let windowWidth = 1632
 let windowHeight = 960
 let up () : unit = inity := !inity -. float_of_int move_distance
@@ -283,7 +289,7 @@ let rec map_wait st lvl =
             | Grass ->
                 up ();
                 end_drawing ();
-                if randomBattleGen then battle_start ()
+                if randomBattleGen then battle_start st
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -304,7 +310,7 @@ let rec map_wait st lvl =
             | Grass ->
                 down ();
                 end_drawing ();
-                if randomBattleGen then battle_start ()
+                if randomBattleGen then battle_start st
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -325,7 +331,7 @@ let rec map_wait st lvl =
             | Grass ->
                 left ();
                 end_drawing ();
-                if randomBattleGen then battle_start ()
+                if randomBattleGen then battle_start st
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -346,7 +352,7 @@ let rec map_wait st lvl =
             | Grass ->
                 right ();
                 end_drawing ();
-                if randomBattleGen then battle_start ()
+                if randomBattleGen then battle_start st
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -357,7 +363,7 @@ let rec map_wait st lvl =
                 map_wait (Game.State.move st x y) lvl)
       | Battle ->
           end_drawing ();
-          battle_start ()
+          battle_start st
       | Exit ->
           end_drawing ();
           exit 0

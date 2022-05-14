@@ -19,3 +19,4 @@ val fought : t -> string -> t
     fought against. Does not check wins*)
 
 val move : t -> int -> int -> t
+(** [move t x y] creates a new state with new location (x, y). *)
