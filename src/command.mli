@@ -31,4 +31,4 @@ type hatchery_command =
   | Skip
   | Invalid
 
-val hatchery_input : char -> hatchery_command
+val hatchery_input : Key.t -> hatchery_command

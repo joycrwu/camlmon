@@ -233,7 +233,7 @@ let inity = ref 0.
 
 let move_distance = 24
 let tile_size = 96
-let randomBattleProbability = 0
+let randomBattleProbability = 10
 let windowWidth = 1632
 let windowHeight = 960
 let up () : unit = inity := !inity -. float_of_int move_distance
@@ -372,6 +372,13 @@ let rec map_wait st lvl =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
+
+let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  let player_input = Raylib.get_key_pressed () in
+  match Command.hatchery_input player_input with
+  | Roll -> Hatchery.gacha hat
+  | Skip -> hatchery_wait st hat
+  | Invalid -> failwith "Invalid Command!"
 
 let main () =
   Raylib.init_window windowWidth windowHeight

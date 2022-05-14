@@ -46,6 +46,6 @@ type hatchery_command =
 
 let hatchery_input k =
   match k with
-  | '1' -> Roll
-  | '2' -> Skip
+  | Key.One -> Roll
+  | Key.Two -> Skip
   | _ -> Invalid
