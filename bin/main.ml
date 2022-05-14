@@ -17,7 +17,6 @@ let _ = Random.self_init ()
    Graphics.clear_graph (); Graphics.auto_synchronize true; interactive
    () *)
 
-(** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 (* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
    230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
    (rgb 0 153 230); Graphics.fill_rect 20 420 560 10; Graphics.set_color
@@ -45,6 +44,9 @@ let _ = Random.self_init ()
    (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
    (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
    Graphics.set_color (rgb 0 0 0) *)
+
+(** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
+let bottom_bar () = draw_rectangle 10 800 1720 200 Color.gray
 
 let health_bar_ally bat () =
   (* Graphics.open_graph ""; *)
@@ -93,21 +95,21 @@ let draw_battle_text bat () =
     ^ (bat |> Game.Battle.team
       |> List.map (fun x -> Game.Character.get_id x)
       |> print_list))
-    50 370 20 Color.black;
+    1300 700 20 Color.black;
   Raylib.draw_text
     ("Press 1 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 0)
-    315 60 20 Color.black;
+    1300 890 20 Color.black;
   Raylib.draw_text
     ("Press 2 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 1)
-    315 40 20 Color.black;
+    1300 920 20 Color.black;
   Raylib.draw_text
     ("Press 3 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 2)
-    315 20 20 Color.black;
-  Raylib.draw_text "Press r to run!" 485 55 20 Color.black;
-  Raylib.draw_text "Press q to quit" 485 25 20 Color.black;
+    1300 950 20 Color.black;
+  Raylib.draw_text "Press r to run!" 485 900 20 Color.black;
+  Raylib.draw_text "Press q to quit" 485 930 20 Color.black;
   Raylib.draw_text
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id))
     450 370 20 Color.red;
@@ -148,6 +150,7 @@ let rec bat_wait (bat : Battle.t) =
       exit_battle bat;
       begin_drawing ();
       clear_background Color.raywhite;
+      bottom_bar ();
       draw_battle_text bat ();
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
