@@ -200,35 +200,39 @@ let rec bat_wait (st : State.t) bat =
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
-let randomChar1 =
-  charArray |> Array.length |> Random.int |> Array.get charArray
+let i_to_char i =
+  "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+  ^ Array.get charArray i
+  |> Yojson.Basic.from_file |> Game.Character.from_json
 
-let randomChar2 =
-  charArray |> Array.length |> Random.int |> Array.get charArray
+let fullpool =
+  Array.map
+    (fun x ->
+      "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ x
+      |> Yojson.Basic.from_file |> Game.Character.from_json)
+    charArray
 
-let randomChar3 =
-  charArray |> Array.length |> Random.int |> Array.get charArray
+let rec team_wait (team : Team.t) (st : State.t) =
+  let add_rem_input = Raylib.get_key_pressed () in
+  let char_select_input = Raylib.get_key_pressed () in
+  match Command.team_add_remove add_rem_input char_select_input with
+  | Add c ->
+      team_wait
+        (Team.add (i_to_char c) team)
+        (State.add_to_team st (i_to_char c))
+  | Remove c ->
+      team_wait
+        (Team.remove (i_to_char c) team)
+        (State.remove_from_team st (i_to_char c))
+  | Unavailable -> failwith "Malformed Command"
 
-let battle_start st =
+let chara i team = List.nth (Team.get_team_characters team) i
+let enemy i = Array.get fullpool i
+
+let battle_start st team =
   set_window_title "Battle";
   let bat =
-    Game.Battle.init_battle
-      ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-       ^ randomChar1
-      |> Yojson.Basic.from_file |> Game.Character.from_json)
-      ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-       ^ randomChar2
-      |> Yojson.Basic.from_file |> Game.Character.from_json)
-      ([
-         "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-         ^ randomChar1
-         |> Yojson.Basic.from_file |> Game.Character.from_json;
-       ]
-      @ [
-          "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-          ^ randomChar3
-          |> Yojson.Basic.from_file |> Game.Character.from_json;
-        ])
+    Game.Battle.init_battle (chara 0 team) (enemy 2) [ chara 0 team ]
   in
   bat_wait st bat
 
@@ -289,7 +293,8 @@ let rec map_wait st lvl =
             | Grass ->
                 up ();
                 end_drawing ();
-                if randomBattleGen then battle_start st
+                if randomBattleGen then
+                  battle_start st (Game.Team.init_team (i_to_char 1))
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -310,7 +315,8 @@ let rec map_wait st lvl =
             | Grass ->
                 down ();
                 end_drawing ();
-                if randomBattleGen then battle_start st
+                if randomBattleGen then
+                  battle_start st (Game.Team.init_team (i_to_char 1))
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -331,7 +337,8 @@ let rec map_wait st lvl =
             | Grass ->
                 left ();
                 end_drawing ();
-                if randomBattleGen then battle_start st
+                if randomBattleGen then
+                  battle_start st (Game.Team.init_team (i_to_char 1))
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -352,7 +359,8 @@ let rec map_wait st lvl =
             | Grass ->
                 right ();
                 end_drawing ();
-                if randomBattleGen then battle_start st
+                if randomBattleGen then
+                  battle_start st (Game.Team.init_team (i_to_char 1))
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
@@ -363,7 +371,7 @@ let rec map_wait st lvl =
                 map_wait (Game.State.move st x y) lvl)
       | Battle ->
           end_drawing ();
-          battle_start st
+          battle_start st (Game.Team.init_team (i_to_char 1))
       | Exit ->
           end_drawing ();
           exit 0
@@ -395,7 +403,8 @@ let main () =
     |> Yojson.Basic.from_file |> Game.Level.from_json
   in
   let c =
-    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ randomChar1
+    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+    ^ Array.get charArray 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
   map_wait (Game.State.init_state lvl c) lvl
