@@ -29,15 +29,19 @@
     (** [get_action c n] is the action name of the [n]th ability of the character [c].*)
     
     val get_rarity : t -> int 
-    (** [get_rarity c] is the rarity of the character *)
+    (** [get_rarity c] is the rarity of the character [c] *)
     
     val get_partner : t -> string
+    (** [get_partner c] is the partner of the character [c] *)
     
     val get_partner_effect : t -> int
+    (** [get_partner_effect c] is the partner effect of the character [c] *)
     
     val get_action_effect : t -> int -> int
-    (** [get_action_effect c n] is the effect int of the [n]th ability of the character [c].*)
+    (** [get_action_effect c n] is the effect int of the [n]th ability of the 
+        character [c].*)
 
     val aff_effect :  t -> t -> string list -> int
+    (** what is this *)
 
     

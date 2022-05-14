@@ -139,15 +139,16 @@ let lose_text () =
   Raylib.draw_rectangle 0 0 600 500 Color.black;
   Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
 
-let exit_battle bat =
-  if Game.Battle.wonbattle bat then victory_text ()
-  else if Game.Battle.losebattle bat then lose_text ()
+let draw_exit_battle bat =
+  if Game.Battle.wonbool bat then victory_text ()
+  else if Game.Battle.losebool bat then lose_text ()
+  else ()
 
-let rec bat_wait (bat : Battle.t) =
+let rec bat_wait (st : State.t) bat =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false -> (
-      exit_battle bat;
+      draw_exit_battle bat;
       begin_drawing ();
       clear_background Color.raywhite;
       bottom_bar ();
@@ -155,44 +156,49 @@ let rec bat_wait (bat : Battle.t) =
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
       let player_input = Raylib.get_key_pressed () in
-      match Game.Command.battle_input bat character player_input with
-      | Attack x ->
-          end_drawing ();
-          bat
-          |> Game.Battle.character_turn x
-          |> Game.Battle.enemy_turn
-               (Game.Character.get_action_effect enemy (Random.int 3))
-          |> bat_wait
-      | Run ->
-          if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
-          then
-            if Random.bool () then exit 0
+      if Battle.overbool bat then
+        match Game.Command.battle_input bat character player_input with
+        | _ -> ()
+      else
+        match Game.Command.battle_input bat character player_input with
+        | Attack x ->
+            end_drawing ();
+            bat
+            |> Game.Battle.character_turn x
+            |> Game.Battle.enemy_turn
+                 (Game.Character.get_action_effect enemy (Random.int 3))
+            |> bat_wait st
+        | Run ->
+            if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
+            then
+              if Random.bool () then exit 0
+              else (
+                draw_failed_run ();
+                end_drawing ();
+                bat
+                |> Game.Battle.enemy_turn
+                     (Game.Character.get_action_effect enemy
+                        (Random.int 3))
+                |> bat_wait st)
+            else if
+              Random.int 100
+              < Game.Battle.character_hp bat
+                - Game.Battle.enemy_hp bat
+                + 50
+            then exit 0
             else (
               draw_failed_run ();
-              end_drawing ();
               bat
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
-              |> bat_wait)
-          else if
-            Random.int 100
-            < Game.Battle.character_hp bat
-              - Game.Battle.enemy_hp bat
-              + 50
-          then exit 0
-          else (
-            draw_failed_run ();
-            bat
-            |> Game.Battle.enemy_turn
-                 (Game.Character.get_action_effect enemy (Random.int 3))
-            |> bat_wait)
-      | Exit ->
-          end_drawing ();
-          exit 0
-      | Invalid_input ->
-          end_drawing ();
-          bat_wait bat)
+              |> bat_wait st)
+        | Exit ->
+            end_drawing ();
+            exit 0
+        | Invalid_input ->
+            end_drawing ();
+            bat_wait st bat)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -206,7 +212,7 @@ let randomChar2 =
 let randomChar3 =
   charArray |> Array.length |> Random.int |> Array.get charArray
 
-let battle_start () =
+let battle_start st =
   set_window_title "Battle";
   let bat =
     Game.Battle.init_battle
@@ -227,7 +233,7 @@ let battle_start () =
           |> Yojson.Basic.from_file |> Game.Character.from_json;
         ])
   in
-  bat_wait bat
+  bat_wait st bat
 
 let initx = ref 0.
 let inity = ref 0.
@@ -236,6 +242,9 @@ let inity = ref 0.
 
 let move_distance = 24
 let tile_size = 96
+let randomBattleProbability = 10
+let windowWidth = 1632
+let windowHeight = 960
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
@@ -269,78 +278,95 @@ let rec map_wait st lvl =
         ^ ","
         ^ string_of_int (snd location))
         0 50 40 Color.black;
+      let randomBattleGen = Random.int 100 < randomBattleProbability in
       match Command.map_input player_input with
       | Up -> (
           let x = fst location in
           let y = snd location - move_distance in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              up ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              up ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                up ();
+                end_drawing ();
+                if randomBattleGen then battle_start st
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                up ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Down -> (
           let x = fst location in
           let y = snd location + move_distance in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              down ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              down ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                down ();
+                end_drawing ();
+                if randomBattleGen then battle_start st
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                down ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Left -> (
           let x = fst location - move_distance in
           let y = snd location in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              left ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              left ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                left ();
+                end_drawing ();
+                if randomBattleGen then battle_start st
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                left ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Right -> (
           let x = fst location + move_distance in
           let y = snd location in
-          match
-            Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
-          with
-          | Grass ->
-              right ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl
-          | Water ->
-              end_drawing ();
-              map_wait st lvl
-          | Road ->
-              right ();
-              end_drawing ();
-              map_wait (Game.State.move st x y) lvl)
+          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
+          then map_wait st lvl
+          else
+            match
+              Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
+            with
+            | Grass ->
+                right ();
+                end_drawing ();
+                if randomBattleGen then battle_start st
+                else map_wait (Game.State.move st x y) lvl
+            | Water ->
+                end_drawing ();
+                map_wait st lvl
+            | Road ->
+                right ();
+                end_drawing ();
+                map_wait (Game.State.move st x y) lvl)
       | Battle ->
           end_drawing ();
-          battle_start ()
+          battle_start st
       | Exit ->
           end_drawing ();
           exit 0
@@ -356,8 +382,16 @@ let rec map_wait st lvl =
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
 
+let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  let player_input = Raylib.get_key_pressed () in
+  match Command.hatchery_input player_input with
+  | Roll -> Hatchery.gacha hat
+  | Skip -> hatchery_wait st hat
+  | Invalid -> failwith "Invalid Command!"
+
 let main () =
-  Raylib.init_window 1720 1000 "raylib [core] example - basic window";
+  Raylib.init_window windowWidth windowHeight
+    "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
   let lvl =
     "data" ^ Filename.dir_sep ^ "basiclevel.json"
