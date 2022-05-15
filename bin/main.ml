@@ -217,11 +217,9 @@ type direction =
 
 let direct = ref Down
 
-let rec battle_wait (st : State.t) bat =
+let rec bat_wait (st : State.t) bat =
   match Raylib.window_should_close () with
-  | true ->
-      Raylib.close_window ();
-      st
+  | true -> Raylib.close_window ()
   | false -> (
       draw_exit_battle bat;
       begin_drawing ();
@@ -236,7 +234,7 @@ let rec battle_wait (st : State.t) bat =
       let player_input = Raylib.get_key_pressed () in
       if Battle.overbool bat then
         match Game.Command.battle_input bat character player_input with
-        | _ -> State.to_level st
+        | _ -> ()
       else
         match Game.Command.battle_input bat character player_input with
         | Attack x ->
@@ -245,7 +243,7 @@ let rec battle_wait (st : State.t) bat =
             |> Game.Battle.character_turn x
             |> Game.Battle.enemy_turn
                  (Game.Character.get_action_effect enemy (Random.int 3))
-            |> battle_wait st
+            |> bat_wait st
         | Run ->
             if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
             then
@@ -257,7 +255,7 @@ let rec battle_wait (st : State.t) bat =
                 |> Game.Battle.enemy_turn
                      (Game.Character.get_action_effect enemy
                         (Random.int 3))
-                |> battle_wait st)
+                |> bat_wait st)
             else if
               Random.int 100
               < Game.Battle.character_hp bat
@@ -270,13 +268,13 @@ let rec battle_wait (st : State.t) bat =
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
-              |> battle_wait st)
+              |> bat_wait st)
         | Exit ->
             end_drawing ();
             exit 0
         | Invalid_input ->
             end_drawing ();
-            battle_wait st bat)
+            bat_wait st bat)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -358,7 +356,7 @@ let battle_start st team =
   let bat =
     Game.Battle.init_battle (chara 0 team) (enemy 2) [ chara 0 team ]
   in
-  battle_wait st bat
+  bat_wait st bat
 
 let initx = ref 0.
 let inity = ref 0.
@@ -372,9 +370,9 @@ let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
 let right () : unit = initx := !initx +. float_of_int move_distance
-let chara = Raylib.load_texture "assets/girl_run_large.png"
 
 let femchard x y (dir : direction) =
+  let chara = Raylib.load_texture "assets/girl_run_large.png" in
   match dir with
   | Up ->
       Raylib.draw_texture_rec chara
@@ -399,16 +397,14 @@ let femchard x y (dir : direction) =
            (410. /. 4.) (410. /. 4.))
         (Vector2.create x y) Color.white
 
-let rec level_wait st =
+let rec map_wait st lvl =
   match Raylib.window_should_close () with
-  | true ->
-      Raylib.close_window ();
-      st
+  | true -> Raylib.close_window ()
   | false -> (
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      Game.Level.draw_lvl (State.current_level st);
+      Game.Level.draw_lvl lvl;
       bottom_bar ();
       draw_map_text ();
       femchard !initx !inity !direct;
@@ -416,7 +412,6 @@ let rec level_wait st =
         ("charloc:" ^ string_of_float !initx ^ ","
        ^ string_of_float !inity)
         0 0 40 Color.black;
-      let lvl = Game.State.current_level st in
       let location = Game.State.current_tile_id st in
       let player_input = Raylib.get_key_pressed () in
       (* Game.Command.map_input ( *)
@@ -433,7 +428,7 @@ let rec level_wait st =
           let x = fst location in
           let y = snd location - move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
-          then level_wait st
+          then map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -443,24 +438,20 @@ let rec level_wait st =
                 end_drawing ();
                 if randomBattleGen then
                   battle_start st (Game.Team.init_team (i_to_char 1))
-                else level_wait (Game.State.move st x y)
+                else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                level_wait st
+                map_wait st lvl
             | Road ->
                 up ();
                 end_drawing ();
-                level_wait (Game.State.move st x y)
-            | Exit ->
-                up ();
-                end_drawing ();
-                level_wait (Game.State.move st x y))
+                map_wait (Game.State.move st x y) lvl)
       | Down -> (
           direct := Down;
           let x = fst location in
           let y = snd location + move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            level_wait st
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -470,24 +461,20 @@ let rec level_wait st =
                 end_drawing ();
                 if randomBattleGen then
                   battle_start st (Game.Team.init_team (i_to_char 1))
-                else level_wait (Game.State.move st x y)
+                else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                level_wait st
+                map_wait st lvl
             | Road ->
                 down ();
                 end_drawing ();
-                level_wait (Game.State.move st x y)
-            | Exit ->
-                down ();
-                end_drawing ();
-                level_wait (Game.State.move st x y))
+                map_wait (Game.State.move st x y) lvl)
       | Left -> (
           direct := Left;
           let x = fst location - move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            level_wait st
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -497,24 +484,20 @@ let rec level_wait st =
                 end_drawing ();
                 if randomBattleGen then
                   battle_start st (Game.Team.init_team (i_to_char 1))
-                else level_wait (Game.State.move st x y)
+                else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                level_wait st
+                map_wait st lvl
             | Road ->
                 left ();
                 end_drawing ();
-                level_wait (Game.State.move st x y)
-            | Exit ->
-                left ();
-                end_drawing ();
-                level_wait (Game.State.move st x y))
+                map_wait (Game.State.move st x y) lvl)
       | Right -> (
           direct := Right;
           let x = fst location + move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            level_wait st
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -524,18 +507,14 @@ let rec level_wait st =
                 end_drawing ();
                 if randomBattleGen then
                   battle_start st (Game.Team.init_team (i_to_char 1))
-                else level_wait (Game.State.move st x y)
+                else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                level_wait st
+                map_wait st lvl
             | Road ->
                 right ();
                 end_drawing ();
-                level_wait (Game.State.move st x y)
-            | Exit ->
-                right ();
-                end_drawing ();
-                level_wait (Game.State.move st x y))
+                map_wait (Game.State.move st x y) lvl)
       | Battle ->
           end_drawing ();
           battle_start st (Game.Team.init_team (i_to_char 1))
@@ -547,7 +526,7 @@ let rec level_wait st =
           hatchery_wait st (Hatchery.new_hatchery ())
       | _ ->
           Raylib.end_drawing ();
-          level_wait st)
+          map_wait st lvl)
 (* | Exit -> end_drawing (); exit 0 | Invalid_input -> end_drawing ();
    battle_start ()) *)
 
@@ -556,37 +535,6 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
-
-let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
-  let player_input = Raylib.get_key_pressed () in
-  match Command.hatchery_input player_input with
-  | Roll -> Hatchery.gacha hat
-  | Skip -> hatchery_wait st hat
-  | Invalid -> failwith "Invalid Command!"
-
-let rec start_wait st =
-  match Raylib.window_should_close () with
-  | true ->
-      Raylib.close_window ();
-      st
-  | false ->
-      let open Raylib in
-      begin_drawing ();
-      clear_background Color.raywhite;
-      Raylib.draw_text "hello, press enter to continue" 0 0 40
-        Color.black;
-      if Raylib.is_key_pressed Key.Enter then (
-        end_drawing ();
-        State.to_level st)
-      else (
-        end_drawing ();
-        start_wait st)
-
-let rec wait st =
-  match State.status st with
-  | Start -> wait (start_wait st)
-  | Level -> wait (level_wait st)
-  | _ -> wait st
 
 let main () =
   Raylib.init_window windowWidth windowHeight
@@ -601,7 +549,9 @@ let main () =
     ^ Array.get charArray 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
-  wait (Game.State.init_state lvl c)
+  (* hatchery_wait (Game.State.init_state lvl c) (Hatchery.new_hatchery
+     ()) *)
+  map_wait (Game.State.init_state lvl c) lvl
 (* (* duplicate code *) let load path = let tex = Raylib.load_texture
    path in Gc.finalise Raylib.unload_texture tex; tex *)
 
