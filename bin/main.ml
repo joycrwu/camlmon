@@ -542,9 +542,9 @@ let rec level_wait st =
       | Exit ->
           end_drawing ();
           exit 0
-      | Hatchery ->
+      (**| Hatchery ->
           end_drawing ();
-          hatchery_wait st (Hatchery.new_hatchery ())
+          hatchery_wait st (Hatchery.new_hatchery ()) *)
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
