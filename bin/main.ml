@@ -1,4 +1,3 @@
-(* open Graphics *)
 open Game
 open Raylib
 
@@ -26,12 +25,11 @@ let _ = Random.self_init ()
    255); Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230
    247 255); Graphics.fill_rect 20 100 560 10; *)
 (* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
-   230 251 255); Graphics.fill_rect 0 90 600 490;
-
-   Graphics.set_color (rgb 128 170 255); Graphics.fill_rect 0 0 600 90;
-   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 10 5 280 80;
-   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 310 5 280
-   80; Graphics.set_color (rgb 0 0 0) *)
+   230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
+   (rgb 128 170 255); Graphics.fill_rect 0 0 600 90; Graphics.set_color
+   (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
+   (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
+   Graphics.set_color (rgb 0 0 0) *)
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -288,6 +286,63 @@ let i_to_char i =
   ^ Array.get charArray i
   |> Yojson.Basic.from_file |> Game.Character.from_json
 
+(**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
+let hatchery_background () =
+  clear_background (Color.create 230 251 255 255);
+  draw_rectangle 0 0 1632 10 Color.gray
+
+let hatchery_bottom_bar () =
+  draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
+  draw_rectangle 26 820 776 140 (Color.create 104 160 160 255);
+  draw_rectangle 829 820 776 140 (Color.create 179 242 255 255)
+
+let draw_hatchery_text () =
+  (* draw_text text pos_x pos_y font_size color *)
+  Raylib.draw_text "Welcome to the Hatchery!" 500 835 50 Color.black;
+  Raylib.draw_text "Press 1 to roll" 100 875 30 Color.black;
+  Raylib.draw_text "Press 2 to skip" 100 915 30 Color.black
+
+let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  match Raylib.window_should_close () with
+  | true -> Raylib.close_window ()
+  | false -> (
+      (let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      hatchery_background ();
+      hatchery_bottom_bar ();
+      draw_hatchery_text ());
+      let player_input = Raylib.get_key_pressed () in
+      match Command.hatchery_input player_input with
+      | Roll ->
+          let new_char = Hatchery.gacha hat in
+          let new_state = State.new_playable_char st new_char in
+          let new_hatchery = Hatchery.character_outputs new_char hat in
+          end_drawing ();
+          hatchery_wait new_state new_hatchery
+      | Skip ->
+          end_drawing ();
+          hatchery_wait st hat
+      | Invalid ->
+          (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
+          end_drawing ();
+          hatchery_wait st hat)
+
+let create_hatchery hat =
+  let all_character_json_list =
+    List.map Yojson.Basic.from_file (Array.to_list charArray)
+  in
+  let all_character_list =
+    List.map Character.from_json all_character_json_list
+  in
+  List.fold_left Hatchery.add_char_to_pool hat all_character_list
+
+let hatchery_start st =
+  set_window_title "Hatchery";
+  let empty_hatchery = Hatchery.new_hatchery () in
+  let charpool_hatchery = create_hatchery empty_hatchery in
+  hatchery_wait st charpool_hatchery
+
 let fullpool =
   Array.map
     (fun x ->
@@ -487,6 +542,9 @@ let rec level_wait st =
       | Exit ->
           end_drawing ();
           exit 0
+      | Hatchery ->
+          end_drawing ();
+          hatchery_wait st (Hatchery.new_hatchery ())
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
