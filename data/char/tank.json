@@ -1,0 +1,28 @@
+{
+  "id": "Tank",
+  "hp": 1000,
+  "attack": 5,
+  "affinity": "blue",
+  "rarity": 3,
+  "actions": [
+    {
+      "name": "Punch",
+      "effect": 1,
+      "description": "Basic attack, deals 5 damage."
+    },
+    {
+      "name": "Heal",
+      "effect": -1,
+      "description": "Small heal for 5 HP."
+    },
+    {
+      "name": "Super Punch",
+      "effect": 3,
+      "description": "Powerful punch for 15 damage."
+    }
+  ],
+  "partner": {
+    "id": "Healer",
+    "parteffect": 3
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "Camel",
+  "hp": 25,
+  "attack": 10,
+  "affinity": "blue",
+  "rarity": 1,
+  "actions": [
+    {
+      "name": "Spit",
+      "effect": 1,
+      "description": "Spits at the enemy, dealing 10 damage."
+    },
+    {
+      "name": "Nap",
+      "effect": 0,
+      "description": "Sits and takes a nap."
+    }
+  ],
+  "partner": {
+    "id": "Bruiser",
+    "parteffect": 2
+  }
+}
