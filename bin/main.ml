@@ -296,9 +296,9 @@ let hatchery_bottom_bar () =
 
 let draw_hatchery_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  Raylib.draw_text "Welcome to the Hatchery!" 500 835 50 Color.black;
-  Raylib.draw_text "Press 1 to roll" 100 875 30 Color.black;
-  Raylib.draw_text "Press 2 to skip" 100 915 30 Color.black
+  Raylib.draw_text "Welcome to the Hatchery!" 80 835 50 Color.black;
+  Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
+  Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
 
 let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
   match Raylib.window_should_close () with
@@ -370,9 +370,9 @@ let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
 let right () : unit = initx := !initx +. float_of_int move_distance
+let chara = Raylib.load_texture "assets/girl_run_large.png"
 
-let femchardup x y (dir : direction) =
-  let chara = Raylib.load_texture "assets/girl_run_large.png" in
+let femchard x y (dir : direction) =
   match dir with
   | Up ->
       Raylib.draw_texture_rec chara
@@ -407,7 +407,7 @@ let rec map_wait st lvl =
       Game.Level.draw_lvl lvl;
       bottom_bar ();
       draw_map_text ();
-      femchardup !initx !inity !direct;
+      femchard !initx !inity !direct;
       Raylib.draw_text
         ("charloc:" ^ string_of_float !initx ^ ","
        ^ string_of_float !inity)
