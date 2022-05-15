@@ -6,45 +6,56 @@ open Raylib
 
 let _ = Random.self_init ()
 
-(* let flush_kp () = while key_pressed () do let _ = read_key () in ()
-   done *)
+(* Graphics.set_color (rgb 0 153 230); Graphics.fill_rect 20 420 560 10;
+   Graphics.set_color (rgb 25 178 255); Graphics.fill_rect 20 400 560
+   10; Graphics.set_color (rgb 77 195 255); Graphics.fill_rect 20 380
+   560 10; Graphics.set_color (rgb 128 212 255); Graphics.fill_rect 20
+   360 560 10; Graphics.set_color (rgb 153 221 255); Graphics.fill_rect
+   20 340 560 10; Graphics.set_color (rgb 153 221 255);
+   Graphics.fill_rect 20 320 560 10; Graphics.set_color (rgb 179 229
+   255); Graphics.fill_rect 20 300 560 10; Graphics.set_color (rgb 204
+   238 255); Graphics.fill_rect 20 280 560 10; Graphics.set_color (rgb
+   204 238 255); Graphics.fill_rect 20 260 560 10; Graphics.set_color
+   (rgb 204 238 255); Graphics.fill_rect 20 240 560 10;
+   Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 220 560
+   10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 200
+   560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20
+   180 560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect
+   20 160 560 10; Graphics.set_color (rgb 204 238 255);
+   Graphics.fill_rect 20 140 560 10; Graphics.set_color (rgb 230 247
+   255); Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230
+   247 255); Graphics.fill_rect 20 100 560 10; *)
+(* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
+   230 251 255); Graphics.fill_rect 0 90 600 490;
 
-(** this code was copied from stackoverflow
-    https://stackoverflow.com/questions/36263152/simple-ocaml-graphics-progam-that-close-before-its-window-is-displayed*)
-
-(* let rec interactive () = let event = wait_next_event [ Key_pressed ]
-   in if event.key == 'p' then exit 0 else print_char event.key;
-   Graphics.clear_graph (); Graphics.auto_synchronize true; interactive
-   () *)
+   Graphics.set_color (rgb 128 170 255); Graphics.fill_rect 0 0 600 90;
+   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 10 5 280 80;
+   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 310 5 280
+   80; Graphics.set_color (rgb 0 0 0) *)
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
-(* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
-   230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
-   (rgb 0 153 230); Graphics.fill_rect 20 420 560 10; Graphics.set_color
-   (rgb 25 178 255); Graphics.fill_rect 20 400 560 10;
-   Graphics.set_color (rgb 77 195 255); Graphics.fill_rect 20 380 560
-   10; Graphics.set_color (rgb 128 212 255); Graphics.fill_rect 20 360
-   560 10; Graphics.set_color (rgb 153 221 255); Graphics.fill_rect 20
-   340 560 10; Graphics.set_color (rgb 153 221 255); Graphics.fill_rect
-   20 320 560 10; Graphics.set_color (rgb 179 229 255);
-   Graphics.fill_rect 20 300 560 10; Graphics.set_color (rgb 204 238
-   255); Graphics.fill_rect 20 280 560 10; Graphics.set_color (rgb 204
-   238 255); Graphics.fill_rect 20 260 560 10; Graphics.set_color (rgb
-   204 238 255); Graphics.fill_rect 20 240 560 10; Graphics.set_color
-   (rgb 204 238 255); Graphics.fill_rect 20 220 560 10;
-   Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 200 560
-   10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 180
-   560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20
-   160 560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect
-   20 140 560 10; Graphics.set_color (rgb 230 247 255);
-   Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230 247
-   255); Graphics.fill_rect 20 100 560 10; Graphics.set_color (rgb 255
-   186 82); Graphics.fill_ellipse 150 95 140 60; Graphics.set_color (rgb
-   255 186 82); Graphics.fill_ellipse 460 270 140 60; Graphics.set_color
-   (rgb 128 170 255); Graphics.fill_rect 0 0 600 90; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
-   Graphics.set_color (rgb 0 0 0) *)
+let bat_backgroud () =
+  clear_background (Color.create 230 251 255 255);
+  draw_rectangle 0 0 1632 10 Color.gray
+
+let bottom_bar () =
+  draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
+  draw_rectangle 26 820 776 140 (Color.create 104 160 160 255);
+  draw_rectangle 829 820 776 140 (Color.create 179 242 255 255)
+
+let battle_platform () =
+  draw_ellipse 400 800 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 1200 350 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 400 800 370. 90. (Color.create 152 224 152 255);
+  draw_ellipse 1200 350 370. 90. (Color.create 152 224 152 255);
+  (* 3 dot row upper right*)
+  draw_rectangle 520 730 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 535 730 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 550 730 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 600 790 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 615 790 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 630 790 10 10 (Color.create 224 224 144 255)
+(* 3 dot row lower left*)
 
 let health_bar_ally bat () =
   (* Graphics.open_graph ""; *)
@@ -93,21 +104,21 @@ let draw_battle_text bat () =
     ^ (bat |> Game.Battle.team
       |> List.map (fun x -> Game.Character.get_id x)
       |> print_list))
-    50 370 20 Color.black;
+    1300 700 20 Color.black;
   Raylib.draw_text
     ("Press 1 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 0)
-    315 60 20 Color.black;
+    100 835 30 Color.black;
   Raylib.draw_text
     ("Press 2 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 1)
-    315 40 20 Color.black;
+    100 875 30 Color.black;
   Raylib.draw_text
     ("Press 3 for "
     ^ Game.Character.get_action (Game.Battle.character bat) 2)
-    315 20 20 Color.black;
-  Raylib.draw_text "Press r to run!" 485 55 20 Color.black;
-  Raylib.draw_text "Press q to quit" 485 25 20 Color.black;
+    100 915 30 Color.black;
+  Raylib.draw_text "Press r to run!" 1000 850 30 Color.black;
+  Raylib.draw_text "Press q to quit" 1000 890 30 Color.black;
   Raylib.draw_text
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id))
     450 370 20 Color.red;
@@ -142,6 +153,14 @@ let draw_exit_battle bat =
   else if Game.Battle.losebool bat then lose_text ()
   else ()
 
+type direction =
+  | Up
+  | Down
+  | Left
+  | Right
+
+let direct = ref Down
+
 let rec bat_wait (st : State.t) bat =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
@@ -149,6 +168,10 @@ let rec bat_wait (st : State.t) bat =
       draw_exit_battle bat;
       begin_drawing ();
       clear_background Color.raywhite;
+      bat_backgroud ();
+      battle_platform ();
+      bottom_bar ();
+
       draw_battle_text bat ();
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
@@ -238,9 +261,6 @@ let battle_start st team =
 
 let initx = ref 0.
 let inity = ref 0.
-
-(* clear_background Color.raywhite *)
-
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
@@ -251,11 +271,31 @@ let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
 let right () : unit = initx := !initx +. float_of_int move_distance
 
-let femchard x y =
+let femchardup x y (dir : direction) =
   let chara = Raylib.load_texture "assets/girl_run_large.png" in
-  Raylib.draw_texture_rec chara
-    (Rectangle.create 0. 0. (410. /. 4.) (410. /. 4.))
-    (Vector2.create x y) Color.white
+  match dir with
+  | Up ->
+      Raylib.draw_texture_rec chara
+        (Rectangle.create 0.
+           (3. *. (410. /. 4.))
+           (410. /. 4.) (410. /. 4.))
+        (Vector2.create x y) Color.white
+  | Down ->
+      Raylib.draw_texture_rec chara
+        (Rectangle.create 0. 0. (410. /. 4.) (410. /. 4.))
+        (Vector2.create x y) Color.white
+  | Left ->
+      Raylib.draw_texture_rec chara
+        (Rectangle.create 0.
+           (1. *. (410. /. 4.))
+           (410. /. 4.) (410. /. 4.))
+        (Vector2.create x y) Color.white
+  | Right ->
+      Raylib.draw_texture_rec chara
+        (Rectangle.create 0.
+           (2. *. (410. /. 4.))
+           (410. /. 4.) (410. /. 4.))
+        (Vector2.create x y) Color.white
 
 let rec map_wait st lvl =
   match Raylib.window_should_close () with
@@ -265,7 +305,7 @@ let rec map_wait st lvl =
       begin_drawing ();
       clear_background Color.raywhite;
       Game.Level.draw_lvl lvl;
-      femchard !initx !inity;
+      femchardup !initx !inity !direct;
       Raylib.draw_text
         ("charloc:" ^ string_of_float !initx ^ ","
        ^ string_of_float !inity)
@@ -282,6 +322,7 @@ let rec map_wait st lvl =
       let randomBattleGen = Random.int 100 < randomBattleProbability in
       match Command.map_input player_input with
       | Up -> (
+          direct := Up;
           let x = fst location in
           let y = snd location - move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
@@ -304,6 +345,7 @@ let rec map_wait st lvl =
                 end_drawing ();
                 map_wait (Game.State.move st x y) lvl)
       | Down -> (
+          direct := Down;
           let x = fst location in
           let y = snd location + move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
@@ -326,6 +368,7 @@ let rec map_wait st lvl =
                 end_drawing ();
                 map_wait (Game.State.move st x y) lvl)
       | Left -> (
+          direct := Left;
           let x = fst location - move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
@@ -348,6 +391,7 @@ let rec map_wait st lvl =
                 end_drawing ();
                 map_wait (Game.State.move st x y) lvl)
       | Right -> (
+          direct := Right;
           let x = fst location + move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
