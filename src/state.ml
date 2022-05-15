@@ -5,6 +5,7 @@ open Battle
 type status =
   | Start
   | Level
+  | Team
   | Battle
   | Hatchery
 
@@ -127,6 +128,7 @@ let change_hp st (change : int) =
 let status st = st.status
 
 let to_battle st =
+
   {
     team = st.team;
     level = st.level;
@@ -144,6 +146,17 @@ let to_level st =
     location = st.location;
     character_pool = st.character_pool;
     status = Level;
+  }
+
+
+let to_team st =
+  {
+    team = st.team;
+    level = st.level;
+    health = st.health;
+    location = st.location;
+    character_pool = st.character_pool;
+    state = Team;
   }
 
 let to_hatchery st =

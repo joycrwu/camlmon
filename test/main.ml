@@ -2,11 +2,14 @@ open OUnit2
 open Game
 open Battle
 open Character
+open Hatchery
 
 let larry = Yojson.Basic.from_file "data/char/larry.json" |> from_json
 
 let dinoplant =
   Yojson.Basic.from_file "data/char/dinoplant.json" |> from_json
+
+let healer = Yojson.Basic.from_file "data/char/healer.json" |> from_json
 
 (* let (basiclevel : Level.t) = Yojson.Basic.from_file
    "data/level/basiclevel.json" |> Level.from_json *)
@@ -123,6 +126,47 @@ let team_test
     (expected_output : Character.t list) =
   name >:: fun _ -> assert_equal expected_output (team battle)
 
+let overbool_test
+    (name : string)
+    (battle : Battle.t)
+    (expected_output : bool) =
+  name >:: fun _ -> assert_equal expected_output (overbool battle)
+
+let wonbool_test
+    (name : string)
+    (battle : Battle.t)
+    (expected_output : bool) =
+  name >:: fun _ -> assert_equal expected_output (wonbool battle)
+
+let losebool_test
+    (name : string)
+    (battle : Battle.t)
+    (expected_output : bool) =
+  name >:: fun _ -> assert_equal expected_output (losebool battle)
+
+(**END BATTLE TESTS**)
+
+(**START HATCHERY TESTS**)
+let get_normalcharpool_test
+    (name : string)
+    (hat : Hatchery.t)
+    (expected_output : Character.t list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (get_normal_char_pool hat)
+
+let get_rarecharpool_test
+    (name : string)
+    (hat : Hatchery.t)
+    (expected_output : Character.t list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (get_rare_char_pool hat)
+
+let get_ssrcharpool_test
+    (name : string)
+    (hat : Hatchery.t)
+    (expected_output : Character.t list) : test =
+  name >:: fun _ -> assert_equal expected_output (get_ssr_char_pool hat)
+
 let get_map_test
     (name : string)
     (lvl : Level.t)
@@ -158,21 +202,90 @@ let character_tests =
   ]
 
 let alpha_battle = init_battle larry dinoplant [ larry ]
+let alpha_battle_won = wonbattle alpha_battle
+let alpha_battle_lost = lostbattle alpha_battle
+let alpha_battle_larryturn = character_turn 2 alpha_battle
+let alpha_battle_dinoturn = enemy_turn 0 alpha_battle_larryturn
 
 let battle_tests =
   [
     character_hp_test "Larry HP - Alpha Battle" alpha_battle 100;
+    character_hp_test "Larry HP - Alpha Battle Won" alpha_battle_won 100;
+    character_hp_test "Larry HP - Alpha Battle Lost" alpha_battle_lost
+      100;
     enemy_hp_test "Dinoplant HP - Alpha Battle" alpha_battle 100;
+    enemy_hp_test "Dinoplant HP - Alpha Battle Won" alpha_battle_won 100;
+    enemy_hp_test "Dinoplant HP - Alpha Battle Lose" alpha_battle_lost
+      100;
     character_test "Larry Character - Alpha Battle" alpha_battle larry;
+    character_test "Larry Character - Alpha Battle Won" alpha_battle_won
+      larry;
+    character_test "Larry Character - Alpha Battle Lose"
+      alpha_battle_lost larry;
     enemy_test "Dinoplant Character - Alpha Battle" alpha_battle
       dinoplant;
+    enemy_test "Dinoplant Character - Alpha Battle Won" alpha_battle_won
+      dinoplant;
+    enemy_test "Dinoplant Character - Alpha Battle Lose"
+      alpha_battle_lost dinoplant;
     team_test "Alpha Battle Team" alpha_battle [ larry ];
+    team_test "Alpha Battle Won Team" alpha_battle_won [ larry ];
+    team_test "Alpha Battle Lost Team" alpha_battle [ larry ];
+    overbool_test "Alpha Battle Ongoing - Ongoing" alpha_battle false;
+    overbool_test "Alpha Battle Won - Ongoing" alpha_battle_won true;
+    overbool_test "Alpha Battle Lost - Ongoing" alpha_battle_lost true;
+    wonbool_test "Alpha Battle Won - Won" alpha_battle_won true;
+    wonbool_test "Alpha Battle Ongoing - Won" alpha_battle false;
+    wonbool_test "Alpha Battle Lose - Won" alpha_battle_lost false;
+    losebool_test "Alpha Battle Lose - Lose" alpha_battle_lost true;
+    losebool_test "Alpha Battle Ongoing - Lose" alpha_battle false;
+    losebool_test "Alpha Battle Won - Lose" alpha_battle_won false;
+    enemy_hp_test "Dino HP - Larry Thunderbolt - Alpha Battle"
+      alpha_battle_larryturn 100;
+    character_hp_test "Larry HP - Larry Thunderbolt - Alpha Battle"
+      alpha_battle_larryturn 100;
+    enemy_hp_test "Dino HP - Dino Thunderbolt - Alpha Battle"
+      alpha_battle_dinoturn 100;
+    character_hp_test "Larry HP - Dino Thunderbolt - Alpha Battle"
+      alpha_battle_dinoturn 100;
   ]
 
+let empty_hatchery = Hatchery.new_hatchery ()
+let alpha_hatchery = Hatchery.add_char_to_pool empty_hatchery larry
+let beta_hatchery = Hatchery.add_char_to_pool alpha_hatchery dinoplant
+let gamma_hatchery = Hatchery.add_char_to_pool beta_hatchery healer
+
+let hatchery_tests =
+  [
+    get_normalcharpool_test "Empty Hatchery - Normal Char Pool"
+      empty_hatchery [];
+    get_rarecharpool_test "Empty Hatchery - Rare Char Pool"
+      empty_hatchery [];
+    get_ssrcharpool_test "Empty Hatchery - SSR Char Pool" empty_hatchery
+      [];
+    get_normalcharpool_test "Larry Hatchery - Normal Char Pool"
+      alpha_hatchery [];
+    get_rarecharpool_test "Larry Hatchery - Rare Char Pool"
+      alpha_hatchery [ larry ];
+    get_ssrcharpool_test "Larry Hatchery - SSR Char Pool" alpha_hatchery
+      [];
+    get_normalcharpool_test "Larry/Dino Hatchery - Normal" beta_hatchery
+      [ dinoplant ];
+    get_rarecharpool_test "Larry/Dino Hatchery - Rare" beta_hatchery
+      [ larry ];
+    get_ssrcharpool_test "Larry/Dino Hatchery - SSR" beta_hatchery [];
+    get_normalcharpool_test "Gamma Hatchery - Normal" gamma_hatchery
+      [ healer; dinoplant ];
+    get_rarecharpool_test "Gamma Hatchery - Rare" gamma_hatchery
+      [ larry ];
+    get_ssrcharpool_test "Gamma Hatchery - SSR" gamma_hatchery [];
+  ]
 (* let level_tests = [ get_map_test "Basiclevel map" basiclevel
    "basiclevel" ] *)
 
 let suite =
-  "test suite" >::: List.flatten ([ character_tests ] @ [ battle_tests ])
+  "test suite"
+  >::: List.flatten
+         ([ character_tests ] @ [ battle_tests ] @ [ hatchery_tests ])
 
 let _ = run_test_tt_main suite
