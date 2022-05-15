@@ -9,6 +9,7 @@ type map_command =
   | Left
   | Right
   | Battle
+  | Hatchery
   | Exit
   | Invalid_input
 

@@ -14,6 +14,11 @@
       "name": "Nap",
       "effect": 0,
       "description": "Sits and takes a nap."
+    },
+    {
+      "name": "Stare",
+      "effect": 0,
+      "description": "Stares"
     }
   ],
   "partner": {
