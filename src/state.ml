@@ -5,6 +5,7 @@ open Battle
 type status =
   | Start
   | Level
+  | Team
   | Battle
   | Hatchery
 
@@ -144,6 +145,16 @@ let to_level st =
     location = st.location;
     character_pool = st.character_pool;
     status = Level;
+  }
+
+let to_team st =
+  {
+    team = st.team;
+    level = st.level;
+    health = st.health;
+    location = st.location;
+    character_pool = st.character_pool;
+    status = Team;
   }
 
 let to_hatchery st =

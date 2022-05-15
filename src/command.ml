@@ -56,6 +56,7 @@ let hatchery_input k =
 type team_command =
   | Add of int
   | Remove of int
+  | Battle
   | Unavailable
 
 let team_add_char k =
@@ -90,4 +91,5 @@ let team_add_remove k c =
   match k with
   | Key.A -> team_add_char c
   | Key.R -> team_remove_char c
+  | Key.B -> Battle
   | _ -> Unavailable

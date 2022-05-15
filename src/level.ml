@@ -2,7 +2,7 @@ open Graphics
 open Raylib
 open Yojson.Basic.Util
 
-(* let _ = Random.self_init () *)
+let _ = Random.self_init ()
 let tile_width = 96
 let tile_height = 96
 
@@ -123,3 +123,10 @@ let draw_lvl lvl =
    Graphics.draw_string "Press WASD to move"; Graphics.moveto 400 40;
    Graphics.draw_string "Press f to fight"; Graphics.moveto 400 15;
    Graphics.draw_string "Press q to quit" *)
+
+let level_array =
+  Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
+
+let random_level =
+  level_array |> Array.length |> Random.int |> Array.get level_array
+  |> Yojson.Basic.from_file |> from_json
