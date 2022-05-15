@@ -2,16 +2,11 @@ open Level
 open Character
 open Battle
 
-type direction =
-  | Left
-  | Right
-  | Up
-  | Down
-
-type action =
-  | Move of direction
-  | Fight
-  | Heal
+type status =
+  | Start
+  | Level
+  | Battle
+  | Hatchery
 
 type t = {
   team : Character.t list;
@@ -19,6 +14,7 @@ type t = {
   level : string;
   location : int * int;
   character_pool : Character.t list;
+  state : status;
 }
 
 (**STATE GETTER FUNCTIONS**)
@@ -39,6 +35,7 @@ let init_state (lvl : Level.t) (starter : Character.t) =
       health = get_hp starter;
       location = start_location lvl;
       character_pool = [ starter ];
+      state = Start;
     }
   in
   t
@@ -55,6 +52,7 @@ let move st (x : int) (y : int) =
     level = st.level;
     location = (x, y);
     character_pool = st.character_pool;
+    state = st.state;
   }
 
 (*not done, probably needs a way to decide which battle it is
@@ -72,6 +70,7 @@ let new_playable_char st (ch : Character.t) =
     health = st.health;
     location = st.location;
     character_pool = ch :: st.character_pool;
+    state = st.state;
   }
 
 (*team is the set of characters that the player chooses to use in a
@@ -85,6 +84,7 @@ let add_to_team st (ch : Character.t) =
       health = st.health;
       location = st.location;
       character_pool = st.character_pool;
+      state = st.state;
     }
   else st
 
@@ -96,6 +96,7 @@ let remove_from_team st (ch : Character.t) =
       health = st.health;
       location = st.location;
       character_pool = st.character_pool;
+      state = st.state;
     }
   else st
 
@@ -106,6 +107,7 @@ let change_hp st (change : int) =
     health = st.health + change;
     location = st.location;
     character_pool = st.character_pool;
+    state = st.state;
   }
 
 (* obtainchar is for when u obtain a new character from the hatchery.
@@ -121,3 +123,35 @@ let change_hp st (change : int) =
    health = st.health; levelmap = st.levelmap; location = st.location;
    alive = st.alive; fought = st.fought; usable = st.usable; inventory =
    item :: st.inventory; } *)
+
+let get_state st = st.state
+
+let to_level st st =
+  {
+    team = st.team;
+    level = st.level;
+    health = st.health;
+    location = st.location;
+    character_pool = st.character_pool;
+    state = Level;
+  }
+
+let to_battle st =
+  {
+    team = st.team;
+    level = st.level;
+    health = st.health;
+    location = st.location;
+    character_pool = st.character_pool;
+    state = Battle;
+  }
+
+let to_level st =
+  {
+    team = st.team;
+    level = st.level;
+    health = st.health;
+    location = st.location;
+    character_pool = st.character_pool;
+    state = Hatchery;
+  }

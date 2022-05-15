@@ -1,5 +1,13 @@
 open Level
 
+type status =
+  | Start
+  | Level
+  | Battle
+  | Hatchery
+
+(** The various types of status that represent the phases of the game. *)
+
 type t
 (** The abstract type of values representing the game state. *)
 
@@ -39,3 +47,16 @@ val remove_from_team : t -> Character.t -> t
 
 val change_hp : t -> int -> t
 (** [change_hp st change] changes the current state's HP by [change].*)
+
+val get_state : t -> status
+(** [get_state st] is the current status of [st], such as the start
+    screen, world map, battle or hatchery. *)
+
+val to_battle : t -> t
+(** [to_battle st] is st with the status changed to battle. *)
+
+val to_battle : t -> t
+(** [to_level st] is st with the status changed to level. *)
+
+val to_battle : t -> t
+(** [to_hatchery st] is st with the status changed to hatchery. *)
