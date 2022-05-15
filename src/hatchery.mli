@@ -6,7 +6,7 @@ type t
 val new_hatchery : unit -> t
 (**Creates a new hatchery with no characters in it yet.*)
 
-val add_char_to_pool : Character.t -> t -> Character.t list
+val add_char_to_pool : t -> Character.t -> t
 val get_normal_char_pool : t -> Character.t list
 val get_rare_char_pool : t -> Character.t list
 val get_ssr_char_pool : t -> Character.t list

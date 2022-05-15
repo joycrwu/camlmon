@@ -18,11 +18,11 @@ let new_hatchery () =
     output_characters = [];
   }
 
-let add_char_to_pool (ch : Character.t) (hat : t) =
+let add_char_to_pool (hat : t) (ch : Character.t) =
   match get_rarity ch with
-  | 1 -> ch :: hat.normal_char_pool
-  | 2 -> ch :: hat.rare_char_pool
-  | 3 -> ch :: hat.ssr_char_pool
+  | 1 -> { hat with normal_char_pool = ch :: hat.normal_char_pool }
+  | 2 -> { hat with rare_char_pool = ch :: hat.rare_char_pool }
+  | 3 -> { hat with ssr_char_pool = ch :: hat.ssr_char_pool }
   | _ -> failwith "Rarity unaccepted"
 
 let get_normal_char_pool hat = hat.normal_char_pool

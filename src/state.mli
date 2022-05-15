@@ -28,6 +28,10 @@ val move : t -> int -> int -> t
 (** [move st x y] changes the current location of the state to the newly
     inputted x and y units. *)
 
+val new_playable_char : t -> Character.t -> t
+(** [new_playable_character st ch] adds [ch] into the pool of possible
+    playable characters.*)
+
 val add_to_team : t -> Character.t -> t
 (** [add_to_team st ch] adds [ch] as a character on the current team if
     there is still room on the team for another character. The maximum
