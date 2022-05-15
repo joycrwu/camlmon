@@ -128,7 +128,6 @@ let change_hp st (change : int) =
 let status st = st.status
 
 let to_battle st =
-
   {
     team = st.team;
     level = st.level;
@@ -148,7 +147,6 @@ let to_level st =
     status = Level;
   }
 
-
 let to_team st =
   {
     team = st.team;
@@ -156,7 +154,7 @@ let to_team st =
     health = st.health;
     location = st.location;
     character_pool = st.character_pool;
-    state = Team;
+    status = Team;
   }
 
 let to_hatchery st =

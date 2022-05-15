@@ -372,9 +372,9 @@ let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
 let right () : unit = initx := !initx +. float_of_int move_distance
-let chara = Raylib.load_texture "assets/girl_run_large.png"
 
 let femchard x y (dir : direction) =
+  let chara = Raylib.load_texture "assets/girl_run_large.png" in
   match dir with
   | Up ->
       Raylib.draw_texture_rec chara
@@ -542,9 +542,9 @@ let rec level_wait st =
       | Exit ->
           end_drawing ();
           exit 0
-      | Hatchery ->
+      (** | Hatchery ->
           end_drawing ();
-          hatchery_wait st (Hatchery.new_hatchery ())
+          hatchery_wait st (Hatchery.new_hatchery ()) *)
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
@@ -556,13 +556,6 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
-
-let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
-  let player_input = Raylib.get_key_pressed () in
-  match Command.hatchery_input player_input with
-  | Roll -> Hatchery.gacha hat
-  | Skip -> hatchery_wait st hat
-  | Invalid -> failwith "Invalid Command!"
 
 let rec start_wait st =
   match Raylib.window_should_close () with
@@ -593,7 +586,7 @@ let main () =
     "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
   let lvl =
-    "data" ^ Filename.dir_sep ^ "basiclevel.json"
+    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep ^ "basiclevel.json"
     |> Yojson.Basic.from_file |> Game.Level.from_json
   in
   let c =
