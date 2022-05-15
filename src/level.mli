@@ -33,5 +33,5 @@ val draw_lvl : t -> unit
 val from_json : Yojson.Basic.t -> t
 (** [from_json j] is the level that [j] represents. Requires: [j] is
         a valid JSON character representation. *)
-val random_level : t
+(** val random_level : t *)
 (** [random_level] is a random level type from data/level.*)

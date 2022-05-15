@@ -124,9 +124,8 @@ let draw_lvl lvl =
    Graphics.draw_string "Press f to fight"; Graphics.moveto 400 15;
    Graphics.draw_string "Press q to quit" *)
 
-let level_array =
-  Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
+(** let level_array = Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^
+    Filename.dir_sep)
 
-let random_level =
-  level_array |> Array.length |> Random.int |> Array.get level_array
-  |> Yojson.Basic.from_file |> from_json
+    let random_level = level_array |> Array.length |> Random.int |>
+    Array.get level_array |> Yojson.Basic.from_file |> from_json *)
