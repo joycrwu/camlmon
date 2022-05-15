@@ -48,14 +48,31 @@ let battle_platform () =
   draw_ellipse 1200 350 400. 100. (Color.create 224 224 144 255);
   draw_ellipse 400 800 370. 90. (Color.create 152 224 152 255);
   draw_ellipse 1200 350 370. 90. (Color.create 152 224 152 255);
+
   (* 3 dot row upper right*)
+  draw_rectangle 1320 300 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 1335 300 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 1350 300 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 1400 360 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 1415 360 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 1430 360 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 1000 360 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 1015 360 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 1030 360 10 10 (Color.create 168 232 168 255);
+  (* 3 dot row lower left*)
   draw_rectangle 520 730 10 10 (Color.create 168 232 168 255);
   draw_rectangle 535 730 10 10 (Color.create 168 232 168 255);
   draw_rectangle 550 730 10 10 (Color.create 224 224 144 255);
   draw_rectangle 600 790 10 10 (Color.create 168 232 168 255);
   draw_rectangle 615 790 10 10 (Color.create 168 232 168 255);
-  draw_rectangle 630 790 10 10 (Color.create 224 224 144 255)
-(* 3 dot row lower left*)
+  draw_rectangle 630 790 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 150 790 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 165 790 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 180 790 10 10 (Color.create 168 232 168 255)
+
+let box_battext () =
+  draw_rectangle 26 100 600 300 (Color.create 248 248 216 255);
+  draw_rectangle 829 520 600 300 (Color.create 248 248 216 255)
 
 let health_bar_ally bat () =
   (* Graphics.open_graph ""; *)
@@ -90,6 +107,16 @@ let rec print_list (list : string list) =
       if List.length list > 1 then h ^ ", " ^ print_list t else h
   | [] -> "none"
 
+let draw_map_text () =
+  Raylib.draw_text "MOVEMENT:" 50 870 30 Color.black;
+  Raylib.draw_text "W - UP" 300 830 30 Color.black;
+  Raylib.draw_text "A - LEFT" 300 860 30 Color.black;
+  Raylib.draw_text "S - DOWN" 300 890 30 Color.black;
+  Raylib.draw_text "D - RIGHT" 300 920 30 Color.black;
+
+  Raylib.draw_text "B - ENTER BATTLE" 1000 830 30 Color.black;
+  Raylib.draw_text "Q - QUIT" 1000 860 30 Color.black
+
 let draw_battle_text bat () =
   (* Graphics.set_color (rgb 0 0 0); *)
   (* bottom_bar (); *)
@@ -121,13 +148,13 @@ let draw_battle_text bat () =
   Raylib.draw_text "Press q to quit" 1000 890 30 Color.black;
   Raylib.draw_text
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id))
-    450 370 20 Color.red;
+    1150 600 30 Color.red;
   Raylib.draw_text
     ("HP: " ^ string_of_int (Game.Battle.character_hp bat))
-    50 90 20 Color.black;
+    50 90 30 Color.black;
   Raylib.draw_text
     ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
-    450 350 20 Color.black
+    1150 640 30 Color.black
 
 (** not currently functional*)
 let draw_failed_run () =
@@ -171,7 +198,7 @@ let rec bat_wait (st : State.t) bat =
       bat_backgroud ();
       battle_platform ();
       bottom_bar ();
-
+      box_battext ();
       draw_battle_text bat ();
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
@@ -262,6 +289,7 @@ let tile_size = 96
 let randomBattleProbability = 10
 let windowWidth = 1632
 let windowHeight = 960
+let tileHeight = (96 * 8) + 10
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
@@ -301,6 +329,8 @@ let rec map_wait st lvl =
       begin_drawing ();
       clear_background Color.raywhite;
       Game.Level.draw_lvl lvl;
+      bottom_bar ();
+      draw_map_text ();
       femchardup !initx !inity !direct;
       Raylib.draw_text
         ("charloc:" ^ string_of_float !initx ^ ","
@@ -343,8 +373,8 @@ let rec map_wait st lvl =
           direct := Down;
           let x = fst location in
           let y = snd location + move_distance in
-          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
-          then map_wait st lvl
+          if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -365,8 +395,8 @@ let rec map_wait st lvl =
           direct := Left;
           let x = fst location - move_distance in
           let y = snd location in
-          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
-          then map_wait st lvl
+          if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -387,8 +417,8 @@ let rec map_wait st lvl =
           direct := Right;
           let x = fst location + move_distance in
           let y = snd location in
-          if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
-          then map_wait st lvl
+          if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
+            map_wait st lvl
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
