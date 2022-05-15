@@ -10,9 +10,14 @@ let dinoplant =
   Yojson.Basic.from_file "data/char/dinoplant.json" |> from_json
 
 let healer = Yojson.Basic.from_file "data/char/healer.json" |> from_json
+let tank = Yojson.Basic.from_file "data/char/tank.json" |> from_json
+let camel = Yojson.Basic.from_file "data/char/camel.json" |> from_json
 
-(* let (basiclevel : Level.t) = Yojson.Basic.from_file
-   "data/level/basiclevel.json" |> Level.from_json *)
+let (basiclevel : Level.t) =
+  Yojson.Basic.from_file "data/basiclevel.json" |> Level.from_json
+
+let (level2 : Level.t) =
+  Yojson.Basic.from_file "data/level2.json" |> Level.from_json
 
 let get_id_test
     (name : string)
@@ -167,20 +172,76 @@ let get_ssrcharpool_test
     (expected_output : Character.t list) : test =
   name >:: fun _ -> assert_equal expected_output (get_ssr_char_pool hat)
 
+(**END HATCHERY TESTS**)
+
+(**START LEVEL TESTS**)
+
 let get_map_test
     (name : string)
     (lvl : Level.t)
     (expected_output : string) : test =
   name >:: fun _ -> assert_equal expected_output (Level.get_map lvl)
 
+(**END LEVEL TESTS**)
+
+(**START STATE TESTS**)
+let current_health_test
+    (name : string)
+    (st : State.t)
+    (expected_output : int) =
+  name >:: fun _ ->
+  assert_equal expected_output (State.current_health st)
+
+let current_tile_id_test
+    (name : string)
+    (st : State.t)
+    (expected_output : int * int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (State.current_tile_id st)
+
+let current_level_test
+    (name : string)
+    (st : State.t)
+    (expected_output : Level.t) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (State.current_level st)
+
+let current_team_test
+    (name : string)
+    (st : State.t)
+    (expected_output : Character.t list) : test =
+  name >:: fun _ -> assert_equal expected_output (State.current_team st)
+
+let current_character_pool_test
+    (name : string)
+    (st : State.t)
+    (expected_output : Character.t list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (State.current_character_pool st)
+
+let status_test
+    (name : string)
+    (st : State.t)
+    (expected_output : State.status) =
+  name >:: fun _ -> assert_equal expected_output (State.status st)
+
 let character_tests =
   [
     get_id_test "Larry's Name" larry "Larry";
     get_id_test "Dinoplant's Name" dinoplant "Dinoplant";
+    get_id_test "Healer's Name" healer "Healer";
+    get_id_test "Tank's Name" tank "Tank";
+    get_id_test "Camel's Name" camel "Camel";
     get_hp_test "Larry's Hp" larry 100;
     get_hp_test "Dinoplant's Hp" dinoplant 100;
+    get_hp_test "Healer's HP" healer 100;
+    get_hp_test "Tank's HP" tank 1000;
+    get_hp_test "Camel's HP" camel 25;
     get_atk_test "Larry's attack" larry 10;
     get_atk_test "Dinoplant's attack" dinoplant 5;
+    get_atk_test "Healer's Attack" healer 5;
+    get_atk_test "Tank's Attack" tank 5;
+    get_atk_test "Camel's Attack" camel 10;
     get_affinity_test "Larry's attack" larry "Cascadilla Hall";
     get_affinity_test "Dinoplant's attack" dinoplant "Grass";
     (* char_list_test "Character List" [ "larry.json"; "dinoplant.json";
@@ -280,12 +341,41 @@ let hatchery_tests =
       [ larry ];
     get_ssrcharpool_test "Gamma Hatchery - SSR" gamma_hatchery [];
   ]
-(* let level_tests = [ get_map_test "Basiclevel map" basiclevel
-   "basiclevel" ] *)
+
+let level_tests =
+  [
+    get_map_test "Basiclevel map" basiclevel "basiclevel";
+    get_map_test "level2" level2 "level2";
+  ]
+
+let alpha_state = State.init_state basiclevel larry
+let level_alpha_state = State.to_level alpha_state
+let battle_alpha_state = State.to_battle alpha_state
+let hatchery_alpha_state = State.to_hatchery alpha_state
+
+let state_tests =
+  [
+    current_health_test "Alpha State - Larry HP" alpha_state 100;
+    current_health_test "Battle Alpha - Larry HP" battle_alpha_state 100;
+    current_health_test "Hatchery Alpha - Larry HP" hatchery_alpha_state
+      100;
+    current_tile_id_test "Alpha State - Default Location" alpha_state
+      (48, 48);
+    current_level_test "Alpha State - Basic Level" alpha_state
+      basiclevel;
+    current_team_test "Alpha State - Default Team" alpha_state [ larry ];
+    current_character_pool_test "Alpha State - Default Pool" alpha_state
+      [ larry ];
+    status_test "Alpha State - Start" alpha_state Start;
+    status_test "Alpha State - Level" level_alpha_state Level;
+    status_test "Alpha State - Battle" battle_alpha_state Battle;
+    status_test "Alpha State - Hatchery" hatchery_alpha_state Hatchery;
+  ]
 
 let suite =
   "test suite"
   >::: List.flatten
-         ([ character_tests ] @ [ battle_tests ] @ [ hatchery_tests ])
+         ([ character_tests ] @ [ battle_tests ] @ [ hatchery_tests ]
+        @ [ state_tests ] @ [ level_tests ])
 
 let _ = run_test_tt_main suite
