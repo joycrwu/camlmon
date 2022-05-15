@@ -10,6 +10,7 @@ type tile =
   | Grass
   | Water
   | Road
+  | Exit
 
 type direction =
   | Left
@@ -40,7 +41,9 @@ let rec match_tiles list acc =
   | h :: t ->
       if h = "grass" then acc @ [ Grass ] @ match_tiles t acc
       else if h = "water" then acc @ [ Water ] @ match_tiles t acc
-      else acc @ [ Road ] @ match_tiles t acc
+      else if h = "road" then acc @ [ Road ] @ match_tiles t acc
+      else if h = "exit" then acc @ [ Exit ] @ match_tiles t acc
+      else failwith "invalid tile type"
 
 let rec getlist list =
   let newlist = [] in
@@ -109,6 +112,14 @@ let draw_lvl lvl =
       | Road ->
           Raylib.draw_texture_rec ground
             (Rectangle.create (gtilewidth *. 1.) (gtileheight *. 1.)
+               gtilewidth gtilewidth)
+            (Vector2.create
+               (float_of_int (i * tile_width))
+               (float_of_int (j * tile_width)))
+            Color.white
+      | Exit ->
+          Raylib.draw_texture_rec ground
+            (Rectangle.create (gtilewidth *. 2.) (gtileheight *. 1.)
                gtilewidth gtilewidth)
             (Vector2.create
                (float_of_int (i * tile_width))
