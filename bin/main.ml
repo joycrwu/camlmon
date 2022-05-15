@@ -148,6 +148,37 @@ let lose_text () =
   Raylib.draw_rectangle 0 0 600 500 Color.black;
   Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
 
+let rec print_numbered_list (list : string list) (num : int) =
+  match list with
+  | h :: t ->
+      if List.length list > 1 then
+        Int.to_string num ^ h ^ ", " ^ print_numbered_list t (num + 1)
+      else h
+  | [] -> "none"
+
+let teambuilder () st =
+  set_window_title "Team Select";
+  Raylib.draw_rectangle 0 0 600 500 Color.yellow;
+  Raylib.draw_text
+    ("Characters: "
+    ^ print_numbered_list
+        (List.map
+           (fun x -> x |> Game.Character.get_id)
+           (State.current_character_pool st))
+        0)
+    250 200 10000 Color.black;
+  Raylib.draw_text
+    ("Team: "
+    ^ print_list
+        (List.map
+           (fun x -> x |> Game.Character.get_id)
+           (State.current_team st)))
+    750 700 10000 Color.black;
+  Raylib.draw_text
+    "To add or remove, press a or r, then the number of the character!"
+    100 835 30 Color.black;
+  Raylib.draw_text "Press B to battle!" 100 875 30 Color.black
+
 let draw_exit_battle bat =
   if Game.Battle.wonbool bat then victory_text ()
   else if Game.Battle.losebool bat then lose_text ()
@@ -234,20 +265,6 @@ let fullpool =
       "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ x
       |> Yojson.Basic.from_file |> Game.Character.from_json)
     charArray
-
-let rec team_wait (team : Team.t) (st : State.t) =
-  let add_rem_input = Raylib.get_key_pressed () in
-  let char_select_input = Raylib.get_key_pressed () in
-  match Command.team_add_remove add_rem_input char_select_input with
-  | Add c ->
-      team_wait
-        (Team.add (i_to_char c) team)
-        (State.add_to_team st (i_to_char c))
-  | Remove c ->
-      team_wait
-        (Team.remove (i_to_char c) team)
-        (State.remove_from_team st (i_to_char c))
-  | Unavailable -> failwith "Malformed Command"
 
 let chara i team = List.nth (Team.get_team_characters team) i
 let enemy i = Array.get fullpool i
