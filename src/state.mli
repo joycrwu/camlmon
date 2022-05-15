@@ -3,6 +3,7 @@ open Level
 type status =
   | Start
   | Level
+  | Team
   | Battle
   | Hatchery
 
@@ -61,6 +62,10 @@ val to_battle : t -> t
 
 val to_level : t -> t
 (** [to_level st] is st with the status changed to level. *)
+
+val to_team : t -> t
+(** [to_team st] is st with the status changed to team. *)
+
 
 val to_hatchery : t -> t
 (** [to_hatchery st] is st with the status changed to hatchery. *)
