@@ -17,7 +17,7 @@ val current_health : t -> int
 val current_tile_id : t -> int * int
 (** [current_tile_id st] is the current location in a given state.*)
 
-val current_level : t -> string
+val current_level : t -> Level.t
 (** [current_level st] is the current level in a given state. *)
 
 val current_team : t -> Character.t list
@@ -52,15 +52,15 @@ val remove_from_team : t -> Character.t -> t
 val change_hp : t -> int -> t
 (** [change_hp st change] changes the current state's HP by [change].*)
 
-val get_state : t -> status
+val status : t -> status
 (** [get_state st] is the current status of [st], such as the start
     screen, world map, battle or hatchery. *)
 
 val to_battle : t -> t
 (** [to_battle st] is st with the status changed to battle. *)
 
-val to_battle : t -> t
+val to_level : t -> t
 (** [to_level st] is st with the status changed to level. *)
 
-val to_battle : t -> t
+val to_hatchery : t -> t
 (** [to_hatchery st] is st with the status changed to hatchery. *)
