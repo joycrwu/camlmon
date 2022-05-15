@@ -1,6 +1,10 @@
 type t
 (** The abstract type of values representing a team. *)
 
+val init_team : Character.t -> t
+(**[init_team c] is the initial team including the starter character
+   [c].*)
+
 val get_team_characters : t -> Character.t list
 (** [get_team_characters j] is the list of characters within the team
     [j].*)
