@@ -1,4 +1,3 @@
-(* open Graphics *)
 open Game
 open Raylib
 
@@ -26,12 +25,11 @@ let _ = Random.self_init ()
    255); Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230
    247 255); Graphics.fill_rect 20 100 560 10; *)
 (* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
-   230 251 255); Graphics.fill_rect 0 90 600 490;
-
-   Graphics.set_color (rgb 128 170 255); Graphics.fill_rect 0 0 600 90;
-   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 10 5 280 80;
-   Graphics.set_color (rgb 179 242 255); Graphics.fill_rect 310 5 280
-   80; Graphics.set_color (rgb 0 0 0) *)
+   230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
+   (rgb 128 170 255); Graphics.fill_rect 0 0 600 90; Graphics.set_color
+   (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
+   (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
+   Graphics.set_color (rgb 0 0 0) *)
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -221,8 +219,24 @@ let direct = ref Down
 
 let rec bat_wait (st : State.t) bat (team : bool) =
   match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
+  | true ->
+      Raylib.close_window ();
+      st
   | false -> (
+      draw_exit_battle bat;
+      begin_drawing ();
+      clear_background Color.raywhite;
+      bat_backgroud ();
+      battle_platform ();
+      bottom_bar ();
+      box_battext ();
+      draw_battle_text bat ();
+      let character = Game.Battle.character bat in
+      let enemy = Game.Battle.enemy bat in
+      let player_input = Raylib.get_key_pressed () in
+      if Battle.overbool bat then
+        match Game.Command.battle_input bat character player_input with
+        | _ -> State.to_level st
       if team then (
         begin_drawing ();
         let team_input = Raylib.get_key_pressed () in
@@ -269,6 +283,12 @@ let rec bat_wait (st : State.t) bat (team : bool) =
         draw_battle_text bat ();
         match Game.Command.battle_input bat character player_input with
         | Attack x ->
+            end_drawing ();
+            bat
+            |> Game.Battle.character_turn x
+            |> Game.Battle.enemy_turn
+                 (Game.Character.get_action_effect enemy (Random.int 3))
+            |> battle_wait st
             (end_drawing ();
              bat
              |> Game.Battle.character_turn x
@@ -280,6 +300,14 @@ let rec bat_wait (st : State.t) bat (team : bool) =
             if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
             then
               if Random.bool () then exit 0
+              else (
+                draw_failed_run ();
+                end_drawing ();
+                bat
+                |> Game.Battle.enemy_turn
+                     (Game.Character.get_action_effect enemy
+                        (Random.int 3))
+                |> battle_wait st)
               else
                 (draw_failed_run ();
                  end_drawing ();
@@ -295,6 +323,13 @@ let rec bat_wait (st : State.t) bat (team : bool) =
                 - Game.Battle.enemy_hp bat
                 + 50
             then exit 0
+            else (
+              draw_failed_run ();
+              bat
+              |> Game.Battle.enemy_turn
+                   (Game.Character.get_action_effect enemy
+                      (Random.int 3))
+              |> battle_wait st)
             else
               (draw_failed_run ();
                bat
@@ -318,6 +353,63 @@ let i_to_char i =
   ^ Array.get charArray i
   |> Yojson.Basic.from_file |> Game.Character.from_json
 
+(**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
+let hatchery_background () =
+  clear_background (Color.create 230 251 255 255);
+  draw_rectangle 0 0 1632 10 Color.gray
+
+let hatchery_bottom_bar () =
+  draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
+  draw_rectangle 26 820 776 140 (Color.create 104 160 160 255);
+  draw_rectangle 829 820 776 140 (Color.create 179 242 255 255)
+
+let draw_hatchery_text () =
+  (* draw_text text pos_x pos_y font_size color *)
+  Raylib.draw_text "Welcome to the Hatchery!" 80 835 50 Color.black;
+  Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
+  Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
+
+let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  match Raylib.window_should_close () with
+  | true -> Raylib.close_window ()
+  | false -> (
+      (let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      hatchery_background ();
+      hatchery_bottom_bar ();
+      draw_hatchery_text ());
+      let player_input = Raylib.get_key_pressed () in
+      match Command.hatchery_input player_input with
+      | Roll ->
+          let new_char = Hatchery.gacha hat in
+          let new_state = State.new_playable_char st new_char in
+          let new_hatchery = Hatchery.character_outputs new_char hat in
+          end_drawing ();
+          hatchery_wait new_state new_hatchery
+      | Skip ->
+          end_drawing ();
+          hatchery_wait st hat
+      | Invalid ->
+          (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
+          end_drawing ();
+          hatchery_wait st hat)
+
+let create_hatchery hat =
+  let all_character_json_list =
+    List.map Yojson.Basic.from_file (Array.to_list charArray)
+  in
+  let all_character_list =
+    List.map Character.from_json all_character_json_list
+  in
+  List.fold_left Hatchery.add_char_to_pool hat all_character_list
+
+let hatchery_start st =
+  set_window_title "Hatchery";
+  let empty_hatchery = Hatchery.new_hatchery () in
+  let charpool_hatchery = create_hatchery empty_hatchery in
+  hatchery_wait st charpool_hatchery
+
 let fullpool =
   Array.map
     (fun x ->
@@ -333,7 +425,7 @@ let battle_start st team =
   let bat =
     Game.Battle.init_battle (chara 0 team) (enemy 2) [ chara 0 team ]
   in
-  bat_wait st bat
+  battle_wait st bat
 
 let initx = ref 0.
 let inity = ref 0.
@@ -347,9 +439,9 @@ let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
 let left () : unit = initx := !initx -. float_of_int move_distance
 let right () : unit = initx := !initx +. float_of_int move_distance
+let chara = Raylib.load_texture "assets/girl_run_large.png"
 
-let femchardup x y (dir : direction) =
-  let chara = Raylib.load_texture "assets/girl_run_large.png" in
+let femchard x y (dir : direction) =
   match dir with
   | Up ->
       Raylib.draw_texture_rec chara
@@ -374,21 +466,24 @@ let femchardup x y (dir : direction) =
            (410. /. 4.) (410. /. 4.))
         (Vector2.create x y) Color.white
 
-let rec map_wait st lvl =
+let rec level_wait st =
   match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
+  | true ->
+      Raylib.close_window ();
+      st
   | false -> (
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      Game.Level.draw_lvl lvl;
+      Game.Level.draw_lvl (State.current_level st);
       bottom_bar ();
       draw_map_text ();
-      femchardup !initx !inity !direct;
+      femchard !initx !inity !direct;
       Raylib.draw_text
         ("charloc:" ^ string_of_float !initx ^ ","
        ^ string_of_float !inity)
         0 0 40 Color.black;
+      let lvl = Game.State.current_level st in
       let location = Game.State.current_tile_id st in
       let player_input = Raylib.get_key_pressed () in
       (* Game.Command.map_input ( *)
@@ -405,7 +500,7 @@ let rec map_wait st lvl =
           let x = fst location in
           let y = snd location - move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= windowHeight
-          then map_wait st lvl
+          then level_wait st
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -420,17 +515,21 @@ let rec map_wait st lvl =
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                map_wait st lvl
+                level_wait st
             | Road ->
                 up ();
                 end_drawing ();
-                map_wait (Game.State.move st x y) lvl)
+                level_wait (Game.State.move st x y)
+            | Exit ->
+                up ();
+                end_drawing ();
+                level_wait (Game.State.move st x y))
       | Down -> (
           direct := Down;
           let x = fst location in
           let y = snd location + move_distance in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            map_wait st lvl
+            level_wait st
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -445,17 +544,21 @@ let rec map_wait st lvl =
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                map_wait st lvl
+                level_wait st
             | Road ->
                 down ();
                 end_drawing ();
-                map_wait (Game.State.move st x y) lvl)
+                level_wait (Game.State.move st x y)
+            | Exit ->
+                down ();
+                end_drawing ();
+                level_wait (Game.State.move st x y))
       | Left -> (
           direct := Left;
           let x = fst location - move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            map_wait st lvl
+            level_wait st
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -470,17 +573,21 @@ let rec map_wait st lvl =
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                map_wait st lvl
+                level_wait st
             | Road ->
                 left ();
                 end_drawing ();
-                map_wait (Game.State.move st x y) lvl)
+                level_wait (Game.State.move st x y)
+            | Exit ->
+                left ();
+                end_drawing ();
+                level_wait (Game.State.move st x y))
       | Right -> (
           direct := Right;
           let x = fst location + move_distance in
           let y = snd location in
           if x < 0 || y < 0 || x >= windowWidth || y >= tileHeight then
-            map_wait st lvl
+            level_wait st
           else
             match
               Game.Level.get_tile (x / tile_size) (y / tile_size) lvl
@@ -495,20 +602,27 @@ let rec map_wait st lvl =
                 else map_wait (Game.State.move st x y) lvl
             | Water ->
                 end_drawing ();
-                map_wait st lvl
+                level_wait st
             | Road ->
                 right ();
                 end_drawing ();
-                map_wait (Game.State.move st x y) lvl)
+                level_wait (Game.State.move st x y)
+            | Exit ->
+                right ();
+                end_drawing ();
+                level_wait (Game.State.move st x y))
       | Battle ->
           end_drawing ();
           battle_start st (Game.Team.init_team (i_to_char 1)) true
       | Exit ->
           end_drawing ();
           exit 0
+      | Hatchery ->
+          end_drawing ();
+          hatchery_wait st (Hatchery.new_hatchery ())
       | _ ->
           Raylib.end_drawing ();
-          map_wait st lvl)
+          level_wait st)
 (* | Exit -> end_drawing (); exit 0 | Invalid_input -> end_drawing ();
    battle_start ()) *)
 
@@ -525,6 +639,30 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
   | Skip -> hatchery_wait st hat
   | Invalid -> failwith "Invalid Command!"
 
+let rec start_wait st =
+  match Raylib.window_should_close () with
+  | true ->
+      Raylib.close_window ();
+      st
+  | false ->
+      let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      Raylib.draw_text "hello, press enter to continue" 0 0 40
+        Color.black;
+      if Raylib.is_key_pressed Key.Enter then (
+        end_drawing ();
+        State.to_level st)
+      else (
+        end_drawing ();
+        start_wait st)
+
+let rec wait st =
+  match State.status st with
+  | Start -> wait (start_wait st)
+  | Level -> wait (level_wait st)
+  | _ -> wait st
+
 let main () =
   Raylib.init_window windowWidth windowHeight
     "raylib [core] example - basic window";
@@ -538,7 +676,7 @@ let main () =
     ^ Array.get charArray 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
-  map_wait (Game.State.init_state lvl c) lvl
+  wait (Game.State.init_state lvl c)
 (* (* duplicate code *) let load path = let tex = Raylib.load_texture
    path in Gc.finalise Raylib.unload_texture tex; tex *)
 

@@ -18,7 +18,7 @@ val current_health : t -> int
 val current_tile_id : t -> int * int
 (** [current_tile_id st] is the current location in a given state.*)
 
-val current_level : t -> string
+val current_level : t -> Level.t
 (** [current_level st] is the current level in a given state. *)
 
 val current_team : t -> Character.t list
@@ -37,6 +37,10 @@ val move : t -> int -> int -> t
 (** [move st x y] changes the current location of the state to the newly
     inputted x and y units. *)
 
+val new_playable_char : t -> Character.t -> t
+(** [new_playable_character st ch] adds [ch] into the pool of possible
+    playable characters.*)
+
 val add_to_team : t -> Character.t -> t
 (** [add_to_team st ch] adds [ch] as a character on the current team if
     there is still room on the team for another character. The maximum
@@ -49,7 +53,7 @@ val remove_from_team : t -> Character.t -> t
 val change_hp : t -> int -> t
 (** [change_hp st change] changes the current state's HP by [change].*)
 
-val get_state : t -> status
+val status : t -> status
 (** [get_state st] is the current status of [st], such as the start
     screen, world map, battle or hatchery. *)
 
@@ -61,6 +65,7 @@ val to_level : t -> t
 
 val to_team : t -> t
 (** [to_team st] is st with the status changed to team. *)
+
 
 val to_hatchery : t -> t
 (** [to_hatchery st] is st with the status changed to hatchery. *)

@@ -16,9 +16,9 @@
       "description": "Sits and takes a nap."
     },
     {
-      "name": "Sleeps",
-      "effect": -1,
-      "description": "Takes a long sleep, healing a small amount."
+      "name": "Stare",
+      "effect": 0,
+      "description": "Stares"
     }
   ],
   "partner": {

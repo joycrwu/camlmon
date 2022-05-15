@@ -12,6 +12,7 @@ type map_command =
   | Left
   | Right
   | Battle
+  | Hatchery
   | Exit
   | Invalid_input
 
@@ -22,6 +23,7 @@ let map_input k =
   | Key.A -> Left
   | Key.D -> Right
   | Key.B -> Battle
+  | Key.H -> Hatchery
   | Key.Q -> Exit
   | _ -> Invalid_input
 

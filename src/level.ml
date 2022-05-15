@@ -12,17 +12,6 @@ type tile =
   | Road
   | Exit
 
-type direction =
-  | Left
-  | Right
-  | Up
-  | Down
-
-type action =
-  | Move of direction
-  | Fight
-  | Heal
-
 type t = {
   grid : tile array array;
   (* grid : string list list; *)
