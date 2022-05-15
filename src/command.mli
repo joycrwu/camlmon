@@ -35,3 +35,10 @@ type hatchery_command =
   | Invalid
 
 val hatchery_input : Key.t -> hatchery_command
+
+type team_command =
+  | Add of int
+  | Remove of int
+  | Unavailable
+
+val team_add_remove : Key.t -> Key.t -> team_command
