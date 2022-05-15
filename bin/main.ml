@@ -44,7 +44,18 @@ let bottom_bar () =
   draw_rectangle 829 820 776 140 (Color.create 179 242 255 255)
 
 let battle_platform () =
-  draw_ellipse 300 700 300. 60. (Color.create 224 224 144 255)
+  draw_ellipse 400 800 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 1200 350 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 400 800 370. 90. (Color.create 152 224 152 255);
+  draw_ellipse 1200 350 370. 90. (Color.create 152 224 152 255);
+  (* 3 dot row upper right*)
+  draw_rectangle 520 730 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 535 730 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 550 730 10 10 (Color.create 224 224 144 255);
+  draw_rectangle 600 790 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 615 790 10 10 (Color.create 168 232 168 255);
+  draw_rectangle 630 790 10 10 (Color.create 224 224 144 255)
+(* 3 dot row lower left*)
 
 let health_bar_ally bat () =
   (* Graphics.open_graph ""; *)
@@ -158,8 +169,9 @@ let rec bat_wait (st : State.t) bat =
       begin_drawing ();
       clear_background Color.raywhite;
       bat_backgroud ();
-      bottom_bar ();
       battle_platform ();
+      bottom_bar ();
+
       draw_battle_text bat ();
       let character = Game.Battle.character bat in
       let enemy = Game.Battle.enemy bat in
