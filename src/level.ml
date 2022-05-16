@@ -18,6 +18,8 @@ type t = {
   level_id : string;
   width : int;
   height : int;
+  start_x : int;
+  start_y : int;
 }
 
 let from_json_tiles json =
@@ -48,10 +50,14 @@ let from_json json =
     level_id = json |> member "id" |> to_string;
     width = json |> member "width" |> to_int;
     height = json |> member "height" |> to_int;
+    start_x =
+      json |> member "start_tile_x" |> to_int |> ( * ) tile_height;
+    start_y =
+      json |> member "start_tile_y" |> to_int |> ( * ) tile_height;
   }
 
 let get_characterid lvl = "lvl.current_character"
-let start_location lvl = (48, 48)
+let start_location lvl = (lvl.start_x + 48, lvl.start_y + 48)
 let get_map lvl = lvl.level_id
 
 let create_grid width height =
@@ -62,7 +68,14 @@ let create_grid width height =
           else Grass))
 
 let init_lvl width height =
-  { grid = create_grid width height; level_id = "test"; width; height }
+  {
+    grid = create_grid width height;
+    level_id = "test";
+    width;
+    height;
+    start_x = 0;
+    start_y = 0;
+  }
 
 let get_tile x y lvl = Array.get (Array.get lvl.grid y) x
 let set_tile x y lvl tile = Array.set (Array.get lvl.grid y) x tile
@@ -124,8 +137,13 @@ let draw_lvl lvl =
    Graphics.draw_string "Press f to fight"; Graphics.moveto 400 15;
    Graphics.draw_string "Press q to quit" *)
 
-(** let level_array = Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^
-    Filename.dir_sep)
+let level_array =
+  Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
 
-    let random_level = level_array |> Array.length |> Random.int |>
-    Array.get level_array |> Yojson.Basic.from_file |> from_json *)
+let random_level =
+  (**level_array |> Array.length |> Random.int |> Array.get level_array
+  |> ( ^ ) ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
+  |> Yojson.Basic.from_file |> from_json *)
+  "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep
+    ^ Array.get level_array 0
+    |> Yojson.Basic.from_file |> from_json

@@ -21,6 +21,12 @@ val current_tile_id : t -> int * int
 val current_level : t -> Level.t
 (** [current_level st] is the current level in a given state. *)
 
+val get_x : t -> float
+(** [get_x st] is the pixel x value in the current state [st]. *)
+
+val get_y : t -> float
+(** [get_y st] is the pixel y value in the current state [st]. *)
+
 val current_team : t -> Character.t list
 (** [current_team st] is the current team in a given state. *)
 
@@ -65,7 +71,6 @@ val to_level : t -> t
 
 val to_team : t -> t
 (** [to_team st] is st with the status changed to team. *)
-
 
 val to_hatchery : t -> t
 (** [to_hatchery st] is st with the status changed to hatchery. *)

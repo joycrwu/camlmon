@@ -548,6 +548,11 @@ let rec level_wait st =
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
+
+let level_start st =
+  set_window_title "Level";
+  initx := State.get_x st;
+  inity := State.get_y st
 (* | Exit -> end_drawing (); exit 0 | Invalid_input -> end_drawing ();
    battle_start ()) *)
 
@@ -570,6 +575,7 @@ let rec start_wait st =
         Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
+        level_start st;
         State.to_level st)
       else (
         end_drawing ();
@@ -586,8 +592,7 @@ let main () =
     "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
   let lvl =
-    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep ^ "basiclevel.json"
-    |> Yojson.Basic.from_file |> Game.Level.from_json
+    Level.random_level
   in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
