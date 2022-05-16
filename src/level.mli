@@ -36,3 +36,6 @@ val from_json : Yojson.Basic.t -> t
         a valid JSON character representation. *)
 val random_level : t 
 (** [random_level] is a random level type from data/level.*)
+val next_level : t -> t
+(** [next_level lvl] takes in an input level and outputs the level that is 
+    sequentially after the input level in the game data files. *)

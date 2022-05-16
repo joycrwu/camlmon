@@ -399,6 +399,11 @@ let femchard x y (dir : direction) =
            (410. /. 4.) (410. /. 4.))
         (Vector2.create x y) Color.white
 
+let level_start st =
+  set_window_title "Level";
+  initx := State.get_x st;
+  inity := State.get_y st
+
 let rec level_wait st =
   match Raylib.window_should_close () with
   | true ->
@@ -454,7 +459,9 @@ let rec level_wait st =
             | Exit ->
                 up ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
+                level_start st';
+                level_wait st')
       | Down -> (
           direct := Down;
           let x = fst location in
@@ -481,7 +488,9 @@ let rec level_wait st =
             | Exit ->
                 down ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
+                level_start st';
+                level_wait st')
       | Left -> (
           direct := Left;
           let x = fst location - move_distance in
@@ -508,7 +517,9 @@ let rec level_wait st =
             | Exit ->
                 left ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
+                level_start st';
+                level_wait st')
       | Right -> (
           direct := Right;
           let x = fst location + move_distance in
@@ -535,7 +546,9 @@ let rec level_wait st =
             | Exit ->
                 right ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
+                level_start st';
+                level_wait st')
       | Battle ->
           end_drawing ();
           battle_start st (Game.Team.init_team (i_to_char 1))
@@ -549,10 +562,6 @@ let rec level_wait st =
           Raylib.end_drawing ();
           level_wait st)
 
-let level_start st =
-  set_window_title "Level";
-  initx := State.get_x st;
-  inity := State.get_y st
 (* | Exit -> end_drawing (); exit 0 | Invalid_input -> end_drawing ();
    battle_start ()) *)
 

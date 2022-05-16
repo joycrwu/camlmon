@@ -43,6 +43,9 @@ val move : t -> int -> int -> t
 (** [move st x y] changes the current location of the state to the newly
     inputted x and y units. *)
 
+val new_level : t -> Level.t -> t
+(** [new_level st lvl] changes the level of the state.*)
+
 val new_playable_char : t -> Character.t -> t
 (** [new_playable_character st ch] adds [ch] into the pool of possible
     playable characters.*)

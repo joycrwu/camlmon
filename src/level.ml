@@ -141,9 +141,20 @@ let level_array =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
 
 let random_level =
-  (**level_array |> Array.length |> Random.int |> Array.get level_array
+  level_array |> Array.length |> Random.int |> Array.get level_array
   |> ( ^ ) ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
-  |> Yojson.Basic.from_file |> from_json *)
-  "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep
-    ^ Array.get level_array 0
-    |> Yojson.Basic.from_file |> from_json
+  |> Yojson.Basic.from_file |> from_json
+
+let rec search lst index x =
+  match lst with
+  | [] -> raise (Failure "Not Found")
+  | hd :: tl ->
+      if hd = x ^ ".json" then index else search tl (index + 1) x
+
+let next_level lvl =
+  lvl |> get_map
+  |> search (level_array |> Array.to_list) 0
+  |> (fun i -> if i + 1 = Array.length level_array then 0 else i + 1)
+  |> Array.get level_array
+  |> ( ^ ) ("data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep)
+  |> Yojson.Basic.from_file |> from_json

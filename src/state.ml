@@ -22,8 +22,11 @@ type t = {
 let current_health st = st.health
 
 let current_tile_id st = st.location
-let get_x st = st.location |> fst |> ( - ) 48 |> float_of_int
-let get_y st = st.location |> snd |> ( - ) 48 |> float_of_int
+
+(** VERY JANKY HARDCODED MATH WILL FIX LATER MAYBE*)
+let get_x st = st.location |> fst |> ( - ) 48 |> abs |> float_of_int
+
+let get_y st = st.location |> snd |> ( - ) 48 |> abs |> float_of_int
 let current_level st = st.level
 let current_team st = st.team
 let current_character_pool st = st.character_pool
@@ -54,6 +57,16 @@ let move st (x : int) (y : int) =
     health = st.health;
     level = st.level;
     location = (x, y);
+    character_pool = st.character_pool;
+    status = st.status;
+  }
+
+let new_level st lvl =
+  {
+    team = st.team;
+    health = st.health;
+    level = lvl;
+    location = start_location lvl;
     character_pool = st.character_pool;
     status = st.status;
   }
