@@ -356,7 +356,7 @@ let draw_hatchery_text () =
 
 let draw_hatchery_output_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  Raylib.draw_text "Congratulations on your new character!" 80 835 50
+  Raylib.draw_text "Congratulations on your new character!" 80 835 30
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
 
