@@ -6,7 +6,27 @@ let _ = Random.self_init ()
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
   clear_background (Color.create 230 251 255 255);
-  draw_rectangle 0 0 1632 10 Color.gray
+  draw_rectangle 0 0 1632 30 (Color.create 29 146 252 100);
+  draw_rectangle 0 40 1632 30 (Color.create 29 146 252 100);
+  draw_rectangle 0 80 1632 30 (Color.create 25 161 239 100);
+  draw_rectangle 0 120 1632 30 (Color.create 25 161 239 100);
+  draw_rectangle 0 160 1632 30 (Color.create 21 177 223 100);
+  draw_rectangle 0 200 1632 30 (Color.create 21 177 223 100);
+  draw_rectangle 0 240 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 280 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 320 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 360 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 400 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 440 1632 30 (Color.create 8 216 185 100);
+  draw_rectangle 0 480 1632 30 (Color.create 8 216 185 100);
+  draw_rectangle 0 520 1632 30 (Color.create 7 225 177 100);
+  draw_rectangle 0 560 1632 30 (Color.create 7 225 177 100);
+  draw_rectangle 0 600 1632 30 (Color.create 36 216 150 100);
+  draw_rectangle 0 640 1632 30 (Color.create 36 216 150 100);
+  draw_rectangle 0 680 1632 30 (Color.create 7 197 123 100);
+  draw_rectangle 0 720 1632 30 (Color.create 7 197 123 100);
+  draw_rectangle 0 760 1632 30 (Color.create 4 135 69 100);
+  draw_rectangle 0 800 1632 30 (Color.create 4 135 69 100)
 
 let bottom_bar () =
   draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
