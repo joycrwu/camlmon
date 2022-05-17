@@ -30,6 +30,11 @@ let get_rare_char_pool hat = hat.rare_char_pool
 let get_ssr_char_pool hat = hat.ssr_char_pool
 let get_output_characters hat = hat.output_characters
 
+let output arr (num_char : int) =
+  let char_ran_num = Random.int 100 in
+  let new_char_ran_num = char_ran_num mod num_char in
+  Array.get arr new_char_ran_num
+
 let gacha hat =
   let ran_num = Random.int 100 in
   let num_normchars = List.length hat.normal_char_pool in
@@ -39,26 +44,11 @@ let gacha hat =
   let array_rarechars = Array.of_list hat.rare_char_pool in
   let array_ssrchars = Array.of_list hat.ssr_char_pool in
   match ran_num > 10 with
-  | true ->
-      let char_ran_num = Random.int 100 in
-      if char_ran_num > num_normchars then
-        let new_char_ran_num = char_ran_num mod num_normchars in
-        Array.get array_normchars new_char_ran_num
-      else Array.get array_normchars char_ran_num
+  | true -> output array_normchars num_normchars
   | false -> (
       match ran_num < 5 with
-      | false ->
-          let char_ran_num = Random.int 100 in
-          if char_ran_num > num_rarechars then
-            let new_char_ran_num = char_ran_num mod num_rarechars in
-            Array.get array_rarechars new_char_ran_num
-          else Array.get array_rarechars char_ran_num
-      | true ->
-          let char_ran_num = Random.int 100 in
-          if char_ran_num > num_ssrchars then
-            let new_char_ran_num = char_ran_num mod num_ssrchars in
-            Array.get array_ssrchars new_char_ran_num
-          else Array.get array_ssrchars char_ran_num)
+      | false -> output array_rarechars num_rarechars
+      | true -> output array_ssrchars num_ssrchars)
 
 let character_outputs (ch : Character.t) (hat : t) =
   { hat with output_characters = ch :: hat.output_characters }

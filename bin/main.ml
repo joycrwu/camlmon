@@ -381,6 +381,8 @@ let i_to_char i =
 
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
+  draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255);
   clear_background (Color.create 230 251 255 255);
   draw_rectangle 0 0 1632 10 Color.gray
 
@@ -397,7 +399,7 @@ let draw_hatchery_text () =
 
 let draw_hatchery_output_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  Raylib.draw_text "Congratulations on your new character!" 80 835 30
+  Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
 
@@ -428,7 +430,7 @@ let draw_gacha_char char =
   let ch = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
   Raylib.draw_texture_rec ch
     (Rectangle.create 0. 0. 300. 300.)
-    (Vector2.create 250. 250.)
+    (Vector2.create 680. 200.)
     Color.white
 
 let rec hatchery_endscreen_wait (st : State.t) =
