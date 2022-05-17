@@ -790,8 +790,8 @@ let rec start_wait st =
       begin_drawing ();
       clear_background Color.raywhite;
       draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
-      timer := Raylib.get_time () *. 4.;
-      let cloudlocation () = if !timer < 60. then !timer else 0. in
+      timer := Raylib.get_time () *. 3.;
+      let cloudlocation () = if !timer < 100. then !timer else 0. in
       let opp2 =
         Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
       in
@@ -800,6 +800,7 @@ let rec start_wait st =
         (Vector2.create (cloudlocation ()) 0.)
         Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
+
       Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
