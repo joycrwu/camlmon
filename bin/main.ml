@@ -6,7 +6,27 @@ let _ = Random.self_init ()
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
   clear_background (Color.create 230 251 255 255);
-  draw_rectangle 0 0 1632 10 Color.gray
+  draw_rectangle 0 0 1632 30 (Color.create 29 146 252 100);
+  draw_rectangle 0 40 1632 30 (Color.create 29 146 252 100);
+  draw_rectangle 0 80 1632 30 (Color.create 25 161 239 100);
+  draw_rectangle 0 120 1632 30 (Color.create 25 161 239 100);
+  draw_rectangle 0 160 1632 30 (Color.create 21 177 223 100);
+  draw_rectangle 0 200 1632 30 (Color.create 21 177 223 100);
+  draw_rectangle 0 240 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 280 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 320 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 360 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 400 1632 30 (Color.create 17 189 213 100);
+  draw_rectangle 0 440 1632 30 (Color.create 8 216 185 100);
+  draw_rectangle 0 480 1632 30 (Color.create 8 216 185 100);
+  draw_rectangle 0 520 1632 30 (Color.create 7 225 177 100);
+  draw_rectangle 0 560 1632 30 (Color.create 7 225 177 100);
+  draw_rectangle 0 600 1632 30 (Color.create 36 216 150 100);
+  draw_rectangle 0 640 1632 30 (Color.create 36 216 150 100);
+  draw_rectangle 0 680 1632 30 (Color.create 7 197 123 100);
+  draw_rectangle 0 720 1632 30 (Color.create 7 197 123 100);
+  draw_rectangle 0 760 1632 30 (Color.create 4 135 69 100);
+  draw_rectangle 0 800 1632 30 (Color.create 4 135 69 100)
 
 let bottom_bar () =
   draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
@@ -411,6 +431,8 @@ let charArray =
 
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
+  draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
+  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255);
   clear_background (Color.create 230 251 255 255);
   draw_rectangle 0 0 1632 10 Color.gray
 
@@ -427,7 +449,7 @@ let draw_hatchery_text () =
 
 let draw_hatchery_output_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  Raylib.draw_text "Congratulations on your new character!" 80 835 50
+  Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
 
@@ -458,7 +480,7 @@ let draw_gacha_char char =
   let ch = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
   Raylib.draw_texture_rec ch
     (Rectangle.create 0. 0. 300. 300.)
-    (Vector2.create 250. 250.)
+    (Vector2.create 680. 200.)
     Color.white
 
 let rec hatchery_endscreen_wait (st : State.t) =
@@ -778,6 +800,7 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
+let timer = ref 0.
 
 let rec start_wait st =
   match Raylib.window_should_close () with
@@ -788,8 +811,19 @@ let rec start_wait st =
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
+      draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
+      timer := Raylib.get_time () *. 3.;
+      let cloudlocation () = if !timer < 100. then !timer else 0. in
+      let opp2 =
+        Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
+      in
+      Raylib.draw_texture_rec opp2
+        (Rectangle.create 0. 0. 1600. 1600.)
+        (Vector2.create (cloudlocation ()) 0.)
+        Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
-      Raylib.draw_text "PRESS ENTER TO START" 540 800 40 Color.black;
+
+      Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
         level_start st;
