@@ -44,7 +44,7 @@ let draw_battle_enemy char =
   let opp2 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
   Raylib.draw_texture_rec opp2
     (Rectangle.create 0. 0. 300. 300.)
-    (Vector2.create 1100. 100.)
+    (Vector2.create 1050. 100.)
     Color.white
 
 (* "assets/girl_run_large.png" *)
@@ -52,7 +52,7 @@ let draw_battle_char char =
   let opp1 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
   Raylib.draw_texture_rec opp1
     (Rectangle.create 0. 0. 300. 300.)
-    (Vector2.create 100. 700.)
+    (Vector2.create 250. 500.)
     Color.white
 
 let box_battext () =
