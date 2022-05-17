@@ -14,10 +14,12 @@ let tank = Yojson.Basic.from_file "data/char/tank.json" |> from_json
 let camel = Yojson.Basic.from_file "data/char/camel.json" |> from_json
 
 let (basiclevel : Level.t) =
-  Yojson.Basic.from_file "data/basiclevel.json" |> Level.from_json
+  Yojson.Basic.from_file "data/level/basiclevel.json" |> Level.from_json
 
 let (level2 : Level.t) =
-  Yojson.Basic.from_file "data/level2.json" |> Level.from_json
+  Yojson.Basic.from_file "data/level/level2.json" |> Level.from_json
+
+let tile_size = 96
 
 let get_id_test
     (name : string)
@@ -182,6 +184,28 @@ let get_map_test
     (expected_output : string) : test =
   name >:: fun _ -> assert_equal expected_output (Level.get_map lvl)
 
+let start_location_test
+    (name : string)
+    (lvl : Level.t)
+    (expected_output : int * int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (Level.start_location lvl)
+
+let get_tile_test
+    (name : string)
+    (lvl : Level.t)
+    (x : int)
+    (y : int)
+    (expected_output : Level.tile) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (Level.get_tile x y lvl)
+
+let next_level_test
+    (name : string)
+    (lvl : Level.t)
+    (expected_output : Level.t) : test =
+  name >:: fun _ -> assert_equal expected_output (Level.next_level lvl)
+
 (**END LEVEL TESTS**)
 
 (**START STATE TESTS**)
@@ -246,8 +270,8 @@ let character_tests =
     get_affinity_test "Dinoplant's attack" dinoplant "Grass";
     (* char_list_test "Character List" [ "larry.json"; "dinoplant.json";
        "healer.json" ]; *)
-    aff_effect_test "Larry aff effect" larry dinoplant 2;
-    aff_effect_test "Dinoplant aff effect" dinoplant larry (1 / 2);
+    (**aff_effect_test "Larry aff effect" larry dinoplant 2;
+    aff_effect_test "Dinoplant aff effect" dinoplant larry (1 / 2); *)
     get_partner_test "Larry partner" larry "Bruiser";
     get_partner_test "Dinoplant partner" dinoplant "Healer";
     get_partner_eff_test "Larry partner" larry 3;
@@ -344,8 +368,15 @@ let hatchery_tests =
 
 let level_tests =
   [
-    get_map_test "Basiclevel map" basiclevel "basiclevel";
-    get_map_test "level2" level2 "level2";
+    get_map_test "Basiclevel map id" basiclevel "basiclevel";
+    get_map_test "level2 map id" level2 "level2";
+    start_location_test "Basiclevel start location" basiclevel (48, 48);
+    start_location_test "level2 start location" level2
+      ((8 * tile_size) + 48, (5 * tile_size) + 48);
+    get_tile_test "Basiclevel water tile at 0, 3" basiclevel 2 0 Water;
+    get_tile_test "Level2 exit tile at 13, 5" level2 12 4 Exit;
+    next_level_test "Basiclevel next level" basiclevel level2;
+    next_level_test "Level2 next level" level2 basiclevel;
   ]
 
 let alpha_state = State.init_state basiclevel larry
