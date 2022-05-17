@@ -56,7 +56,6 @@ let from_json json =
       json |> member "start_tile_y" |> to_int |> ( * ) tile_height;
   }
 
-let get_characterid lvl = "lvl.current_character"
 let start_location lvl = (lvl.start_x + 48, lvl.start_y + 48)
 let get_map lvl = lvl.level_id
 
