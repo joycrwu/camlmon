@@ -198,6 +198,46 @@ let team_screen () st =
   team_card_dist 500 585 3;
   draw_rectangle 0 820 2000 220 Color.white
 
+let rec pool_no_team (pool : Character.t list) (team : Character.t list)
+    =
+  match pool with
+  | h :: t ->
+      if List.length (List.find_all (fun x -> x = h) team) = 0 then
+        [ h ] @ pool_no_team t team
+      else pool_no_team t team
+  | _ -> pool
+
+let draw_battle_char_adj chara startx starty =
+  let opp1 = Raylib.load_texture ("assets/" ^ chara ^ ".png") in
+  Raylib.draw_texture_rec opp1
+    (Rectangle.create 0. 0. 300. 300.)
+    (Vector2.create startx starty)
+    Color.white
+
+let rec pool_images
+    (pool : Character.t list)
+    (startx : float)
+    (starty : float) =
+  match pool with
+  | h :: t ->
+      draw_battle_char_adj (Character.get_id h) startx starty;
+      pool_images t (startx +. 360.) starty
+  | _ -> ()
+
+(*code taken from stack overflow
+  https://stackoverflow.com/questions/26543669/ocaml-return-first-n-elements-of-a-list*)
+let rec firstk k xs =
+  match xs with
+  | [] -> failwith "firstk fail"
+  | x :: xs -> if k = 1 then [ x ] else x :: firstk (k - 1) xs
+
+let init_char_graphics () (st : State.t) =
+  let team = State.current_team st in
+  let pool = pool_no_team (State.current_character_pool st) team in
+  if List.length pool < 6 then pool_images pool 193. 43.
+  else pool_images (firstk 5 pool) 193. 43.;
+  pool_images pool 193. 43.
+
 let team_text () st =
   Raylib.draw_text
     ("Characters: "
@@ -249,6 +289,7 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           clear_background Color.raywhite;
           team_screen () st;
           team_text () st;
+          init_char_graphics () st;
           match Command.team_add_remove team_input char_input with
           | Add c ->
               end_drawing ();
