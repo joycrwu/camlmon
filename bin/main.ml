@@ -222,7 +222,7 @@ let rec battle_wait (st : State.t) bat (team : bool) =
   | true ->
       Raylib.close_window ();
       st
-  | false -> (
+  | false ->
       if team then (
         begin_drawing ();
         let team_input = Raylib.get_key_pressed () in
@@ -234,78 +234,85 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           clear_background Color.raywhite;
           teambuilder () st;
           match Command.team_add_remove team_input char_input with
-        | Add c ->
-            end_drawing ();
-            battle_wait
-              (State.add_to_team st
-                 (List.nth (State.current_team st) c))
-              bat true
-        | Remove c ->
-          end_drawing ();
-          battle_wait
-            (State.remove_from_team st
-               (List.nth (State.current_team st) c))
-            bat true
-        | Battle -> battle_wait st bat false
-        | Unavailable ->
-                end_drawing ();
-                battle_wait st bat true)
-      )
+          | Add c ->
+              end_drawing ();
+              battle_wait
+                (State.add_to_team st
+                   (List.nth (State.current_team st) c))
+                bat true
+          | Remove c ->
+              end_drawing ();
+              battle_wait
+                (State.remove_from_team st
+                   (List.nth (State.current_team st) c))
+                bat true
+          | Battle -> battle_wait st bat false
+          | Unavailable ->
+              end_drawing ();
+              battle_wait st bat true))
       else (
-      draw_exit_battle bat;
-      begin_drawing ();
-      clear_background Color.raywhite;
-      bat_backgroud ();
-      battle_platform ();
-      bottom_bar ();
-      box_battext ();
-      draw_battle_text bat ();
-      let character = Game.Battle.character bat in
-      let enemy = Game.Battle.enemy bat in
-      let player_input = Raylib.get_key_pressed () in
-      if Battle.overbool bat then
-        match Game.Command.battle_input bat character player_input with
-        | _ -> State.to_level st
-      else
-        match Game.Command.battle_input bat character player_input with
-        | Attack x ->
-            end_drawing ();
-            (bat
-            |> Game.Battle.character_turn x
-            |> Game.Battle.enemy_turn
-                 (Game.Character.get_action_effect enemy (Random.int 3))
-            |> battle_wait st )false
-        | Run ->
-            if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
-            then
-              if Random.bool () then exit 0
-              else (
-                draw_failed_run ();
-                end_drawing ();
-                (bat
-                |> Game.Battle.enemy_turn
-                     (Game.Character.get_action_effect enemy
-                        (Random.int 3))
-                |> battle_wait st)) false
-            else if
-              Random.int 100
-              < Game.Battle.character_hp bat
-                - Game.Battle.enemy_hp bat
-                + 50
-            then exit 0
-            else (
-              draw_failed_run ();
+        draw_exit_battle bat;
+        begin_drawing ();
+        clear_background Color.raywhite;
+        bat_backgroud ();
+        battle_platform ();
+        bottom_bar ();
+        box_battext ();
+        draw_battle_text bat ();
+        let character = Game.Battle.character bat in
+        let enemy = Game.Battle.enemy bat in
+        let player_input = Raylib.get_key_pressed () in
+        if Battle.overbool bat then
+          match
+            Game.Command.battle_input bat character player_input
+          with
+          | _ -> State.to_level st
+        else
+          match
+            Game.Command.battle_input bat character player_input
+          with
+          | Attack x ->
+              end_drawing ();
               (bat
+              |> Game.Battle.character_turn x
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
-              |> battle_wait st)) false
-        | Exit ->
-            end_drawing ();
-            exit 0
-        | Invalid_input ->
-            end_drawing ();
-            battle_wait st bat false))
+              |> battle_wait st)
+                false
+          | Run ->
+              if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
+              then
+                if Random.bool () then exit 0
+                else
+                  (draw_failed_run ();
+                   end_drawing ();
+                   bat
+                   |> Game.Battle.enemy_turn
+                        (Game.Character.get_action_effect enemy
+                           (Random.int 3))
+                   |> battle_wait st)
+                    false
+              else if
+                Random.int 100
+                < Game.Battle.character_hp bat
+                  - Game.Battle.enemy_hp bat
+                  + 50
+              then exit 0
+              else
+                (draw_failed_run ();
+                 bat
+                 |> Game.Battle.enemy_turn
+                      (Game.Character.get_action_effect enemy
+                         (Random.int 3))
+                 |> battle_wait st)
+                  false
+          | Exit ->
+              end_drawing ();
+              exit 0
+          | Invalid_input ->
+              end_drawing ();
+              battle_wait st bat false)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -331,9 +338,20 @@ let draw_hatchery_text () =
   Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
   Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
 
+let initx = ref 0.
+let inity = ref 0.
+
+let level_start st =
+  set_window_title "Level";
+  initx := State.get_x st;
+  inity := State.get_y st
+
 let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  set_window_title "Hatchery";
   match Raylib.window_should_close () with
-  | true -> st
+  | true ->
+      end_drawing ();
+      st
   | false -> (
       (let open Raylib in
       begin_drawing ();
@@ -344,19 +362,31 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
       let player_input = Raylib.get_key_pressed () in
       match Command.hatchery_input player_input with
       | Roll ->
+          end_drawing ();
           let new_char = Hatchery.gacha hat in
           State.new_playable_char st new_char
       | Skip ->
           end_drawing ();
-          hatchery_wait st hat
+          let st' =
+            Game.State.new_level st
+              (st |> State.current_level |> Level.next_level)
+          in
+          level_start st';
+          hatchery_wait st' hat
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
           end_drawing ();
           hatchery_wait st hat)
 
 let create_hatchery hat =
+  let pathstring =
+    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+  in
+  let all_character_pathway =
+    List.map (fun x -> pathstring ^ x) (Array.to_list charArray)
+  in
   let all_character_json_list =
-    List.map Yojson.Basic.from_file (Array.to_list charArray)
+    List.map Yojson.Basic.from_file all_character_pathway
   in
   let all_character_list =
     List.map Character.from_json all_character_json_list
@@ -366,8 +396,7 @@ let create_hatchery hat =
 let hatchery_start st =
   set_window_title "Hatchery";
   let empty_hatchery = Hatchery.new_hatchery () in
-  let charpool_hatchery = create_hatchery empty_hatchery in
-  hatchery_wait st charpool_hatchery
+  create_hatchery empty_hatchery
 
 let fullpool =
   Array.map
@@ -386,8 +415,6 @@ let battle_start st team =
   in
   battle_wait st bat
 
-let initx = ref 0.
-let inity = ref 0.
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
@@ -424,11 +451,6 @@ let femchard x y (dir : direction) =
            (2. *. (410. /. 4.))
            (410. /. 4.) (410. /. 4.))
         (Vector2.create x y) Color.white
-
-let level_start st =
-  set_window_title "Level";
-  initx := State.get_x st;
-  inity := State.get_y st
 
 let rec level_wait st =
   match Raylib.window_should_close () with
@@ -473,7 +495,9 @@ let rec level_wait st =
                 up ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1)) true
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -485,9 +509,9 @@ let rec level_wait st =
             | Exit ->
                 up ();
                 end_drawing ();
-                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
-                level_start st';
-                level_wait st')
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Down -> (
           direct := Down;
           let x = fst location in
@@ -502,7 +526,9 @@ let rec level_wait st =
                 down ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1)) true
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -514,9 +540,9 @@ let rec level_wait st =
             | Exit ->
                 down ();
                 end_drawing ();
-                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
-                level_start st';
-                level_wait st')
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Left -> (
           direct := Left;
           let x = fst location - move_distance in
@@ -531,7 +557,9 @@ let rec level_wait st =
                 left ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1)) true
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -543,9 +571,9 @@ let rec level_wait st =
             | Exit ->
                 left ();
                 end_drawing ();
-                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
-                level_start st';
-                level_wait st')
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Right -> (
           direct := Right;
           let x = fst location + move_distance in
@@ -560,7 +588,9 @@ let rec level_wait st =
                 right ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 0)) true (*truncate*)
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 0))
+                    true (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -572,9 +602,12 @@ let rec level_wait st =
             | Exit ->
                 right ();
                 end_drawing ();
-                let st' = Game.State.new_level st (st |> State.current_level |> Level.next_level ) in
-                level_start st';
-                level_wait st')
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery
+          (* let st' = Game.State.new_level st (st |>
+             State.current_level |> Level.next_level) in level_start
+             st'; level_wait st') *))
       | Battle ->
           end_drawing ();
           battle_start st (Game.Team.init_team (i_to_char 1)) true
@@ -626,15 +659,7 @@ let main () =
   Raylib.init_window windowWidth windowHeight
     "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
-  let lvl =
-<<<<<<< HEAD
-    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep
-    ^ "basiclevel.json"
-    |> Yojson.Basic.from_file |> Game.Level.from_json
-=======
-    Level.random_level
->>>>>>> 04b98784687fd664be9329380395c95b2d3ab50d
-  in
+  let lvl = Level.random_level in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
     ^ Array.get charArray 0
