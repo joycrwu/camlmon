@@ -758,6 +758,7 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
+let timer = ref 0.
 
 let rec start_wait st =
   match Raylib.window_should_close () with
@@ -768,8 +769,18 @@ let rec start_wait st =
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
+      draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
+      timer := Raylib.get_time () *. 4.;
+      let cloudlocation () = if !timer < 60. then !timer else 0. in
+      let opp2 =
+        Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
+      in
+      Raylib.draw_texture_rec opp2
+        (Rectangle.create 0. 0. 1600. 1600.)
+        (Vector2.create (cloudlocation ()) 0.)
+        Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
-      Raylib.draw_text "PRESS ENTER TO START" 540 800 40 Color.black;
+      Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
         level_start st;
