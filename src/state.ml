@@ -85,7 +85,10 @@ let new_playable_char st (ch : Character.t) =
     level = st.level;
     health = st.health;
     location = st.location;
-    character_pool = ch :: st.character_pool;
+    character_pool =
+      (if List.exists (fun x -> x = ch) st.character_pool then
+       st.character_pool
+      else ch :: st.character_pool);
     status = st.status;
   }
 
