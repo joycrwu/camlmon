@@ -41,24 +41,18 @@ let gacha hat =
   match ran_num > 10 with
   | true ->
       let char_ran_num = Random.int 100 in
-      if char_ran_num > num_normchars then
-        let new_char_ran_num = char_ran_num mod num_normchars in
-        Array.get array_normchars new_char_ran_num
-      else Array.get array_normchars char_ran_num
+      let new_char_ran_num = char_ran_num mod num_normchars in
+      Array.get array_normchars new_char_ran_num
   | false -> (
       match ran_num < 5 with
       | false ->
           let char_ran_num = Random.int 100 in
-          if char_ran_num > num_rarechars then
-            let new_char_ran_num = char_ran_num mod num_rarechars in
-            Array.get array_rarechars new_char_ran_num
-          else Array.get array_rarechars char_ran_num
+          let new_char_ran_num = char_ran_num mod num_rarechars in
+          Array.get array_rarechars new_char_ran_num
       | true ->
           let char_ran_num = Random.int 100 in
-          if char_ran_num > num_ssrchars then
-            let new_char_ran_num = char_ran_num mod num_ssrchars in
-            Array.get array_ssrchars new_char_ran_num
-          else Array.get array_ssrchars char_ran_num)
+          let new_char_ran_num = char_ran_num mod num_ssrchars in
+          Array.get array_ssrchars new_char_ran_num)
 
 let character_outputs (ch : Character.t) (hat : t) =
   { hat with output_characters = ch :: hat.output_characters }
