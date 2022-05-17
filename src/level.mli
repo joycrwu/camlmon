@@ -17,7 +17,8 @@ val get_characterid : t -> string
     controlled by the user in the [lvl].*)
 
 val start_location : t -> int * int
-(** [start_location lvl] the starting location of the current level *)
+(** [start_location lvl] the starting location of the current level, in terms 
+    of pixels rather than tiles. *)
 
 val get_map : t -> string
 (** [get_map t] is the list of all the character ids that the user has
@@ -33,5 +34,8 @@ val draw_lvl : t -> unit
 val from_json : Yojson.Basic.t -> t
 (** [from_json j] is the level that [j] represents. Requires: [j] is
         a valid JSON character representation. *)
-(** val random_level : t *)
+val random_level : t 
 (** [random_level] is a random level type from data/level.*)
+val next_level : t -> t
+(** [next_level lvl] takes in an input level and outputs the level that is 
+    sequentially after the input level in the game data files. *)
