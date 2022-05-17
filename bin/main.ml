@@ -41,7 +41,10 @@ let battle_platform () =
   draw_rectangle 180 790 10 10 (Color.create 168 232 168 255)
 
 let draw_battle_enemy char =
-  let opp2 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
+  let opp2 =
+    Raylib.load_texture
+      (String.lowercase_ascii ("assets/" ^ char ^ ".png"))
+  in
   Raylib.draw_texture_rec opp2
     (Rectangle.create 0. 0. 300. 300.)
     (Vector2.create 1050. 100.)
@@ -49,7 +52,10 @@ let draw_battle_enemy char =
 
 (* "assets/girl_run_large.png" *)
 let draw_battle_char char =
-  let opp1 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
+  let opp1 =
+    Raylib.load_texture
+      (String.lowercase_ascii ("assets/" ^ char ^ ".png"))
+  in
   Raylib.draw_texture_rec opp1
     (Rectangle.create 0. 0. 300. 300.)
     (Vector2.create 250. 500.)
