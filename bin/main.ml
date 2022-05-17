@@ -40,6 +40,21 @@ let battle_platform () =
   draw_rectangle 165 790 10 10 (Color.create 168 232 168 255);
   draw_rectangle 180 790 10 10 (Color.create 168 232 168 255)
 
+let draw_battle_enemy char =
+  let opp2 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
+  Raylib.draw_texture_rec opp2
+    (Rectangle.create 0. 0. 300. 300.)
+    (Vector2.create 1100. 100.)
+    Color.white
+
+(* "assets/girl_run_large.png" *)
+let draw_battle_char char =
+  let opp1 = Raylib.load_texture ("assets/" ^ char ^ ".png") in
+  Raylib.draw_texture_rec opp1
+    (Rectangle.create 0. 0. 300. 300.)
+    (Vector2.create 100. 700.)
+    Color.white
+
 let box_battext () =
   draw_rectangle 100 100 600 300 (Color.create 248 248 216 255);
   draw_rectangle 920 480 600 300 (Color.create 248 248 216 255)
@@ -86,6 +101,8 @@ let draw_battle_text bat () =
   Raylib.draw_text
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id))
     170 190 40 Color.black;
+  draw_battle_char
+    (bat |> Game.Battle.character |> Game.Character.get_id);
   Raylib.draw_text
     ("HP: " ^ string_of_int (Game.Battle.character_hp bat))
     170 240 40 Color.black;
@@ -112,6 +129,7 @@ let draw_battle_text bat () =
   Raylib.draw_text
     ("Enemy " ^ (bat |> Game.Battle.enemy |> Game.Character.get_id))
     1000 570 40 Color.red;
+  draw_battle_enemy (bat |> Game.Battle.enemy |> Game.Character.get_id);
   Raylib.draw_text
     ("HP: " ^ string_of_int (Game.Battle.enemy_hp bat))
     1000 620 40 Color.black
