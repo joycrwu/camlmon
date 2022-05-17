@@ -78,9 +78,15 @@ let rec find x lst =
   | [] -> raise (Failure "Not Found")
   | h :: t -> if x = h then 0 else 1 + find x t
 
-let character_cycle team c =
-  if find c team = List.length team - 1 then List.nth team 0
-  else List.nth team (find c team + 1)
+let character_cycle team (c : Character.t) =
+  if List.length team = 1 then List.nth team 0
+  else
+    match team with
+    | h :: t ->
+        if List.nth team (List.length team - 1) <> c then
+          List.nth team (find c team + 1)
+        else List.nth team 0
+    | _ -> failwith "not a valid team"
 
 let character_turn_hp c_action_eff bat =
   if c_action_eff < 0 then
