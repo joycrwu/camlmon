@@ -1,15 +1,30 @@
-(*Test Plan: We approached testing based on each of the modules, so we
-  have test cases written in a list for most of the modular content
-  needed for our software. To begin, we tested many of the getter
-  functions for the modules. We started with the ones that took in a
-  json file, such as character. Since many of the type t's in the
-  modules were implemented as records, we could check whether the
-  getters were retrieving them correctly. From there, we tested some of
-  the manipulator functions that would change the type t in each of the
-  modules. Since the type t's cannot be accessed from outside of the
-  module itself, we then used the getters again to test whether the type
-  t was manipulated properly. The specific modules that we tested using
-  OUnit include State, Level Hatchery, and Character.*)
+(** TEST PLAN
+    Due to the game-like nature of our program, it was difficult to test all
+    functions via OUnit. Many of our functionalities depended on a sequence of
+    functions, or relied on player input, and thus much of the testing was 
+    completed via "make play" rather than "make test." As a general rule, 
+    raylib graphics, main functions, and the Command module had to be tested
+    exclusively in "make play." On the other hand json reliant modules such as
+    Character and Level, as well as general getter functions from modules like
+    Hatchery, Battle, State and Team could be tested in OUnit.
+  
+    We approached testing based on each of the modules, so we
+    have test cases written in a list for most of the modular content
+    needed for our software. To begin, we tested many of the getter
+    functions for the modules. We started with the ones that took in a
+    json file, such as character. Since many of the type t's in the
+    modules were implemented as records, we could check whether the
+    getters were retrieving them correctly. From there, we tested some of
+    the manipulator functions that would change the type t in each of the
+    modules. Since the type t's cannot be accessed from outside of the
+    module itself, we then used the getters again to test whether the type
+    t was manipulated properly. The specific modules that we tested using
+    OUnit include Battle, State, Level, Hatchery, and Character.
+    
+    Test cases were developed via black-box testing, or based on the specs of 
+    the tested functions. Many of the testable functions were simple getter 
+    functions and thus had few paths to run through. *)
+
 
 open OUnit2
 open Game
