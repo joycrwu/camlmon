@@ -304,7 +304,7 @@ let draw_hatchery_text () =
 
 let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
   match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
+  | true -> st
   | false -> (
       (let open Raylib in
       begin_drawing ();
@@ -316,10 +316,7 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
       match Command.hatchery_input player_input with
       | Roll ->
           let new_char = Hatchery.gacha hat in
-          let new_state = State.new_playable_char st new_char in
-          let new_hatchery = Hatchery.character_outputs new_char hat in
-          end_drawing ();
-          hatchery_wait new_state new_hatchery
+          State.new_playable_char st new_char
       | Skip ->
           end_drawing ();
           hatchery_wait st hat
@@ -542,9 +539,9 @@ let rec level_wait st =
       | Exit ->
           end_drawing ();
           exit 0
-      (** | Hatchery ->
+      | Hatchery ->
           end_drawing ();
-          hatchery_wait st (Hatchery.new_hatchery ()) *)
+          hatchery_wait st (Hatchery.new_hatchery ())
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
@@ -586,7 +583,8 @@ let main () =
     "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
   let lvl =
-    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep ^ "basiclevel.json"
+    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep
+    ^ "basiclevel.json"
     |> Yojson.Basic.from_file |> Game.Level.from_json
   in
   let c =

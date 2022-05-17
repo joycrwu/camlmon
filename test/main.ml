@@ -1,3 +1,16 @@
+(*Test Plan: We approached testing based on each of the modules, so we
+  have test cases written in a list for most of the modular content
+  needed for our software. To begin, we tested many of the getter
+  functions for the modules. We started with the ones that took in a
+  json file, such as character. Since many of the type t's in the
+  modules were implemented as records, we could check whether the
+  getters were retrieving them correctly. From there, we tested some of
+  the manipulator functions that would change the type t in each of the
+  modules. Since the type t's cannot be accessed from outside of the
+  module itself, we then used the getters again to test whether the type
+  t was manipulated properly. The specific modules that we tested using
+  OUnit include State, Level Hatchery, and Character.*)
+
 open OUnit2
 open Game
 open Battle
