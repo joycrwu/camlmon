@@ -217,12 +217,41 @@ type direction =
 
 let direct = ref Down
 
-let rec battle_wait (st : State.t) bat =
+let rec battle_wait (st : State.t) bat (team : bool) =
   match Raylib.window_should_close () with
   | true ->
       Raylib.close_window ();
       st
   | false -> (
+      if team then (
+        begin_drawing ();
+        let team_input = Raylib.get_key_pressed () in
+        let char_input = Raylib.get_key_pressed () in
+        if Battle.overbool bat then
+          match Game.Command.team_add_remove team_input char_input with
+          | _ -> State.to_level st
+        else (
+          clear_background Color.raywhite;
+          teambuilder () st;
+          match Command.team_add_remove team_input char_input with
+        | Add c ->
+            end_drawing ();
+            battle_wait
+              (State.add_to_team st
+                 (List.nth (State.current_team st) c))
+              bat true
+        | Remove c ->
+          end_drawing ();
+          battle_wait
+            (State.remove_from_team st
+               (List.nth (State.current_team st) c))
+            bat true
+        | Battle -> battle_wait st bat false
+        | Unavailable ->
+                end_drawing ();
+                battle_wait st bat true)
+      )
+      else (
       draw_exit_battle bat;
       begin_drawing ();
       clear_background Color.raywhite;
@@ -241,11 +270,11 @@ let rec battle_wait (st : State.t) bat =
         match Game.Command.battle_input bat character player_input with
         | Attack x ->
             end_drawing ();
-            bat
+            (bat
             |> Game.Battle.character_turn x
             |> Game.Battle.enemy_turn
                  (Game.Character.get_action_effect enemy (Random.int 3))
-            |> battle_wait st
+            |> battle_wait st )false
         | Run ->
             if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
             then
@@ -253,11 +282,11 @@ let rec battle_wait (st : State.t) bat =
               else (
                 draw_failed_run ();
                 end_drawing ();
-                bat
+                (bat
                 |> Game.Battle.enemy_turn
                      (Game.Character.get_action_effect enemy
                         (Random.int 3))
-                |> battle_wait st)
+                |> battle_wait st)) false
             else if
               Random.int 100
               < Game.Battle.character_hp bat
@@ -266,17 +295,17 @@ let rec battle_wait (st : State.t) bat =
             then exit 0
             else (
               draw_failed_run ();
-              bat
+              (bat
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
-              |> battle_wait st)
+              |> battle_wait st)) false
         | Exit ->
             end_drawing ();
             exit 0
         | Invalid_input ->
             end_drawing ();
-            battle_wait st bat)
+            battle_wait st bat false))
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -447,7 +476,7 @@ let rec level_wait st =
                 up ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st (Game.Team.init_team (i_to_char 1)) true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -476,7 +505,7 @@ let rec level_wait st =
                 down ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st (Game.Team.init_team (i_to_char 1)) true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -505,7 +534,7 @@ let rec level_wait st =
                 left ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st (Game.Team.init_team (i_to_char 1)) true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -534,7 +563,7 @@ let rec level_wait st =
                 right ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st (Game.Team.init_team (i_to_char 0)) true (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -551,7 +580,7 @@ let rec level_wait st =
                 level_wait st')
       | Battle ->
           end_drawing ();
-          battle_start st (Game.Team.init_team (i_to_char 1))
+          battle_start st (Game.Team.init_team (i_to_char 1)) true
       | Exit ->
           end_drawing ();
           exit 0
