@@ -1,35 +1,7 @@
 open Game
 open Raylib
 
-(* old stuff *)
-
 let _ = Random.self_init ()
-
-(* Graphics.set_color (rgb 0 153 230); Graphics.fill_rect 20 420 560 10;
-   Graphics.set_color (rgb 25 178 255); Graphics.fill_rect 20 400 560
-   10; Graphics.set_color (rgb 77 195 255); Graphics.fill_rect 20 380
-   560 10; Graphics.set_color (rgb 128 212 255); Graphics.fill_rect 20
-   360 560 10; Graphics.set_color (rgb 153 221 255); Graphics.fill_rect
-   20 340 560 10; Graphics.set_color (rgb 153 221 255);
-   Graphics.fill_rect 20 320 560 10; Graphics.set_color (rgb 179 229
-   255); Graphics.fill_rect 20 300 560 10; Graphics.set_color (rgb 204
-   238 255); Graphics.fill_rect 20 280 560 10; Graphics.set_color (rgb
-   204 238 255); Graphics.fill_rect 20 260 560 10; Graphics.set_color
-   (rgb 204 238 255); Graphics.fill_rect 20 240 560 10;
-   Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 220 560
-   10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 200
-   560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20
-   180 560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect
-   20 160 560 10; Graphics.set_color (rgb 204 238 255);
-   Graphics.fill_rect 20 140 560 10; Graphics.set_color (rgb 230 247
-   255); Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230
-   247 255); Graphics.fill_rect 20 100 560 10; *)
-(* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
-   230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
-   (rgb 128 170 255); Graphics.fill_rect 0 0 600 90; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
-   Graphics.set_color (rgb 0 0 0) *)
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -90,8 +62,7 @@ let health_bar_enemy bat () =
   let num_health = int_of_float (percent_health *. 100.) in
   if num_health > Character.get_hp enemy then
     Raylib.draw_rectangle 1000 680 300 20 Color.red
-  else
-    Raylib.draw_rectangle 1000 680 num_health 20 Color.red
+  else Raylib.draw_rectangle 1000 680 num_health 20 Color.red
 
 let rec print_list (list : string list) =
   match list with
@@ -110,15 +81,13 @@ let draw_map_text () =
   Raylib.draw_text "Q - QUIT" 1000 860 30 Color.black
 
 let draw_battle_text bat () =
-  (* Graphics.set_color (rgb 0 0 0); *)
-  (* bottom_bar (); *)
   health_bar_ally bat ();
   health_bar_enemy bat ();
-  (* draw_text text pos_x pos_y font_size color *)
   Raylib.draw_text
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id))
     170 190 40 Color.black;
-  Raylib.draw_text ("HP: " ^ string_of_int (Game.Battle.character_hp bat))
+  Raylib.draw_text
+    ("HP: " ^ string_of_int (Game.Battle.character_hp bat))
     170 240 40 Color.black;
   Raylib.draw_text
     ("Team: "
@@ -156,12 +125,8 @@ let draw_failed_run () =
 let victory_text () =
   Raylib.set_window_title "Victory";
   Raylib.draw_text "Poggers!" 250 200 10000 Color.green
-(* Graphics.set_color (rgb 0 255 0); Graphics.fill_rect 0 0 600 500;
-   Graphics.set_color (rgb 0 0 255); Graphics.set_text_size 10000000;
-   Graphics.moveto 250 200; Graphics.draw_string "Poggers!" *)
 
 let lose_text () =
-  (* Graphics.open_graph ""; *)
   set_window_title "Game Over";
   Raylib.draw_rectangle 0 0 600 500 Color.black;
   Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
@@ -174,9 +139,42 @@ let rec print_numbered_list (list : string list) (num : int) =
       else h
   | [] -> "none"
 
-let teambuilder () st =
+let rec card_distributor
+    (startx : int)
+    (starty : int)
+    (counter : int)
+    (row : int) =
+  draw_rectangle startx starty 40 40 (Color.create 69 67 65 255);
+  Raylib.draw_text
+    (string_of_int (11 - (counter + row)))
+    startx starty 10000 Color.black;
+  draw_rectangle (startx + 75) (starty + 10) 180 220
+    (Color.create 140 138 133 255);
+  draw_rectangle (startx + 65) starty 180 220
+    (Color.create 168 166 160 255);
+  if counter > 1 then
+    card_distributor (startx + 360) starty (counter - 1) row
+  else ()
+
+let rec team_card_dist (startx : int) (starty : int) (counter : int) =
+  draw_rectangle (startx + 70) (starty + 10) 180 220
+    (Color.create 173 193 201 255);
+  draw_rectangle (startx + 60) starty 180 220
+    (Color.create 202 227 237 255);
+  if counter > 1 then team_card_dist (startx + 300) starty (counter - 1)
+  else ()
+
+let team_screen () st =
   set_window_title "Team Select";
-  Raylib.draw_rectangle 0 0 600 500 Color.yellow;
+  clear_background (Color.create 224 224 144 255);
+  card_distributor 115 30 5 0;
+  card_distributor 120 320 5 5;
+  draw_rectangle 0 570 2000 260 (Color.create 219 168 116 255);
+  draw_rectangle 600 775 600 10 (Color.create 184 134 83 255);
+  team_card_dist 500 585 3;
+  draw_rectangle 0 820 2000 220 Color.white
+
+let team_text () st =
   Raylib.draw_text
     ("Characters: "
     ^ print_numbered_list
@@ -194,8 +192,8 @@ let teambuilder () st =
     750 700 10000 Color.black;
   Raylib.draw_text
     "To add or remove, press a or r, then the number of the character!"
-    100 835 30 Color.black;
-  Raylib.draw_text "Press B to battle!" 100 875 30 Color.black
+    100 855 30 Color.black;
+  Raylib.draw_text "Press B to battle!" 100 895 30 Color.black
 
 let draw_exit_battle bat =
   if Game.Battle.wonbool bat then victory_text ()
@@ -210,66 +208,103 @@ type direction =
 
 let direct = ref Down
 
-let rec battle_wait (st : State.t) bat =
+let rec battle_wait (st : State.t) bat (team : bool) =
   match Raylib.window_should_close () with
   | true ->
       Raylib.close_window ();
       st
-  | false -> (
-      draw_exit_battle bat;
-      begin_drawing ();
-      clear_background Color.raywhite;
-      bat_backgroud ();
-      battle_platform ();
-      bottom_bar ();
-      box_battext ();
-      draw_battle_text bat ();
-      let character = Game.Battle.character bat in
-      let enemy = Game.Battle.enemy bat in
-      let player_input = Raylib.get_key_pressed () in
-      if Battle.overbool bat then
-        match Game.Command.battle_input bat character player_input with
-        | _ -> State.to_level st
-      else
-        match Game.Command.battle_input bat character player_input with
-        | Attack x ->
-            end_drawing ();
-            bat
-            |> Game.Battle.character_turn x
-            |> Game.Battle.enemy_turn
-                 (Game.Character.get_action_effect enemy (Random.int 3))
-            |> battle_wait st
-        | Run ->
-            if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
-            then
-              if Random.bool () then exit 0
-              else (
-                draw_failed_run ();
-                end_drawing ();
-                bat
-                |> Game.Battle.enemy_turn
-                     (Game.Character.get_action_effect enemy
-                        (Random.int 3))
-                |> battle_wait st)
-            else if
-              Random.int 100
-              < Game.Battle.character_hp bat
-                - Game.Battle.enemy_hp bat
-                + 50
-            then exit 0
-            else (
-              draw_failed_run ();
-              bat
+  | false ->
+      if team then (
+        begin_drawing ();
+        let team_input = Raylib.get_key_pressed () in
+        let char_input = Raylib.get_key_pressed () in
+        if Battle.overbool bat then
+          match Game.Command.team_add_remove team_input char_input with
+          | _ -> State.to_level st
+        else (
+          clear_background Color.raywhite;
+          team_screen () st;
+          team_text () st;
+          match Command.team_add_remove team_input char_input with
+          | Add c ->
+              end_drawing ();
+              battle_wait
+                (State.add_to_team st
+                   (List.nth (State.current_team st) c))
+                bat true
+          | Remove c ->
+              end_drawing ();
+              battle_wait
+                (State.remove_from_team st
+                   (List.nth (State.current_team st) c))
+                bat true
+          | Battle -> battle_wait st bat false
+          | Unavailable ->
+              end_drawing ();
+              battle_wait st bat true))
+      else (
+        draw_exit_battle bat;
+        begin_drawing ();
+        clear_background Color.raywhite;
+        bat_backgroud ();
+        battle_platform ();
+        bottom_bar ();
+        box_battext ();
+        draw_battle_text bat ();
+        let character = Game.Battle.character bat in
+        let enemy = Game.Battle.enemy bat in
+        let player_input = Raylib.get_key_pressed () in
+        if Battle.overbool bat then
+          match
+            Game.Command.battle_input bat character player_input
+          with
+          | _ -> State.to_level st
+        else
+          match
+            Game.Command.battle_input bat character player_input
+          with
+          | Attack x ->
+              end_drawing ();
+              (bat
+              |> Game.Battle.character_turn x
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
               |> battle_wait st)
-        | Exit ->
-            end_drawing ();
-            exit 0
-        | Invalid_input ->
-            end_drawing ();
-            battle_wait st bat)
+                false
+          | Run ->
+              if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
+              then
+                if Random.bool () then exit 0
+                else
+                  (draw_failed_run ();
+                   end_drawing ();
+                   bat
+                   |> Game.Battle.enemy_turn
+                        (Game.Character.get_action_effect enemy
+                           (Random.int 3))
+                   |> battle_wait st)
+                    false
+              else if
+                Random.int 100
+                < Game.Battle.character_hp bat
+                  - Game.Battle.enemy_hp bat
+                  + 50
+              then exit 0
+              else
+                (draw_failed_run ();
+                 bat
+                 |> Game.Battle.enemy_turn
+                      (Game.Character.get_action_effect enemy
+                         (Random.int 3))
+                 |> battle_wait st)
+                  false
+          | Exit ->
+              end_drawing ();
+              exit 0
+          | Invalid_input ->
+              end_drawing ();
+              battle_wait st bat false)
 
 let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
@@ -295,9 +330,20 @@ let draw_hatchery_text () =
   Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
   Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
 
+let initx = ref 0.
+let inity = ref 0.
+
+let level_start st =
+  set_window_title "Level";
+  initx := State.get_x st;
+  inity := State.get_y st
+
 let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
+  set_window_title "Hatchery";
   match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
+  | true ->
+      Raylib.close_window ();
+      st
   | false -> (
       (let open Raylib in
       begin_drawing ();
@@ -308,22 +354,44 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
       let player_input = Raylib.get_key_pressed () in
       match Command.hatchery_input player_input with
       | Roll ->
-          let new_char = Hatchery.gacha hat in
-          let new_state = State.new_playable_char st new_char in
-          let new_hatchery = Hatchery.character_outputs new_char hat in
           end_drawing ();
-          hatchery_wait new_state new_hatchery
+          let new_char = Hatchery.gacha hat in
+          let new_playable_char_state =
+            State.new_playable_char st new_char
+          in
+          let level_with_new_char =
+            State.to_level new_playable_char_state
+          in
+          let next_level_st =
+            State.new_level level_with_new_char
+              (level_with_new_char |> State.current_level
+             |> Level.next_level)
+          in
+          level_start next_level_st;
+          next_level_st
       | Skip ->
           end_drawing ();
-          hatchery_wait st hat
+          let st' =
+            Game.State.new_level st
+              (st |> State.current_level |> Level.next_level)
+          in
+          let new_st = State.to_level st' in
+          level_start new_st;
+          new_st
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
           end_drawing ();
           hatchery_wait st hat)
 
 let create_hatchery hat =
+  let pathstring =
+    "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+  in
+  let all_character_pathway =
+    List.map (fun x -> pathstring ^ x) (Array.to_list charArray)
+  in
   let all_character_json_list =
-    List.map Yojson.Basic.from_file (Array.to_list charArray)
+    List.map Yojson.Basic.from_file all_character_pathway
   in
   let all_character_list =
     List.map Character.from_json all_character_json_list
@@ -333,8 +401,7 @@ let create_hatchery hat =
 let hatchery_start st =
   set_window_title "Hatchery";
   let empty_hatchery = Hatchery.new_hatchery () in
-  let charpool_hatchery = create_hatchery empty_hatchery in
-  hatchery_wait st charpool_hatchery
+  create_hatchery empty_hatchery
 
 let fullpool =
   Array.map
@@ -353,8 +420,6 @@ let battle_start st team =
   in
   battle_wait st bat
 
-let initx = ref 0.
-let inity = ref 0.
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
@@ -435,7 +500,9 @@ let rec level_wait st =
                 up ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -447,7 +514,9 @@ let rec level_wait st =
             | Exit ->
                 up ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Down -> (
           direct := Down;
           let x = fst location in
@@ -462,7 +531,9 @@ let rec level_wait st =
                 down ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -474,7 +545,9 @@ let rec level_wait st =
             | Exit ->
                 down ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Left -> (
           direct := Left;
           let x = fst location - move_distance in
@@ -489,7 +562,9 @@ let rec level_wait st =
                 left ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -501,7 +576,9 @@ let rec level_wait st =
             | Exit ->
                 left ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery)
       | Right -> (
           direct := Right;
           let x = fst location + move_distance in
@@ -516,7 +593,9 @@ let rec level_wait st =
                 right ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st (Game.Team.init_team (i_to_char 1))
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 0))
+                    true (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -528,16 +607,21 @@ let rec level_wait st =
             | Exit ->
                 right ();
                 end_drawing ();
-                level_wait (Game.State.move st x y))
+                let hatchery_state = State.to_hatchery st in
+                let new_hatchery = hatchery_start st in
+                hatchery_wait hatchery_state new_hatchery
+          (* let st' = Game.State.new_level st (st |>
+             State.current_level |> Level.next_level) in level_start
+             st'; level_wait st') *))
       | Battle ->
           end_drawing ();
-          battle_start st (Game.Team.init_team (i_to_char 1))
+          battle_start st (Game.Team.init_team (i_to_char 1)) true
       | Exit ->
           end_drawing ();
           exit 0
-      (** | Hatchery ->
+      | Hatchery ->
           end_drawing ();
-          hatchery_wait st (Hatchery.new_hatchery ()) *)
+          hatchery_wait st (Hatchery.new_hatchery ())
       | _ ->
           Raylib.end_drawing ();
           level_wait st)
@@ -559,12 +643,11 @@ let rec start_wait st =
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      Raylib.draw_text "UNTITLED" 410 60 150
-        Color.black;
-      Raylib.draw_text "PRESS ENTER TO START" 540 800 40
-        Color.black;
+      Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
+      Raylib.draw_text "PRESS ENTER TO START" 540 800 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
+        level_start st;
         State.to_level st)
       else (
         end_drawing ();
@@ -580,10 +663,7 @@ let main () =
   Raylib.init_window windowWidth windowHeight
     "raylib [core] example - basic window";
   Raylib.set_target_fps 60;
-  let lvl =
-    "data" ^ Filename.dir_sep ^ "level" ^ Filename.dir_sep ^ "basiclevel.json"
-    |> Yojson.Basic.from_file |> Game.Level.from_json
-  in
+  let lvl = Level.random_level in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
     ^ Array.get charArray 0
