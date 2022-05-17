@@ -1,35 +1,9 @@
 open Game
 open Raylib
 
-(* old stuff *)
 
 let _ = Random.self_init ()
 
-(* Graphics.set_color (rgb 0 153 230); Graphics.fill_rect 20 420 560 10;
-   Graphics.set_color (rgb 25 178 255); Graphics.fill_rect 20 400 560
-   10; Graphics.set_color (rgb 77 195 255); Graphics.fill_rect 20 380
-   560 10; Graphics.set_color (rgb 128 212 255); Graphics.fill_rect 20
-   360 560 10; Graphics.set_color (rgb 153 221 255); Graphics.fill_rect
-   20 340 560 10; Graphics.set_color (rgb 153 221 255);
-   Graphics.fill_rect 20 320 560 10; Graphics.set_color (rgb 179 229
-   255); Graphics.fill_rect 20 300 560 10; Graphics.set_color (rgb 204
-   238 255); Graphics.fill_rect 20 280 560 10; Graphics.set_color (rgb
-   204 238 255); Graphics.fill_rect 20 260 560 10; Graphics.set_color
-   (rgb 204 238 255); Graphics.fill_rect 20 240 560 10;
-   Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 220 560
-   10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20 200
-   560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect 20
-   180 560 10; Graphics.set_color (rgb 204 238 255); Graphics.fill_rect
-   20 160 560 10; Graphics.set_color (rgb 204 238 255);
-   Graphics.fill_rect 20 140 560 10; Graphics.set_color (rgb 230 247
-   255); Graphics.fill_rect 20 120 560 10; Graphics.set_color (rgb 230
-   247 255); Graphics.fill_rect 20 100 560 10; *)
-(* let bottom_bar () = Graphics.open_graph ""; Graphics.set_color (rgb
-   230 251 255); Graphics.fill_rect 0 90 600 490; Graphics.set_color
-   (rgb 128 170 255); Graphics.fill_rect 0 0 600 90; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 10 5 280 80; Graphics.set_color
-   (rgb 179 242 255); Graphics.fill_rect 310 5 280 80;
-   Graphics.set_color (rgb 0 0 0) *)
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -91,12 +65,10 @@ let health_bar_enemy bat () =
   let percent_health = enemy_currhp /. enemy_maxhp in
   let num_health = int_of_float (percent_health *. 100.) in
   if num_health > Character.get_hp enemy then
-    (* (Graphics.set_color (rgb 0 0 0); Graphics.fill_rect 450 390 100
-       10) *)
+
     Raylib.draw_rectangle 450 390 100 10 Color.black
   else
-    (* (Graphics.set_color (rgb 0 0 0); Graphics.fill_rect 450 390
-       num_health 10) *)
+
     Raylib.draw_rectangle 450 390 num_health 10 Color.black
 
 let rec print_list (list : string list) =
@@ -116,11 +88,9 @@ let draw_map_text () =
   Raylib.draw_text "Q - QUIT" 1000 860 30 Color.black
 
 let draw_battle_text bat () =
-  (* Graphics.set_color (rgb 0 0 0); *)
-  (* bottom_bar (); *)
+
   health_bar_ally bat ();
   health_bar_enemy bat ();
-  (* draw_text text pos_x pos_y font_size color *)
   Raylib.draw_text
     ("Ally " ^ (bat |> Game.Battle.character |> Game.Character.get_id))
     50 100 20 Color.black;
@@ -163,12 +133,9 @@ let draw_failed_run () =
 let victory_text () =
   Raylib.set_window_title "Victory";
   Raylib.draw_text "Poggers!" 250 200 10000 Color.green
-(* Graphics.set_color (rgb 0 255 0); Graphics.fill_rect 0 0 600 500;
-   Graphics.set_color (rgb 0 0 255); Graphics.set_text_size 10000000;
-   Graphics.moveto 250 200; Graphics.draw_string "Poggers!" *)
+
 
 let lose_text () =
-  (* Graphics.open_graph ""; *)
   set_window_title "Game Over";
   Raylib.draw_rectangle 0 0 600 500 Color.black;
   Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
@@ -181,9 +148,34 @@ let rec print_numbered_list (list : string list) (num : int) =
       else h
   | [] -> "none"
 
-let teambuilder () st =
+let rec card_distributor (startx : int) (starty : int) (counter :int) (row : int) = 
+  draw_rectangle startx starty 40 40 (Color.create 69 67 65 255);
+  Raylib.draw_text (string_of_int (11 - (counter + row))) startx starty 10000 Color.black;
+  draw_rectangle (startx + 75) (starty + 10) 180 220 (Color.create 140 138 133 255);
+ draw_rectangle (startx + 65) starty 180 220 (Color.create 168 166 160 255);
+ if counter > 1 then
+ card_distributor (startx + 360) starty (counter -1) row
+ else ()
+ 
+let rec team_card_dist (startx : int) (starty : int) (counter :int) = 
+  draw_rectangle (startx + 70) (starty + 10) 180 220 (Color.create 173 193 201 255);
+ draw_rectangle (startx + 60) starty 180 220 (Color.create 202 227 237 255);
+ if counter > 1 then
+ team_card_dist (startx + 300) starty (counter -1)
+ else ()
+
+let team_screen () st =
   set_window_title "Team Select";
-  Raylib.draw_rectangle 0 0 600 500 Color.yellow;
+  clear_background (Color.create 224 224 144 255);
+  card_distributor 115 30 5 0;
+  card_distributor 120 320 5 5;
+  draw_rectangle 0 570 2000 260 (Color.create 219 168 116 255);
+  draw_rectangle 600 775 600 10 (Color.create 184 134 83 255);
+  team_card_dist 500 585 3;
+  draw_rectangle 0 820 2000 220 (Color.white)
+
+
+let team_text () st=
   Raylib.draw_text
     ("Characters: "
     ^ print_numbered_list
@@ -201,8 +193,8 @@ let teambuilder () st =
     750 700 10000 Color.black;
   Raylib.draw_text
     "To add or remove, press a or r, then the number of the character!"
-    100 835 30 Color.black;
-  Raylib.draw_text "Press B to battle!" 100 875 30 Color.black
+    100 855 30 Color.black;
+  Raylib.draw_text "Press B to battle!" 100 895 30 Color.black
 
 let draw_exit_battle bat =
   if Game.Battle.wonbool bat then victory_text ()
@@ -232,7 +224,8 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | _ -> State.to_level st
         else (
           clear_background Color.raywhite;
-          teambuilder () st;
+          team_screen () st;
+          team_text () st;
           match Command.team_add_remove team_input char_input with
         | Add c ->
             end_drawing ();
