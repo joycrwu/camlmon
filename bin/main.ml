@@ -330,6 +330,16 @@ let draw_hatchery_text () =
   Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
   Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
 
+let draw_hatchery_output_text () =
+  (* draw_text text pos_x pos_y font_size color *)
+  Raylib.draw_text "Congratulations on your new character!" 80 835 50
+    Color.black;
+  Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
+
+let draw_gacha_output (s1 : string) (s2 : string) =
+  Raylib.draw_text s1 40 40 40 Color.black;
+  Raylib.draw_text s2 40 80 40 Color.black
+
 let initx = ref 0.
 let inity = ref 0.
 
@@ -337,6 +347,66 @@ let level_start st =
   set_window_title "Level";
   initx := State.get_x st;
   inity := State.get_y st
+
+let move_on_from_hatchery st =
+  end_drawing ();
+  let level_with_new_char = State.to_level st in
+  let next_level_st =
+    State.new_level level_with_new_char
+      (level_with_new_char |> State.current_level |> Level.next_level)
+  in
+  level_start next_level_st;
+  next_level_st
+
+let draw_gacha_char char =
+  let lowercase = String.lowercase_ascii char in
+  let ch = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
+  Raylib.draw_texture_rec ch
+    (Rectangle.create 0. 0. 300. 300.)
+    (Vector2.create 250. 250.)
+    Color.white
+
+let rec hatchery_endscreen_wait (st : State.t) =
+  set_window_title "New Character!";
+  match Raylib.window_should_close () with
+  | true ->
+      Raylib.close_window ();
+      st
+  | false -> (
+      (let open Raylib in
+      begin_drawing ();
+      clear_background Color.raywhite;
+      hatchery_background ();
+      hatchery_bottom_bar ();
+      draw_hatchery_output_text ();
+      let currpool_array =
+        Array.of_list (State.current_character_pool st)
+      in
+      let new_chara = Array.get currpool_array 0 in
+      let new_chara_name = Character.get_id new_chara in
+      draw_gacha_char new_chara_name;
+      let new_chara_rarity = Character.get_rarity new_chara in
+      match new_chara_rarity with
+      | 1 -> draw_gacha_output new_chara_name "Normal"
+      | 2 -> draw_gacha_output new_chara_name "Rare"
+      | 3 -> draw_gacha_output new_chara_name "SSR"
+      | _ -> failwith "something went wrong");
+      let player_input = Raylib.get_key_pressed () in
+      match Command.hatchery_input player_input with
+      | Roll -> move_on_from_hatchery st
+      | Skip -> move_on_from_hatchery st
+      | Invalid ->
+          end_drawing ();
+          hatchery_endscreen_wait st)
+
+let rec gacha_and_check (st : State.t) (hat : Hatchery.t) =
+  let gacha_output = Hatchery.gacha hat in
+  if
+    List.exists
+      (fun x -> x = gacha_output)
+      (State.current_character_pool st)
+  then gacha_and_check st hat
+  else State.new_playable_char st gacha_output
 
 let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
   set_window_title "Hatchery";
@@ -355,20 +425,8 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
       match Command.hatchery_input player_input with
       | Roll ->
           end_drawing ();
-          let new_char = Hatchery.gacha hat in
-          let new_playable_char_state =
-            State.new_playable_char st new_char
-          in
-          let level_with_new_char =
-            State.to_level new_playable_char_state
-          in
-          let next_level_st =
-            State.new_level level_with_new_char
-              (level_with_new_char |> State.current_level
-             |> Level.next_level)
-          in
-          level_start next_level_st;
-          next_level_st
+          let new_playable_char_state = gacha_and_check st hat in
+          hatchery_endscreen_wait new_playable_char_state
       | Skip ->
           end_drawing ();
           let st' =
