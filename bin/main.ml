@@ -331,16 +331,15 @@ let rec battle_wait (st : State.t) bat (team : bool) =
       begin_drawing ();
       clear_background Color.raywhite;
       if team then
-        let team_input = Raylib.get_key_pressed () in
         let char_input = Raylib.get_key_pressed () in
         if Battle.overbool bat then
-          match Game.Command.team_add_remove team_input char_input with
+          match Game.Command.team_add_remove char_input with
           | _ -> State.to_level st
         else (
           team_screen () st;
           team_text () st;
           init_char_graphics () st;
-          match Command.team_add_remove team_input char_input with
+          match Command.team_add_remove char_input with
           | Add c ->
               end_drawing ();
               battle_wait

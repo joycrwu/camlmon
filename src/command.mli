@@ -43,4 +43,4 @@ type team_command =
   | Battle
   | Unavailable
 
-val team_add_remove : Key.t -> Key.t -> team_command
+val team_add_remove : Key.t -> team_command
