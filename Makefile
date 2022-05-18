@@ -26,7 +26,7 @@ clean:
 	dune clean
 	rm -f game.zip
 
-doc:
+docs:
 	dune build @doc
 
 cloc: clean
