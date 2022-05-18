@@ -82,7 +82,7 @@ let new_playable_char st (ch : Character.t) =
   battle. Not yeet implemented.*)
 
 let add_to_team st (ch : Character.t) =
-  if List.length st.team < 3 then { st with team = ch :: st.team }
+  if List.length st.team < 3 then { st with team = [ ch ] @ st.team }
   else st
 
 let remove_from_team st (ch : Character.t) =
