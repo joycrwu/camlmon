@@ -2,8 +2,6 @@ open Game
 open Raylib
 
 let _ = Random.self_init ()
-let windowWidth = 1632
-let windowHeight = 960
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -73,10 +71,10 @@ let draw_battle_enemy char =
     Color.white
 
 (* "assets/girl_run_large.png" *)
-let draw_battle_char char =
+let draw_battle_char chara =
   let opp1 =
     Raylib.load_texture
-      (String.lowercase_ascii ("assets/" ^ char ^ ".png"))
+      (String.lowercase_ascii ("assets/" ^ chara ^ ".png"))
   in
   Raylib.draw_texture_rec opp1
     (Rectangle.create 0. 0. 300. 300.)
@@ -165,27 +163,17 @@ let draw_battle_text bat () =
 (** not currently functional*)
 let draw_failed_run () =
   Raylib.draw_rectangle 0 0 600 500 (Color.create 100 100 0 0);
-  Raylib.draw_text "You failed to run away" 250 200 100
+  Raylib.draw_text "You failed to run away" 250 200 10000
     (Color.create 0 0 255 0)
 
 let victory_text () =
   Raylib.set_window_title "Victory";
-  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.green;
-  Raylib.draw_text "Poggers!" (windowWidth / 2) (windowHeight / 2) 50
-    Color.black;
-  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
-    ((windowHeight / 2) + 50)
-    50 Color.black
+  Raylib.draw_text "Poggers!" 250 200 10000 Color.green
 
 let lose_text () =
   set_window_title "Game Over";
   Raylib.draw_rectangle 0 0 600 500 Color.black;
-  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.red;
-  Raylib.draw_text "Sadge D:" (windowWidth / 2) (windowHeight / 2) 50
-    Color.black;
-  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
-    ((windowHeight / 2) + 50)
-    50 Color.black
+  Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
 
 let rec print_numbered_list (list : string list) (num : int) =
   match list with
@@ -347,12 +335,16 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                   (pool_no_team
                      (State.current_character_pool st)
                      (State.current_team st))
-                < c
+                < c + 1
               then battle_wait st bat true
               else
                 battle_wait
                   (State.add_to_team st
-                     (List.nth (State.current_team st) c))
+                     (List.nth
+                        (pool_no_team
+                           (State.current_character_pool st)
+                           (State.current_team st))
+                        c))
                   bat true
           | Remove c ->
               end_drawing ();
@@ -364,9 +356,9 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                      (List.nth (State.current_team st) c))
                   bat true
           | Battle ->
-              if List.length (State.current_team st) = 0 then
-                battle_wait st bat true
-              else battle_wait st bat false
+              if List.length (State.current_team st) > 0 then
+                battle_wait st bat false
+              else battle_wait st bat true
           | Unavailable ->
               end_drawing ();
               battle_wait st bat true))
@@ -434,19 +426,32 @@ let rec battle_wait (st : State.t) bat (team : bool) =
               end_drawing ();
               battle_wait st bat false)
 
-let charArray =
+let charArraystr =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
 let i_to_char i =
   "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-  ^ Array.get charArray i
+  ^ Array.get charArraystr i
   |> Yojson.Basic.from_file |> Game.Character.from_json
+
+let arrInd array element =
+  let i = ref (-1) in
+  let () =
+    Array.iteri
+      (fun n elt -> if element = elt then i := n else ())
+      array
+  in
+  !i
+
+let charArray =
+  Array.map (fun x -> i_to_char (arrInd charArraystr x)) charArraystr
 
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
-  clear_background (Color.create 230 251 255 255);
   draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
-  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255)
+  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255);
+  clear_background (Color.create 230 251 255 255);
+  draw_rectangle 0 0 1632 10 Color.gray
 
 let hatchery_bottom_bar () =
   draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
@@ -461,130 +466,6 @@ let draw_hatchery_text () =
 
 let draw_hatchery_output_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  draw_triangle (Vector2.create 0. 0.)
-    (Vector2.create 50. 100.)
-    (Vector2.create 100. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 100. 0.)
-    (Vector2.create 150. 100.)
-    (Vector2.create 200. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 200. 0.)
-    (Vector2.create 250. 100.)
-    (Vector2.create 300. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 300. 0.)
-    (Vector2.create 350. 100.)
-    (Vector2.create 400. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 400. 0.)
-    (Vector2.create 450. 100.)
-    (Vector2.create 500. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 500. 0.)
-    (Vector2.create 550. 100.)
-    (Vector2.create 600. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 600. 0.)
-    (Vector2.create 650. 100.)
-    (Vector2.create 700. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 700. 0.)
-    (Vector2.create 750. 100.)
-    (Vector2.create 800. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 800. 0.)
-    (Vector2.create 850. 100.)
-    (Vector2.create 900. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 900. 0.)
-    (Vector2.create 950. 100.)
-    (Vector2.create 1000. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 1000. 0.)
-    (Vector2.create 1050. 100.)
-    (Vector2.create 1100. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 1100. 0.)
-    (Vector2.create 1150. 100.)
-    (Vector2.create 1200. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 1200. 0.)
-    (Vector2.create 1250. 100.)
-    (Vector2.create 1300. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 1300. 0.)
-    (Vector2.create 1350. 100.)
-    (Vector2.create 1400. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 1400. 0.)
-    (Vector2.create 1450. 100.)
-    (Vector2.create 1500. 0.)
-    (Color.create 255 212 204 155);
-  draw_triangle
-    (Vector2.create 1500. 0.)
-    (Vector2.create 1550. 100.)
-    (Vector2.create 1600. 0.)
-    (Color.create 255 217 179 255);
-  draw_triangle
-    (Vector2.create 400. 650.)
-    (Vector2.create 0. 500.)
-    (Vector2.create 0. 800.)
-    (Color.create 255 255 153 255);
-  draw_triangle
-    (Vector2.create 1632. 500.)
-    (Vector2.create 1232. 650.)
-    (Vector2.create 1632. 800.)
-    (Color.create 255 255 153 255);
-  draw_triangle
-    (Vector2.create 400. 350.)
-    (Vector2.create 0. 200.)
-    (Vector2.create 0. 500.)
-    (Color.create 255 255 153 255);
-  draw_triangle
-    (Vector2.create 400. 350.)
-    (Vector2.create 0. 200.)
-    (Vector2.create 0. 500.)
-    (Color.create 255 255 153 255);
-  draw_triangle
-    (Vector2.create 1632. 200.)
-    (Vector2.create 1232. 350.)
-    (Vector2.create 1632. 500.)
-    (Color.create 255 255 153 255);
-  draw_triangle
-    (Vector2.create 400. 300.)
-    (Vector2.create 0. 150.)
-    (Vector2.create 0. 450.)
-    (Color.create 255 153 153 200);
-  draw_triangle
-    (Vector2.create 1632. 150.)
-    (Vector2.create 1232. 300.)
-    (Vector2.create 1632. 450.)
-    (Color.create 255 153 153 200);
-  draw_triangle
-    (Vector2.create 400. 600.)
-    (Vector2.create 0. 450.)
-    (Vector2.create 0. 750.)
-    (Color.create 255 153 153 200);
-  draw_triangle
-    (Vector2.create 1632. 450.)
-    (Vector2.create 1232. 600.)
-    (Vector2.create 1632. 750.)
-    (Color.create 255 153 153 200);
   Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
@@ -608,6 +489,7 @@ let move_on_from_hatchery st =
     State.new_level level_with_new_char
       (level_with_new_char |> State.current_level |> Level.next_level)
   in
+  level_start next_level_st;
   next_level_st
 
 let draw_gacha_char char =
@@ -686,6 +568,7 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
               (st |> State.current_level |> Level.next_level)
           in
           let new_st = State.to_level st' in
+          level_start new_st;
           new_st
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
@@ -697,7 +580,7 @@ let create_hatchery hat =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
   in
   let all_character_pathway =
-    List.map (fun x -> pathstring ^ x) (Array.to_list charArray)
+    List.map (fun x -> pathstring ^ x) (Array.to_list charArraystr)
   in
   let all_character_json_list =
     List.map Yojson.Basic.from_file all_character_pathway
@@ -717,21 +600,26 @@ let fullpool =
     (fun x ->
       "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ x
       |> Yojson.Basic.from_file |> Game.Character.from_json)
-    charArray
+    charArraystr
 
-let chara i team = List.nth (Team.get_team_characters team) i
-let enemy i = Array.get fullpool i
+let random (lst : Character.t list) =
+  List.nth lst (Random.int (List.length lst))
 
-let battle_start st team =
+let battle_start st =
   set_window_title "Battle";
   let bat =
-    Game.Battle.init_battle (chara 0 team) (enemy 2) [ chara 0 team ]
+    Game.Battle.init_battle
+      (random (State.current_team st))
+      charArray.(Random.int (Array.length charArray))
+      (State.current_team st)
   in
   battle_wait st bat
 
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
+let windowWidth = 1632
+let windowHeight = 960
 let tileHeight = (96 * 8) + 10
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
@@ -806,10 +694,7 @@ let rec level_wait st =
             | Grass ->
                 up ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st
-                    (Game.Team.init_team (i_to_char 1))
-                    true
+                if randomBattleGen then battle_start st true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -837,10 +722,7 @@ let rec level_wait st =
             | Grass ->
                 down ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st
-                    (Game.Team.init_team (i_to_char 1))
-                    true
+                if randomBattleGen then battle_start st true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -868,10 +750,7 @@ let rec level_wait st =
             | Grass ->
                 left ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st
-                    (Game.Team.init_team (i_to_char 1))
-                    true
+                if randomBattleGen then battle_start st true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -899,10 +778,8 @@ let rec level_wait st =
             | Grass ->
                 right ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st
-                    (Game.Team.init_team (i_to_char 0))
-                    true (*truncate*)
+                if randomBattleGen then battle_start st true
+                  (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -922,7 +799,7 @@ let rec level_wait st =
              st'; level_wait st') *))
       | Battle ->
           end_drawing ();
-          battle_start st (Game.Team.init_team (i_to_char 1)) true
+          battle_start st true
       | Exit ->
           end_drawing ();
           exit 0
@@ -962,9 +839,11 @@ let rec start_wait st =
         (Vector2.create (cloudlocation ()) 0.)
         Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
+
       Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
+        level_start st;
         State.to_level st)
       else (
         end_drawing ();
@@ -973,9 +852,7 @@ let rec start_wait st =
 let rec wait st =
   match State.status st with
   | Start -> wait (start_wait st)
-  | Level ->
-      level_start st;
-      wait (level_wait st)
+  | Level -> wait (level_wait st)
   | _ -> wait st
 
 let main () =
@@ -985,7 +862,7 @@ let main () =
   let lvl = Level.random_level in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-    ^ Array.get charArray 0
+    ^ Array.get charArraystr 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
   wait (Game.State.init_state lvl c)
