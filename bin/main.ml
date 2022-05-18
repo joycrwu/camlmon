@@ -324,17 +324,35 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           match Command.team_add_remove char_input with
           | Add c ->
               end_drawing ();
-              battle_wait
-                (State.add_to_team st
-                   (List.nth (State.current_team st) c))
-                bat true
+              if
+                List.length
+                  (pool_no_team
+                     (State.current_character_pool st)
+                     (State.current_team st))
+                < c + 1
+              then battle_wait st bat true
+              else
+                battle_wait
+                  (State.add_to_team st
+                     (List.nth
+                        (pool_no_team
+                           (State.current_character_pool st)
+                           (State.current_team st))
+                        c))
+                  bat true
           | Remove c ->
               end_drawing ();
-              battle_wait
-                (State.remove_from_team st
-                   (List.nth (State.current_team st) c))
-                bat true
-          | Battle -> battle_wait st bat false
+              if List.length (State.current_team st) < c + 1 then
+                battle_wait st bat true
+              else
+                battle_wait
+                  (State.remove_from_team st
+                     (List.nth (State.current_team st) c))
+                  bat true
+          | Battle ->
+              if List.length (State.current_team st) > 0 then
+                battle_wait st bat false
+              else battle_wait st bat true
           | Unavailable ->
               end_drawing ();
               battle_wait st bat true)
