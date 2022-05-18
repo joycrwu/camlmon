@@ -23,8 +23,11 @@
     
     Test cases were developed via black-box testing, or based on the specs of 
     the tested functions. Many of the testable functions were simple getter 
-    functions and thus had few paths to run through. *)
-
+    functions and thus had few paths to run through. Our testing demonstrates 
+    the correctness of our system because not only do we test that the 
+    individual functionalities are working, we also tested with the GUI itself 
+    which proves that each modular program works in conjunction. Many bugs
+    could be identified via make play, then isolated and solved by make test. *)
 
 open OUnit2
 open Game
@@ -135,13 +138,13 @@ let character_hp_test
     (name : string)
     (battle : Battle.t)
     (expected_output : int) =
-  name >:: fun _ -> assert_equal expected_output (character_hp battle)
+  name >:: fun _ -> assert_equal expected_output (character_hp battle) ~printer:string_of_int
 
 let enemy_hp_test
     (name : string)
     (battle : Battle.t)
     (expected_output : int) =
-  name >:: fun _ -> assert_equal expected_output (enemy_hp battle)
+  name >:: fun _ -> assert_equal expected_output (enemy_hp battle) ~printer:string_of_int
 
 let character_test
     (name : string)
@@ -317,8 +320,10 @@ let character_tests =
 let alpha_battle = init_battle larry dinoplant [ larry ]
 let alpha_battle_won = wonbattle alpha_battle
 let alpha_battle_lost = lostbattle alpha_battle
-let alpha_battle_larryturn = character_turn 2 alpha_battle
-let alpha_battle_dinoturn = enemy_turn 0 alpha_battle_larryturn
+let alpha_battle_larryturn = character_turn 
+(Character.get_action_effect larry 0) alpha_battle
+let alpha_battle_dinoturn = enemy_turn 
+(Character.get_action_effect dinoplant 0) alpha_battle_larryturn
 
 let battle_tests =
   [
@@ -354,13 +359,13 @@ let battle_tests =
     losebool_test "Alpha Battle Ongoing - Lose" alpha_battle false;
     losebool_test "Alpha Battle Won - Lose" alpha_battle_won false;
     enemy_hp_test "Dino HP - Larry Thunderbolt - Alpha Battle"
-      alpha_battle_larryturn 100;
+      alpha_battle_larryturn 80;
     character_hp_test "Larry HP - Larry Thunderbolt - Alpha Battle"
       alpha_battle_larryturn 100;
     enemy_hp_test "Dino HP - Dino Thunderbolt - Alpha Battle"
-      alpha_battle_dinoturn 100;
+      alpha_battle_dinoturn 80;
     character_hp_test "Larry HP - Dino Thunderbolt - Alpha Battle"
-      alpha_battle_dinoturn 100;
+      alpha_battle_dinoturn 90;
   ]
 
 let empty_hatchery = Hatchery.new_hatchery ()
