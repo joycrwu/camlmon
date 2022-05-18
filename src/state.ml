@@ -98,7 +98,7 @@ let new_playable_char st (ch : Character.t) =
 let add_to_team st (ch : Character.t) =
   if List.length st.team < 3 then
     {
-      team = ch :: st.team;
+      team = [ ch ] @ st.team;
       level = st.level;
       health = st.health;
       location = st.location;
