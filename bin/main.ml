@@ -73,10 +73,10 @@ let draw_battle_enemy char =
     Color.white
 
 (* "assets/girl_run_large.png" *)
-let draw_battle_char char =
+let draw_battle_char chara =
   let opp1 =
     Raylib.load_texture
-      (String.lowercase_ascii ("assets/" ^ char ^ ".png"))
+      (String.lowercase_ascii ("assets/" ^ chara ^ ".png"))
   in
   Raylib.draw_texture_rec opp1
     (Rectangle.create 0. 0. 300. 300.)
@@ -165,7 +165,7 @@ let draw_battle_text bat () =
 (** not currently functional*)
 let draw_failed_run () =
   Raylib.draw_rectangle 0 0 600 500 (Color.create 100 100 0 0);
-  Raylib.draw_text "You failed to run away" 250 200 100
+  Raylib.draw_text "You failed to run away" 250 200 10000
     (Color.create 0 0 255 0)
 
 let victory_text () =
@@ -328,8 +328,9 @@ let rec battle_wait (st : State.t) bat (team : bool) =
       Raylib.close_window ();
       st
   | false ->
-      if team then (
-        begin_drawing ();
+      begin_drawing ();
+      clear_background Color.raywhite;
+      if team then
         let char_input = Raylib.get_key_pressed () in
         if Battle.overbool bat then
           match Game.Command.team_add_remove char_input with
@@ -347,12 +348,16 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                   (pool_no_team
                      (State.current_character_pool st)
                      (State.current_team st))
-                < c
+                < c + 1
               then battle_wait st bat true
               else
                 battle_wait
                   (State.add_to_team st
-                     (List.nth (State.current_team st) c))
+                     (List.nth
+                        (pool_no_team
+                           (State.current_character_pool st)
+                           (State.current_team st))
+                        c))
                   bat true
           | Remove c ->
               end_drawing ();
@@ -364,30 +369,31 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                      (List.nth (State.current_team st) c))
                   bat true
           | Battle ->
-              if List.length (State.current_team st) = 0 then
-                battle_wait st bat true
-              else battle_wait st bat false
+              if List.length (State.current_team st) > 0 then
+                battle_wait st bat false
+              else battle_wait st bat true
           | Unavailable ->
               end_drawing ();
-              battle_wait st bat true))
-      else (
-        draw_exit_battle bat;
-        begin_drawing ();
-        clear_background Color.raywhite;
-        bat_backgroud ();
-        battle_platform ();
-        bottom_bar ();
-        box_battext ();
-        draw_battle_text bat ();
-        let character = Game.Battle.character bat in
-        let enemy = Game.Battle.enemy bat in
+              battle_wait st bat true)
+      else
         let player_input = Raylib.get_key_pressed () in
-        if Battle.overbool bat then
-          match
-            Game.Command.battle_input bat character player_input
-          with
-          | _ -> State.to_level st
-        else
+        if Battle.overbool bat then (
+          draw_exit_battle bat;
+          match player_input with
+          | Key.Enter ->
+              end_drawing ();
+              State.to_level st
+          | _ ->
+              end_drawing ();
+              battle_wait st bat false)
+        else (
+          bat_backgroud ();
+          battle_platform ();
+          bottom_bar ();
+          box_battext ();
+          draw_battle_text bat ();
+          let character = Game.Battle.character bat in
+          let enemy = Game.Battle.enemy bat in
           match
             Game.Command.battle_input bat character player_input
           with
@@ -434,12 +440,12 @@ let rec battle_wait (st : State.t) bat (team : bool) =
               end_drawing ();
               battle_wait st bat false)
 
-let charArray =
+let charArraystr =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
 let i_to_char i =
   "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-  ^ Array.get charArray i
+  ^ Array.get charArraystr i
   |> Yojson.Basic.from_file |> Game.Character.from_json
 
 let arrInd array element =
@@ -459,12 +465,15 @@ let boss =
 let random (lst : Character.t list) =
   List.nth lst (Random.int (List.length lst))
 
+let charArray =
+  Array.map (fun x -> i_to_char (arrInd charArraystr x)) charArraystr
+
 let fullpool =
   Array.map
     (fun x ->
       "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ x
       |> Yojson.Basic.from_file |> Game.Character.from_json)
-    charArray
+    charArraystr
 
 let chara i st = List.nth (State.current_team st) i
 let enemy i = Array.get fullpool i
@@ -484,9 +493,10 @@ let battle_start st =
 
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
-  clear_background (Color.create 230 251 255 255);
   draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
-  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255)
+  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255);
+  clear_background (Color.create 230 251 255 255);
+  draw_rectangle 0 0 1632 10 Color.gray
 
 let hatchery_bottom_bar () =
   draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
@@ -625,9 +635,10 @@ let draw_hatchery_output_text () =
     (Vector2.create 1232. 600.)
     (Vector2.create 1632. 750.)
     (Color.create 255 153 153 200);
+  (* rgb() *)
   Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
-  Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
+  Raylib.draw_text "Press 1 or 2 to move on!" 1120 870 30 Color.black
 
 let draw_gacha_output (s1 : string) (s2 : string) =
   Raylib.draw_text s1 40 40 40 Color.black;
@@ -649,9 +660,7 @@ let move_on_from_hatchery st =
       (level_with_new_char |> State.current_level |> Level.next_level)
   in
   match State.get_num_levels next_level_st < 4 with
-  | true ->
-      level_start next_level_st;
-      next_level_st
+  | true -> next_level_st
   | false ->
       let final_boss_st = State.to_battle next_level_st in
       battle_start final_boss_st true
@@ -736,7 +745,7 @@ let create_hatchery hat =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
   in
   let all_character_pathway =
-    List.map (fun x -> pathstring ^ x) (Array.to_list charArray)
+    List.map (fun x -> pathstring ^ x) (Array.to_list charArraystr)
   in
   let all_character_json_list =
     List.map Yojson.Basic.from_file all_character_pathway
@@ -975,6 +984,7 @@ let rec start_wait st =
         (Vector2.create (cloudlocation ()) 0.)
         Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
+
       Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
@@ -998,7 +1008,7 @@ let main () =
   let lvl = Level.random_level in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-    ^ Array.get charArray 0
+    ^ Array.get charArraystr 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
   wait (Game.State.init_state lvl c)
