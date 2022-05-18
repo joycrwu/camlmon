@@ -2,6 +2,8 @@ open Game
 open Raylib
 
 let _ = Random.self_init ()
+let windowWidth = 1632
+let windowHeight = 960
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
@@ -168,12 +170,22 @@ let draw_failed_run () =
 
 let victory_text () =
   Raylib.set_window_title "Victory";
-  Raylib.draw_text "Poggers!" 250 200 10000 Color.green
+  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.green;
+  Raylib.draw_text "Poggers!" (windowWidth / 2) (windowHeight / 2) 50
+    Color.black;
+  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+    ((windowHeight / 2) + 50)
+    50 Color.black
 
 let lose_text () =
   set_window_title "Game Over";
   Raylib.draw_rectangle 0 0 600 500 Color.black;
-  Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
+  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.red;
+  Raylib.draw_text "Sadge D:" (windowWidth / 2) (windowHeight / 2) 50
+    Color.black;
+  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+    ((windowHeight / 2) + 50)
+    50 Color.black
 
 let rec print_numbered_list (list : string list) (num : int) =
   match list with
@@ -316,15 +328,15 @@ let rec battle_wait (st : State.t) bat (team : bool) =
       Raylib.close_window ();
       st
   | false ->
-      if team then (
-        begin_drawing ();
+      begin_drawing ();
+      clear_background Color.raywhite;
+      if team then
         let team_input = Raylib.get_key_pressed () in
         let char_input = Raylib.get_key_pressed () in
         if Battle.overbool bat then
           match Game.Command.team_add_remove team_input char_input with
           | _ -> State.to_level st
         else (
-          clear_background Color.raywhite;
           team_screen () st;
           team_text () st;
           init_char_graphics () st;
@@ -344,25 +356,26 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Battle -> battle_wait st bat false
           | Unavailable ->
               end_drawing ();
-              battle_wait st bat true))
-      else (
-        draw_exit_battle bat;
-        begin_drawing ();
-        clear_background Color.raywhite;
-        bat_backgroud ();
-        battle_platform ();
-        bottom_bar ();
-        box_battext ();
-        draw_battle_text bat ();
-        let character = Game.Battle.character bat in
-        let enemy = Game.Battle.enemy bat in
+              battle_wait st bat true)
+      else
         let player_input = Raylib.get_key_pressed () in
-        if Battle.overbool bat then
-          match
-            Game.Command.battle_input bat character player_input
-          with
-          | _ -> State.to_level st
-        else
+        if Battle.overbool bat then (
+          draw_exit_battle bat;
+          match player_input with
+          | Key.Enter ->
+              end_drawing ();
+              State.to_level st
+          | _ ->
+              end_drawing ();
+              battle_wait st bat false)
+        else (
+          bat_backgroud ();
+          battle_platform ();
+          bottom_bar ();
+          box_battext ();
+          draw_battle_text bat ();
+          let character = Game.Battle.character bat in
+          let enemy = Game.Battle.enemy bat in
           match
             Game.Command.battle_input bat character player_input
           with
@@ -601,8 +614,6 @@ let battle_start st =
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
-let windowWidth = 1632
-let windowHeight = 960
 let tileHeight = (96 * 8) + 10
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
