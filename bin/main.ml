@@ -196,38 +196,43 @@ let rec print_numbered_list (list : string list) (num : int) =
   | [] -> "none"
 
 let rec card_distributor
+    ()
     (startx : int)
     (starty : int)
     (counter : int)
     (row : int) =
   draw_rectangle startx starty 40 40 (Color.create 69 67 65 255);
+  begin_drawing ();
   Raylib.draw_text
-    (string_of_int (11 - (counter + row)))
-    startx starty 10000 Color.black;
+    (string_of_int (10 - (counter + row)))
+    (startx + 10) (starty + 5) 30 Color.white;
   draw_rectangle (startx + 75) (starty + 10) 180 220
     (Color.create 140 138 133 255);
   draw_rectangle (startx + 65) starty 180 220
     (Color.create 168 166 160 255);
   if counter > 1 then
-    card_distributor (startx + 360) starty (counter - 1) row
+    card_distributor () (startx + 360) starty (counter - 1) row
   else ()
 
-let rec team_card_dist (startx : int) (starty : int) (counter : int) =
+let rec team_card_dist () (startx : int) (starty : int) (counter : int)
+    =
   draw_rectangle (startx + 70) (starty + 10) 180 220
     (Color.create 173 193 201 255);
   draw_rectangle (startx + 60) starty 180 220
     (Color.create 202 227 237 255);
-  if counter > 1 then team_card_dist (startx + 300) starty (counter - 1)
+  if counter > 1 then
+    team_card_dist () (startx + 300) starty (counter - 1)
   else ()
 
 let team_screen () st =
   set_window_title "Team Select";
   clear_background (Color.create 224 224 144 255);
-  card_distributor 115 30 5 0;
-  card_distributor 120 320 5 5;
+  card_distributor () 115 30 5 5;
+  card_distributor () 120 320 5 0;
   draw_rectangle 0 570 2000 260 (Color.create 219 168 116 255);
+  Raylib.draw_text "Team: " 100 630 80 Color.red;
   draw_rectangle 600 775 600 10 (Color.create 184 134 83 255);
-  team_card_dist 500 585 3;
+  team_card_dist () 500 585 3;
   draw_rectangle 0 820 2000 220 Color.white
 
 let rec pool_no_team (pool : Character.t list) (team : Character.t list)
@@ -239,36 +244,49 @@ let rec pool_no_team (pool : Character.t list) (team : Character.t list)
       else pool_no_team t team
   | _ -> pool
 
-let draw_battle_char_adj chara startx starty =
-  let opp1 = Raylib.load_texture ("assets/" ^ chara ^ ".png") in
-  Raylib.draw_texture_rec opp1
-    (Rectangle.create 0. 0. 300. 300.)
+let draw_teampool_char chara startx starty =
+  let lowercase = String.lowercase_ascii chara in
+  let char = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
+  Raylib.draw_texture_rec char
+    (Rectangle.create 0. 0. 150. 200.)
     (Vector2.create startx starty)
     Color.white
 
 let rec pool_images
+    ()
     (pool : Character.t list)
     (startx : float)
-    (starty : float) =
+    (starty : float)
+    (team : bool) =
   match pool with
   | h :: t ->
-      draw_battle_char_adj (Character.get_id h) startx starty;
-      pool_images t (startx +. 360.) starty
+      draw_teampool_char (Character.get_id h) startx starty;
+      if team = false then pool_images () t (startx +. 360.) starty team
+      else pool_images () t (startx +. 300.) starty team
   | _ -> ()
 
-(*code taken from stack overflow
-  https://stackoverflow.com/questions/26543669/ocaml-return-first-n-elements-of-a-list*)
-let rec firstk k xs =
-  match xs with
-  | [] -> failwith "firstk fail"
-  | x :: xs -> if k = 1 then [ x ] else x :: firstk (k - 1) xs
+let rec firstn n lst =
+  match lst with
+  | [] -> []
+  | h :: t -> if n = 1 then [ h ] else h :: firstn (n - 1) t
+
+let rec second_row lst =
+  match lst with
+  | h :: t ->
+      if List.length (List.find_all (fun x -> x = h) (firstn 5 lst)) = 0
+      then [ h ] @ second_row t
+      else second_row t
+  | [] -> []
 
 let init_char_graphics () (st : State.t) =
   let team = State.current_team st in
   let pool = pool_no_team (State.current_character_pool st) team in
-  if List.length pool < 6 then pool_images pool 193. 43.
-  else pool_images (firstk 5 pool) 193. 43.;
-  pool_images pool 193. 43.
+  if List.length pool = 0 then
+    Raylib.draw_text "No new \nunlocks" 193 70 40 Color.black
+  else if List.length pool < 6 then pool_images () pool 193. 43. false
+  else pool_images () (firstn 5 pool) 193. 43. false;
+  pool_images () (second_row pool) 193. 43. false;
+  pool_images () team 575. 595. true
 
 let team_text () st =
   Raylib.draw_text
@@ -310,14 +328,14 @@ let rec battle_wait (st : State.t) bat (team : bool) =
       Raylib.close_window ();
       st
   | false ->
-      begin_drawing ();
-      clear_background Color.raywhite;
-      if team then
+      if team then (
+        begin_drawing ();
         let char_input = Raylib.get_key_pressed () in
         if Battle.overbool bat then
           match Game.Command.team_add_remove char_input with
           | _ -> State.to_level st
         else (
+          clear_background Color.raywhite;
           team_screen () st;
           team_text () st;
           init_char_graphics () st;
@@ -329,60 +347,51 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                   (pool_no_team
                      (State.current_character_pool st)
                      (State.current_team st))
-                < c + 1
+                < c
               then battle_wait st bat true
               else
                 battle_wait
                   (State.add_to_team st
-                     (List.nth
-                        (pool_no_team
-                           (State.current_character_pool st)
-                           (State.current_team st))
-                        c))
+                     (List.nth (State.current_team st) c))
                   bat true
           | Remove c ->
               end_drawing ();
-              if List.length (State.current_team st) < c + 1 then
+              if List.length (State.current_team st) < c then
                 battle_wait st bat true
               else
                 battle_wait
                   (State.remove_from_team st
                      (List.nth (State.current_team st) c))
                   bat true
-          | Battle ->
-              if List.length (State.current_team st) > 0 then
-                battle_wait st bat false
-              else battle_wait st bat true
+          | Battle -> battle_wait st bat false
           | Unavailable ->
               end_drawing ();
-              battle_wait st bat true)
-      else
+              battle_wait st bat true))
+      else (
+        draw_exit_battle bat;
+        begin_drawing ();
+        clear_background Color.raywhite;
+        bat_backgroud ();
+        battle_platform ();
+        bottom_bar ();
+        box_battext ();
+        draw_battle_text bat ();
+        let character = Game.Battle.character bat in
+        let enemy = Game.Battle.enemy bat in
         let player_input = Raylib.get_key_pressed () in
-        if Battle.overbool bat then (
-          draw_exit_battle bat;
-          match player_input with
-          | Key.Enter ->
-              end_drawing ();
-              State.to_level st
-          | _ ->
-              end_drawing ();
-              battle_wait st bat false)
-        else (
-          bat_backgroud ();
-          battle_platform ();
-          bottom_bar ();
-          box_battext ();
-          draw_battle_text bat ();
-          let character = Game.Battle.character bat in
-          let enemy = Game.Battle.enemy bat in
+        if Battle.overbool bat then
+          match
+            Game.Command.battle_input bat character player_input
+          with
+          | _ -> State.to_level st
+        else
           match
             Game.Command.battle_input bat character player_input
           with
           | Attack x ->
               end_drawing ();
               (bat
-              |> Game.Battle.character_turn
-                   (Game.Character.get_action_effect character x)
+              |> Game.Battle.character_turn x
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
