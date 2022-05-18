@@ -356,14 +356,17 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                   bat true
           | Remove c ->
               end_drawing ();
-              if List.length (State.current_team st) < c then
+              if List.length (State.current_team st) < c + 1 then
                 battle_wait st bat true
               else
                 battle_wait
                   (State.remove_from_team st
                      (List.nth (State.current_team st) c))
                   bat true
-          | Battle -> battle_wait st bat false
+          | Battle ->
+              if List.length (State.current_team st) = 0 then
+                battle_wait st bat true
+              else battle_wait st bat false
           | Unavailable ->
               end_drawing ();
               battle_wait st bat true))
