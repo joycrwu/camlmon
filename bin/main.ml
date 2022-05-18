@@ -170,11 +170,26 @@ let draw_failed_run () =
 
 let victory_text () =
   Raylib.set_window_title "Victory";
-  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.green;
+  Raylib.draw_circle 1400 800 100. (Color.create 224 187 228 200);
+  Raylib.draw_circle 1273 723 400. (Color.create 149 125 173 200);
+  Raylib.draw_circle 943 589 300. (Color.create 224 187 228 200);
+  Raylib.draw_circle 284 234 260. (Color.create 255 223 211 200);
+  Raylib.draw_circle 749 543 190. (Color.create 224 187 228 200);
+  Raylib.draw_circle 759 123 526. (Color.create 210 145 188 200);
+  Raylib.draw_circle 104 632 163. (Color.create 149 125 173 200);
+  Raylib.draw_circle 568 429 90. (Color.create 255 223 211 200);
+  Raylib.draw_circle 189 373 450. (Color.create 254 200 216 200);
+  Raylib.draw_circle 309 761 600. (Color.create 224 187 228 200);
+  Raylib.draw_circle 20 436 562. (Color.create 254 200 216 200);
+  Raylib.draw_rectangle 0 0 windowWidth windowHeight
+    (Color.create 153 221 255 255);
   Raylib.draw_text "Poggers!" (windowWidth / 2) (windowHeight / 2) 50
     Color.black;
-  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+  Raylib.draw_text "You Won!!" (windowWidth / 2)
     ((windowHeight / 2) + 50)
+    50 Color.black;
+  Raylib.draw_text "Press enter to continue on" (windowWidth / 2)
+    ((windowHeight / 2) + 100)
     50 Color.black
 
 let lose_text () =
