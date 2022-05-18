@@ -2,31 +2,13 @@ open Game
 open Raylib
 
 let _ = Random.self_init ()
+let windowWidth = 1632
+let windowHeight = 960
 
 (** https://stackoverflow.com/questions/6390631/ocaml-module-graphics-queuing-keypresses *)
 let bat_backgroud () =
   clear_background (Color.create 230 251 255 255);
-  draw_rectangle 0 0 1632 30 (Color.create 29 146 252 100);
-  draw_rectangle 0 40 1632 30 (Color.create 29 146 252 100);
-  draw_rectangle 0 80 1632 30 (Color.create 25 161 239 100);
-  draw_rectangle 0 120 1632 30 (Color.create 25 161 239 100);
-  draw_rectangle 0 160 1632 30 (Color.create 21 177 223 100);
-  draw_rectangle 0 200 1632 30 (Color.create 21 177 223 100);
-  draw_rectangle 0 240 1632 30 (Color.create 17 189 213 100);
-  draw_rectangle 0 280 1632 30 (Color.create 17 189 213 100);
-  draw_rectangle 0 320 1632 30 (Color.create 17 189 213 100);
-  draw_rectangle 0 360 1632 30 (Color.create 17 189 213 100);
-  draw_rectangle 0 400 1632 30 (Color.create 17 189 213 100);
-  draw_rectangle 0 440 1632 30 (Color.create 8 216 185 100);
-  draw_rectangle 0 480 1632 30 (Color.create 8 216 185 100);
-  draw_rectangle 0 520 1632 30 (Color.create 7 225 177 100);
-  draw_rectangle 0 560 1632 30 (Color.create 7 225 177 100);
-  draw_rectangle 0 600 1632 30 (Color.create 36 216 150 100);
-  draw_rectangle 0 640 1632 30 (Color.create 36 216 150 100);
-  draw_rectangle 0 680 1632 30 (Color.create 7 197 123 100);
-  draw_rectangle 0 720 1632 30 (Color.create 7 197 123 100);
-  draw_rectangle 0 760 1632 30 (Color.create 4 135 69 100);
-  draw_rectangle 0 800 1632 30 (Color.create 4 135 69 100)
+  draw_rectangle 0 0 1632 10 Color.gray
 
 let bottom_bar () =
   draw_rectangle 0 800 1632 200 (Color.create 72 64 80 255);
@@ -71,10 +53,10 @@ let draw_battle_enemy char =
     Color.white
 
 (* "assets/girl_run_large.png" *)
-let draw_battle_char chara =
+let draw_battle_char char =
   let opp1 =
     Raylib.load_texture
-      (String.lowercase_ascii ("assets/" ^ chara ^ ".png"))
+      (String.lowercase_ascii ("assets/" ^ char ^ ".png"))
   in
   Raylib.draw_texture_rec opp1
     (Rectangle.create 0. 0. 300. 300.)
@@ -168,12 +150,21 @@ let draw_failed_run () =
 
 let victory_text () =
   Raylib.set_window_title "Victory";
-  Raylib.draw_text "Poggers!" 250 200 10000 Color.green
+  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.green;
+  Raylib.draw_text "Poggers!" (windowWidth / 2) (windowHeight / 2) 50
+    Color.black;
+  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+    ((windowHeight / 2) + 50)
+    50 Color.black
 
 let lose_text () =
   set_window_title "Game Over";
-  Raylib.draw_rectangle 0 0 600 500 Color.black;
-  Raylib.draw_text "Sadge D:" 250 200 10000 Color.red
+  Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.red;
+  Raylib.draw_text "Sadge D:" (windowWidth / 2) (windowHeight / 2) 50
+    Color.black;
+  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+    ((windowHeight / 2) + 50)
+    50 Color.black
 
 let rec print_numbered_list (list : string list) (num : int) =
   match list with
@@ -184,43 +175,38 @@ let rec print_numbered_list (list : string list) (num : int) =
   | [] -> "none"
 
 let rec card_distributor
-    ()
     (startx : int)
     (starty : int)
     (counter : int)
     (row : int) =
   draw_rectangle startx starty 40 40 (Color.create 69 67 65 255);
-  begin_drawing ();
   Raylib.draw_text
-    (string_of_int (10 - (counter + row)))
-    (startx + 10) (starty + 5) 30 Color.white;
+    (string_of_int (11 - (counter + row)))
+    startx starty 10000 Color.black;
   draw_rectangle (startx + 75) (starty + 10) 180 220
     (Color.create 140 138 133 255);
   draw_rectangle (startx + 65) starty 180 220
     (Color.create 168 166 160 255);
   if counter > 1 then
-    card_distributor () (startx + 360) starty (counter - 1) row
+    card_distributor (startx + 360) starty (counter - 1) row
   else ()
 
-let rec team_card_dist () (startx : int) (starty : int) (counter : int)
-    =
+let rec team_card_dist (startx : int) (starty : int) (counter : int) =
   draw_rectangle (startx + 70) (starty + 10) 180 220
     (Color.create 173 193 201 255);
   draw_rectangle (startx + 60) starty 180 220
     (Color.create 202 227 237 255);
-  if counter > 1 then
-    team_card_dist () (startx + 300) starty (counter - 1)
+  if counter > 1 then team_card_dist (startx + 300) starty (counter - 1)
   else ()
 
 let team_screen () st =
   set_window_title "Team Select";
   clear_background (Color.create 224 224 144 255);
-  card_distributor () 115 30 5 5;
-  card_distributor () 120 320 5 0;
+  card_distributor 115 30 5 0;
+  card_distributor 120 320 5 5;
   draw_rectangle 0 570 2000 260 (Color.create 219 168 116 255);
-  Raylib.draw_text "Team: " 100 630 80 Color.red;
   draw_rectangle 600 775 600 10 (Color.create 184 134 83 255);
-  team_card_dist () 500 585 3;
+  team_card_dist 500 585 3;
   draw_rectangle 0 820 2000 220 Color.white
 
 let rec pool_no_team (pool : Character.t list) (team : Character.t list)
@@ -232,49 +218,36 @@ let rec pool_no_team (pool : Character.t list) (team : Character.t list)
       else pool_no_team t team
   | _ -> pool
 
-let draw_teampool_char chara startx starty =
-  let lowercase = String.lowercase_ascii chara in
-  let char = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
-  Raylib.draw_texture_rec char
-    (Rectangle.create 0. 0. 150. 200.)
+let draw_battle_char_adj chara startx starty =
+  let opp1 = Raylib.load_texture ("assets/" ^ chara ^ ".png") in
+  Raylib.draw_texture_rec opp1
+    (Rectangle.create 0. 0. 300. 300.)
     (Vector2.create startx starty)
     Color.white
 
 let rec pool_images
-    ()
     (pool : Character.t list)
     (startx : float)
-    (starty : float)
-    (team : bool) =
+    (starty : float) =
   match pool with
   | h :: t ->
-      draw_teampool_char (Character.get_id h) startx starty;
-      if team = false then pool_images () t (startx +. 360.) starty team
-      else pool_images () t (startx +. 300.) starty team
+      draw_battle_char_adj (Character.get_id h) startx starty;
+      pool_images t (startx +. 360.) starty
   | _ -> ()
 
-let rec firstn n lst =
-  match lst with
-  | [] -> []
-  | h :: t -> if n = 1 then [ h ] else h :: firstn (n - 1) t
-
-let rec second_row lst =
-  match lst with
-  | h :: t ->
-      if List.length (List.find_all (fun x -> x = h) (firstn 5 lst)) = 0
-      then [ h ] @ second_row t
-      else second_row t
-  | [] -> []
+(*code taken from stack overflow
+  https://stackoverflow.com/questions/26543669/ocaml-return-first-n-elements-of-a-list*)
+let rec firstk k xs =
+  match xs with
+  | [] -> failwith "firstk fail"
+  | x :: xs -> if k = 1 then [ x ] else x :: firstk (k - 1) xs
 
 let init_char_graphics () (st : State.t) =
   let team = State.current_team st in
   let pool = pool_no_team (State.current_character_pool st) team in
-  if List.length pool = 0 then
-    Raylib.draw_text "No new \nunlocks" 193 70 40 Color.black
-  else if List.length pool < 6 then pool_images () pool 193. 43. false
-  else pool_images () (firstn 5 pool) 193. 43. false;
-  pool_images () (second_row pool) 193. 43. false;
-  pool_images () team 575. 595. true
+  if List.length pool < 6 then pool_images pool 193. 43.
+  else pool_images (firstk 5 pool) 193. 43.;
+  pool_images pool 193. 43.
 
 let team_text () st =
   Raylib.draw_text
@@ -316,8 +289,9 @@ let rec battle_wait (st : State.t) bat (team : bool) =
       Raylib.close_window ();
       st
   | false ->
-      if team then (
-        begin_drawing ();
+      begin_drawing ();
+      clear_background Color.raywhite;
+      if team then
         let team_input = Raylib.get_key_pressed () in
         let char_input = Raylib.get_key_pressed () in
         if Battle.overbool bat then
@@ -344,25 +318,26 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Battle -> battle_wait st bat false
           | Unavailable ->
               end_drawing ();
-              battle_wait st bat true))
-      else (
-        draw_exit_battle bat;
-        begin_drawing ();
-        clear_background Color.raywhite;
-        bat_backgroud ();
-        battle_platform ();
-        bottom_bar ();
-        box_battext ();
-        draw_battle_text bat ();
-        let character = Game.Battle.character bat in
-        let enemy = Game.Battle.enemy bat in
+              battle_wait st bat true)
+      else
         let player_input = Raylib.get_key_pressed () in
-        if Battle.overbool bat then
-          match
-            Game.Command.battle_input bat character player_input
-          with
-          | _ -> State.to_level st
-        else
+        if Battle.overbool bat then (
+          draw_exit_battle bat;
+          match player_input with
+          | Key.Enter ->
+              end_drawing ();
+              State.to_level st
+          | _ ->
+              end_drawing ();
+              battle_wait st bat false)
+        else (
+          bat_backgroud ();
+          battle_platform ();
+          bottom_bar ();
+          box_battext ();
+          draw_battle_text bat ();
+          let character = Game.Battle.character bat in
+          let enemy = Game.Battle.enemy bat in
           match
             Game.Command.battle_input bat character player_input
           with
@@ -409,30 +384,16 @@ let rec battle_wait (st : State.t) bat (team : bool) =
               end_drawing ();
               battle_wait st bat false)
 
-let charArraystr =
+let charArray =
   Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
 let i_to_char i =
   "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-  ^ Array.get charArraystr i
+  ^ Array.get charArray i
   |> Yojson.Basic.from_file |> Game.Character.from_json
-
-let arrInd array element =
-  let i = ref (-1) in
-  let () =
-    Array.iteri
-      (fun n elt -> if element = elt then i := n else ())
-      array
-  in
-  !i
-
-let charArray =
-  Array.map (fun x -> i_to_char (arrInd charArraystr x)) charArraystr
 
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
-  draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
-  draw_ellipse 800 500 370. 90. (Color.create 152 224 152 255);
   clear_background (Color.create 230 251 255 255);
   draw_rectangle 0 0 1632 10 Color.gray
 
@@ -449,7 +410,7 @@ let draw_hatchery_text () =
 
 let draw_hatchery_output_text () =
   (* draw_text text pos_x pos_y font_size color *)
-  Raylib.draw_text "Congratulations on your new character!" 80 750 50
+  Raylib.draw_text "Congratulations on your new character!" 80 835 50
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
 
@@ -472,7 +433,6 @@ let move_on_from_hatchery st =
     State.new_level level_with_new_char
       (level_with_new_char |> State.current_level |> Level.next_level)
   in
-  level_start next_level_st;
   next_level_st
 
 let draw_gacha_char char =
@@ -480,7 +440,7 @@ let draw_gacha_char char =
   let ch = Raylib.load_texture ("assets/" ^ lowercase ^ ".png") in
   Raylib.draw_texture_rec ch
     (Rectangle.create 0. 0. 300. 300.)
-    (Vector2.create 680. 200.)
+    (Vector2.create 250. 250.)
     Color.white
 
 let rec hatchery_endscreen_wait (st : State.t) =
@@ -551,7 +511,6 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
               (st |> State.current_level |> Level.next_level)
           in
           let new_st = State.to_level st' in
-          level_start new_st;
           new_st
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
@@ -563,7 +522,7 @@ let create_hatchery hat =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
   in
   let all_character_pathway =
-    List.map (fun x -> pathstring ^ x) (Array.to_list charArraystr)
+    List.map (fun x -> pathstring ^ x) (Array.to_list charArray)
   in
   let all_character_json_list =
     List.map Yojson.Basic.from_file all_character_pathway
@@ -583,26 +542,21 @@ let fullpool =
     (fun x ->
       "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep ^ x
       |> Yojson.Basic.from_file |> Game.Character.from_json)
-    charArraystr
+    charArray
 
-let random (lst : Character.t list) =
-  List.nth lst (Random.int (List.length lst))
+let chara i team = List.nth (Team.get_team_characters team) i
+let enemy i = Array.get fullpool i
 
-let battle_start st =
+let battle_start st team =
   set_window_title "Battle";
   let bat =
-    Game.Battle.init_battle
-      (random (State.current_team st))
-      charArray.(Random.int (Array.length charArray))
-      (State.current_team st)
+    Game.Battle.init_battle (chara 0 team) (enemy 2) [ chara 0 team ]
   in
   battle_wait st bat
 
 let move_distance = 24
 let tile_size = 96
 let randomBattleProbability = 10
-let windowWidth = 1632
-let windowHeight = 960
 let tileHeight = (96 * 8) + 10
 let up () : unit = inity := !inity -. float_of_int move_distance
 let down () : unit = inity := !inity +. float_of_int move_distance
@@ -677,7 +631,10 @@ let rec level_wait st =
             | Grass ->
                 up ();
                 end_drawing ();
-                if randomBattleGen then battle_start st true
+                if randomBattleGen then
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -705,7 +662,10 @@ let rec level_wait st =
             | Grass ->
                 down ();
                 end_drawing ();
-                if randomBattleGen then battle_start st true
+                if randomBattleGen then
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -733,7 +693,10 @@ let rec level_wait st =
             | Grass ->
                 left ();
                 end_drawing ();
-                if randomBattleGen then battle_start st true
+                if randomBattleGen then
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 1))
+                    true
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -762,7 +725,9 @@ let rec level_wait st =
                 right ();
                 end_drawing ();
                 if randomBattleGen then
-                  battle_start st true (*truncate*)
+                  battle_start st
+                    (Game.Team.init_team (i_to_char 0))
+                    true (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
@@ -782,7 +747,7 @@ let rec level_wait st =
              st'; level_wait st') *))
       | Battle ->
           end_drawing ();
-          battle_start st true
+          battle_start st (Game.Team.init_team (i_to_char 1)) true
       | Exit ->
           end_drawing ();
           exit 0
@@ -800,7 +765,6 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
-let timer = ref 0.
 
 let rec start_wait st =
   match Raylib.window_should_close () with
@@ -811,22 +775,10 @@ let rec start_wait st =
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
-      timer := Raylib.get_time () *. 3.;
-      let cloudlocation () = if !timer < 100. then !timer else 0. in
-      let opp2 =
-        Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
-      in
-      Raylib.draw_texture_rec opp2
-        (Rectangle.create 0. 0. 1600. 1600.)
-        (Vector2.create (cloudlocation ()) 0.)
-        Color.white;
       Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
-
-      Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
+      Raylib.draw_text "PRESS ENTER TO START" 540 800 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
-        level_start st;
         State.to_level st)
       else (
         end_drawing ();
@@ -835,7 +787,9 @@ let rec start_wait st =
 let rec wait st =
   match State.status st with
   | Start -> wait (start_wait st)
-  | Level -> wait (level_wait st)
+  | Level ->
+      level_start st;
+      wait (level_wait st)
   | _ -> wait st
 
 let main () =
@@ -845,7 +799,7 @@ let main () =
   let lvl = Level.random_level in
   let c =
     "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
-    ^ Array.get charArraystr 0
+    ^ Array.get charArray 0
     |> Yojson.Basic.from_file |> Game.Character.from_json
   in
   wait (Game.State.init_state lvl c)
