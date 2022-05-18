@@ -761,8 +761,8 @@ let rec level_wait st =
             | Grass ->
                 right ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st true (*truncate*)
+                if randomBattleGen then battle_start st true
+                  (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();
