@@ -116,7 +116,7 @@ let character_turn c_action_eff bat =
       team = bat.team;
       enemy = bat.enemy;
       enemy_hp = character_turn_enemyhp c_action_eff bat;
-      status = Ongoing;
+      status = bat.status;
     }
 
 let enemy_turn_charhp e_action_eff bat =
@@ -142,5 +142,5 @@ let enemy_turn e_action_eff bat =
       team = bat.team;
       enemy = bat.enemy;
       enemy_hp = enemy_turn_hp e_action_eff bat;
-      status = Ongoing;
+      status = bat.status;
     }

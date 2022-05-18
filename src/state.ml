@@ -8,6 +8,7 @@ type status =
   | Team
   | Battle
   | Hatchery
+  | Endscreen of bool
 
 type t = {
   team : Character.t list;
@@ -112,3 +113,4 @@ let to_battle st = { st with status = Battle }
 let to_level st = { st with status = Level }
 let to_team st = { st with status = Team }
 let to_hatchery st = { st with status = Hatchery }
+let to_endscreen st win = { st with status = Endscreen win }

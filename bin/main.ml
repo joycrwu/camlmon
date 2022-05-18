@@ -304,9 +304,8 @@ let team_text () st =
            (fun x -> x |> Game.Character.get_id)
            (State.current_team st)))
     750 700 10000 Color.black;
-  Raylib.draw_text
-    "To add or remove, press a or r, then the number of the character!"
-    100 855 30 Color.black;
+  Raylib.draw_text "Press 0-9 to add and Q-E to remove characters!" 100
+    855 30 Color.black;
   Raylib.draw_text "Press B to battle!" 100 895 30 Color.black
 
 let draw_exit_battle bat =
@@ -321,6 +320,59 @@ type direction =
   | Right
 
 let direct = ref Down
+
+let charArraystr =
+  Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
+
+let timer = ref 0.
+
+let cloud_screen (title : string) (action : string) (white : bool) =
+  let open Raylib in
+  begin_drawing ();
+  clear_background Color.raywhite;
+  draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
+  timer := Raylib.get_time () *. 3.;
+  let cloudlocation () = if !timer < 100. then !timer else 0. in
+  let opp2 =
+    Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
+  in
+  if white then (
+    let color = Color.white in
+    Raylib.draw_texture_rec opp2
+      (Rectangle.create 0. 0. 1600. 1600.)
+      (Vector2.create (cloudlocation ()) 0.)
+      color;
+    Raylib.draw_text title 410 60 150 Color.black;
+    Raylib.draw_text action 540 600 40 Color.black)
+  else
+    let color = Color.red in
+    Raylib.draw_texture_rec opp2
+      (Rectangle.create 0. 0. 1600. 1600.)
+      (Vector2.create (cloudlocation ()) 0.)
+      color;
+    Raylib.draw_text title 410 60 150 Color.black;
+    Raylib.draw_text action 540 600 40 Color.black
+
+let rec endscreen_wait (st : State.t) (win : bool) =
+  match Raylib.window_should_close () with
+  | true ->
+      Raylib.close_window ();
+      st
+  | false ->
+      if win then cloud_screen "YOU WIN!" "PRESS ENTER TO RESTART" win
+      else cloud_screen "GAME OVER" "PRESS ENTER TO RESTART" win;
+      if Raylib.is_key_pressed Key.Enter then (
+        end_drawing ();
+        let lvl = Level.random_level in
+        let c =
+          "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
+          ^ Array.get charArraystr 0
+          |> Yojson.Basic.from_file |> Game.Character.from_json
+        in
+        State.init_state lvl c)
+      else (
+        end_drawing ();
+        endscreen_wait st win)
 
 let rec battle_wait (st : State.t) bat (team : bool) =
   match Raylib.window_should_close () with
@@ -377,15 +429,18 @@ let rec battle_wait (st : State.t) bat (team : bool) =
               battle_wait st bat true)
       else
         let player_input = Raylib.get_key_pressed () in
-        if Battle.overbool bat then (
-          draw_exit_battle bat;
-          match player_input with
-          | Key.Enter ->
-              end_drawing ();
-              State.to_level st
-          | _ ->
-              end_drawing ();
-              battle_wait st bat false)
+        if Battle.overbool bat then
+          if Character.get_id (Battle.enemy bat) = "Dijkstra" then
+            State.to_endscreen st (Battle.wonbool bat)
+          else (
+            draw_exit_battle bat;
+            match player_input with
+            | Key.Enter ->
+                end_drawing ();
+                State.to_level st
+            | _ ->
+                end_drawing ();
+                battle_wait st bat false)
         else (
           bat_backgroud ();
           battle_platform ();
@@ -400,7 +455,8 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Attack x ->
               end_drawing ();
               (bat
-              |> Game.Battle.character_turn x
+              |> Game.Battle.character_turn
+                   (Game.Character.get_action_effect character x)
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
@@ -409,7 +465,7 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Run ->
               if Game.Battle.character_hp bat < Game.Battle.enemy_hp bat
               then
-                if Random.bool () then exit 0
+                if Random.bool () then State.to_level st
                 else
                   (draw_failed_run ();
                    end_drawing ();
@@ -424,7 +480,7 @@ let rec battle_wait (st : State.t) bat (team : bool) =
                 < Game.Battle.character_hp bat
                   - Game.Battle.enemy_hp bat
                   + 50
-              then exit 0
+              then State.to_level st
               else
                 (draw_failed_run ();
                  bat
@@ -439,9 +495,6 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Invalid_input ->
               end_drawing ();
               battle_wait st bat false)
-
-let charArraystr =
-  Sys.readdir ("data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep)
 
 let i_to_char i =
   "data" ^ Filename.dir_sep ^ "char" ^ Filename.dir_sep
@@ -482,7 +535,10 @@ let battle_start st =
   set_window_title "Battle";
   if State.get_num_levels st < 4 then
     let bat =
-      Game.Battle.init_battle (chara 0 st) (enemy 2) [ chara 0 st ]
+      Game.Battle.init_battle
+        (random (State.current_team st))
+        charArray.(Random.int (Array.length charArray))
+        (State.current_team st)
     in
     battle_wait st bat
   else
@@ -808,22 +864,10 @@ let rec level_wait st =
       bottom_bar ();
       draw_map_text ();
       femchard !initx !inity !direct;
-      Raylib.draw_text
-        ("charloc:" ^ string_of_float !initx ^ ","
-       ^ string_of_float !inity)
-        0 0 40 Color.black;
       let lvl = Game.State.current_level st in
       let location = Game.State.current_tile_id st in
       let player_input = Raylib.get_key_pressed () in
       (* Game.Command.map_input ( *)
-      Raylib.draw_text
-        ("stateloc:"
-        ^ string_of_int (fst location)
-        ^ ","
-        ^ string_of_int (snd location))
-        0 50 40 Color.black;
-      let num_levels = string_of_int (State.get_num_levels st) in
-      Raylib.draw_text num_levels 0 100 40 Color.black;
       let randomBattleGen = Random.int 100 < randomBattleProbability in
       match Command.map_input player_input with
       | Up -> (
@@ -962,7 +1006,6 @@ let rec level_wait st =
    Filename.dir_sep ^ randomChar1 |> Yojson.Basic.from_file |>
    Game.Character.from_json in map_wait (Game.State.init_state lvl c)
    lvl *)
-let timer = ref 0.
 
 let rec start_wait st =
   match Raylib.window_should_close () with
@@ -970,22 +1013,7 @@ let rec start_wait st =
       Raylib.close_window ();
       st
   | false ->
-      let open Raylib in
-      begin_drawing ();
-      clear_background Color.raywhite;
-      draw_rectangle 0 0 1632 960 (Color.create 78 173 245 255);
-      timer := Raylib.get_time () *. 3.;
-      let cloudlocation () = if !timer < 100. then !timer else 0. in
-      let opp2 =
-        Raylib.load_texture (String.lowercase_ascii "assets/clouds.png")
-      in
-      Raylib.draw_texture_rec opp2
-        (Rectangle.create 0. 0. 1600. 1600.)
-        (Vector2.create (cloudlocation ()) 0.)
-        Color.white;
-      Raylib.draw_text "UNTITLED" 410 60 150 Color.black;
-
-      Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
+      cloud_screen "POKEML" "PRESS ENTER TO START" true;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
         State.to_level st)
@@ -999,6 +1027,7 @@ let rec wait st =
   | Level ->
       level_start st;
       wait (level_wait st)
+  | Endscreen b -> wait (endscreen_wait st b)
   | _ -> wait st
 
 let main () =
