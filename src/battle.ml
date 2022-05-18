@@ -91,9 +91,10 @@ let character_cycle team (c : Character.t) =
 let character_turn_hp c_action_eff bat =
   if c_action_eff < 0 then
     bat.character_hp
-    - Character.get_atk bat.character
-      * c_action_eff
-      * Team.partner_check bat.character bat.team
+    + abs
+        (Character.get_atk bat.character
+        * c_action_eff
+        * Team.partner_check bat.character bat.team)
   else bat.character_hp
 
 let character_turn_enemyhp c_action_eff bat =
@@ -129,7 +130,7 @@ let enemy_turn_charhp e_action_eff bat =
 
 let enemy_turn_hp e_action_eff bat =
   if e_action_eff < 0 then
-    bat.enemy_hp - (Character.get_atk bat.enemy * e_action_eff)
+    bat.enemy_hp + abs (Character.get_atk bat.enemy * e_action_eff)
   else bat.enemy_hp
 
 let enemy_turn e_action_eff bat =
@@ -140,6 +141,6 @@ let enemy_turn e_action_eff bat =
       character_hp = enemy_turn_charhp e_action_eff bat;
       team = bat.team;
       enemy = bat.enemy;
-      enemy_hp = enemy_turn_charhp e_action_eff bat;
+      enemy_hp = enemy_turn_hp e_action_eff bat;
       status = Ongoing;
     }
