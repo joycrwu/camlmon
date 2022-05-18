@@ -34,6 +34,10 @@ val current_character_pool : t -> Character.t list
 (** [current_character_pool st] is the current playable character pool
     of a given state. *)
 
+val get_num_levels : t -> int
+(** [get_num_levels st] is the number of levels that the character has
+    traversed through in a given state.*)
+
 val init_state : Level.t -> Character.t -> t
 (** [init_state a] is the initial state of the game when playing on a
     level [a]. In that state the character is currently located in the

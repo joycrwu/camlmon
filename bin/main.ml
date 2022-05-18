@@ -429,6 +429,32 @@ let arrInd array element =
 let charArray =
   Array.map (fun x -> i_to_char (arrInd charArraystr x)) charArraystr
 
+let boss =
+  "data" ^ Filename.dir_sep ^ "boss" ^ Filename.dir_sep
+  ^ "dijkstra.json"
+  |> Yojson.Basic.from_file |> Game.Character.from_json
+
+let random (lst : Character.t list) =
+  List.nth lst (Random.int (List.length lst))
+
+let battle_start st =
+  set_window_title "Battle";
+  if State.get_num_levels st < 4 then
+    let bat =
+      Game.Battle.init_battle
+        (random (State.current_team st))
+        charArray.(Random.int (Array.length charArray))
+        (State.current_team st)
+    in
+    battle_wait st bat
+  else
+    let final_bat =
+      Game.Battle.init_battle
+        (random (State.current_team st))
+        boss (State.current_team st)
+    in
+    battle_wait st final_bat
+
 (**HATCHERY DRAWING AND HATCHERY BIG RECURSION**)
 let hatchery_background () =
   draw_ellipse 800 500 400. 100. (Color.create 224 224 144 255);
@@ -472,8 +498,13 @@ let move_on_from_hatchery st =
     State.new_level level_with_new_char
       (level_with_new_char |> State.current_level |> Level.next_level)
   in
-  level_start next_level_st;
-  next_level_st
+  match State.get_num_levels next_level_st < 4 with
+  | true ->
+      level_start next_level_st;
+      next_level_st
+  | false ->
+      let final_boss_st = State.to_battle next_level_st in
+      battle_start final_boss_st true
 
 let draw_gacha_char char =
   let lowercase = String.lowercase_ascii char in
@@ -544,15 +575,7 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
           end_drawing ();
           let new_playable_char_state = gacha_and_check st hat in
           hatchery_endscreen_wait new_playable_char_state
-      | Skip ->
-          end_drawing ();
-          let st' =
-            Game.State.new_level st
-              (st |> State.current_level |> Level.next_level)
-          in
-          let new_st = State.to_level st' in
-          level_start new_st;
-          new_st
+      | Skip -> move_on_from_hatchery st
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
           end_drawing ();
@@ -587,16 +610,6 @@ let fullpool =
 
 let random (lst : Character.t list) =
   List.nth lst (Random.int (List.length lst))
-
-let battle_start st =
-  set_window_title "Battle";
-  let bat =
-    Game.Battle.init_battle
-      (random (State.current_team st))
-      charArray.(Random.int (Array.length charArray))
-      (State.current_team st)
-  in
-  battle_wait st bat
 
 let move_distance = 24
 let tile_size = 96
@@ -662,6 +675,8 @@ let rec level_wait st =
         ^ ","
         ^ string_of_int (snd location))
         0 50 40 Color.black;
+      let num_levels = string_of_int (State.get_num_levels st) in
+      Raylib.draw_text num_levels 0 100 40 Color.black;
       let randomBattleGen = Random.int 100 < randomBattleProbability in
       match Command.map_input player_input with
       | Up -> (
@@ -761,8 +776,8 @@ let rec level_wait st =
             | Grass ->
                 right ();
                 end_drawing ();
-                if randomBattleGen then
-                  battle_start st true (*truncate*)
+                if randomBattleGen then battle_start st true
+                  (*truncate*)
                 else level_wait (Game.State.move st x y)
             | Water ->
                 end_drawing ();

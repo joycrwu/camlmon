@@ -1,0 +1,28 @@
+{
+  "id": "Dijkstra",
+  "hp": 50,
+  "attack": 10,
+  "affinity": "blue",
+  "rarity": 3,
+  "actions": [
+    {
+      "name": "Shortest Path",
+      "effect": 1,
+      "description": "Finds the shortest path to kill you."
+    },
+    {
+      "name": "David Gries",
+      "effect": 0,
+      "description": "Summons David Gries to kill you."
+    },
+    {
+      "name": "Frontier Set",
+      "effect": 0,
+      "description": "Drops you off at the frontier set."
+    }
+  ],
+  "partner": {
+    "id": "Bruiser",
+    "parteffect": 2
+  }
+}
