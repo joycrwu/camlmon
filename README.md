@@ -3,8 +3,8 @@
 1. Install the ocaml-raylib package via 
 https://github.com/tjammer/raylib-ocaml/blob/master/README.md
 Raylib has a few dependencies that must first be installed:
-<code>sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev<code>
-Some of these dependencies have other dependencies including ALSA, Mesa, and X11.
+<code>sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev</code>
+  Some of these dependencies have other dependencies including ALSA, Mesa, and X11.
 https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux for more information.
 
 2. There may be an error on windows laptops where there is an fatal error with opening the GUI. THis can be solved by the tutorial linked here: 
