@@ -574,7 +574,7 @@ let draw_hatchery_text () =
   Raylib.draw_text "Press 1 to roll" 1120 870 30 Color.black;
   Raylib.draw_text "Press 2 to skip" 1120 900 30 Color.black
 
-let draw_hatchery_output_text (rarity_color : Color.t) () =
+let draw_hatchery_output_text rarity () =
   (* draw_text text pos_x pos_y font_size color *)
   draw_triangle (Vector2.create 0. 0.)
     (Vector2.create 50. 100.)
@@ -700,15 +700,20 @@ let draw_hatchery_output_text (rarity_color : Color.t) () =
     (Vector2.create 1232. 600.)
     (Vector2.create 1632. 750.)
     (Color.create 255 153 153 200);
-  draw_circle 50 50 50.0 rarity_color;
-  draw_circle 50 50 50.0 rarity_color;
-  draw_circle 50 50 50.0 rarity_color;
-  draw_circle 50 50 50.0 rarity_color;
-
   (* rgb() *)
   Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
-  Raylib.draw_text "Press 1 or 2 to move on!" 1120 870 30 Color.black
+  Raylib.draw_text "Press 1 or 2 to move on!" 1120 870 30 Color.black;
+  match rarity with
+  | 1 -> draw_circle 850 540 40.0 (Color.create 205 127 32 200)
+  | 2 ->
+      draw_circle 900 540 40.0 (Color.create 192 192 192 200);
+      draw_circle 800 540 40.0 (Color.create 192 192 192 200)
+  | 3 ->
+      draw_circle 750 540 40.0 Color.gold;
+      draw_circle 850 540 40.0 Color.gold;
+      draw_circle 950 540 40.0 Color.gold
+  | _ -> failwith "error"
 
 let draw_gacha_output (s1 : string) (s2 : string) =
   Raylib.draw_text s1 40 40 40 Color.black;
@@ -763,16 +768,11 @@ let rec hatchery_endscreen_wait (st : State.t) =
       draw_gacha_char new_chara_name;
       let new_chara_rarity = Character.get_rarity new_chara in
       (match new_chara_rarity with
-      | 1 ->
-          draw_gacha_output new_chara_name "Normal";
-          draw_hatchery_output_text (Color.create 205 127 32 200) ()
-      | 2 ->
-          draw_gacha_output new_chara_name "Rare";
-          draw_hatchery_output_text (Color.create 192 192 192 200) ()
-      | 3 ->
-          draw_gacha_output new_chara_name "SSR";
-          draw_hatchery_output_text Color.gold ()
+      | 1 -> draw_gacha_output new_chara_name "Normal"
+      | 2 -> draw_gacha_output new_chara_name "Rare"
+      | 3 -> draw_gacha_output new_chara_name "SSR"
       | _ -> failwith "something went wrong");
+      draw_hatchery_output_text new_chara_rarity ();
       let player_input = Raylib.get_key_pressed () in
       match Command.hatchery_input player_input with
       | Roll -> move_on_from_hatchery st
