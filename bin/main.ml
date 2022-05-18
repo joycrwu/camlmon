@@ -525,10 +525,36 @@ let draw_hatchery_output_text () =
     (Vector2.create 0. 500.)
     (Color.create 255 255 153 255);
   draw_triangle
+    (Vector2.create 400. 350.)
+    (Vector2.create 0. 200.)
+    (Vector2.create 0. 500.)
+    (Color.create 255 255 153 255);
+  draw_triangle
     (Vector2.create 1632. 200.)
     (Vector2.create 1232. 350.)
     (Vector2.create 1632. 500.)
     (Color.create 255 255 153 255);
+  draw_triangle
+    (Vector2.create 400. 300.)
+    (Vector2.create 0. 150.)
+    (Vector2.create 0. 450.)
+    (Color.create 255 153 153 200);
+  draw_triangle
+    (Vector2.create 1632. 150.)
+    (Vector2.create 1232. 300.)
+    (Vector2.create 1632. 450.)
+    (Color.create 255 153 153 200);
+  draw_triangle
+    (Vector2.create 400. 600.)
+    (Vector2.create 0. 450.)
+    (Vector2.create 0. 750.)
+    (Color.create 255 153 153 200);
+  draw_triangle
+    (Vector2.create 1632. 450.)
+    (Vector2.create 1232. 600.)
+    (Vector2.create 1632. 750.)
+    (Color.create 255 153 153 200);
+  (* rgb() *)
   Raylib.draw_text "Congratulations on your new character!" 80 750 50
     Color.black;
   Raylib.draw_text "Press 1 to move on!" 1120 870 30 Color.black
