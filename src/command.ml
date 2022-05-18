@@ -71,15 +71,8 @@ let team_add_remove k =
   | Key.Seven -> Add 7
   | Key.Eight -> Add 8
   | Key.Nine -> Add 9
-  | Key.Q -> Remove 1
-  | Key.W -> Remove 2
-  | Key.E -> Remove 3
-  | Key.R -> Remove 4
-  | Key.T -> Remove 5
-  | Key.Y -> Remove 6
-  | Key.U -> Remove 7
-  | Key.I -> Remove 8
-  | Key.O -> Remove 9
-  | Key.P -> Remove 0
+  | Key.Q -> Remove 0
+  | Key.W -> Remove 1
+  | Key.E -> Remove 2
   | Key.B -> Battle
   | _ -> Unavailable
