@@ -12,12 +12,12 @@
     },
     {
       "name": "David Gries",
-      "effect": 0,
+      "effect": 1,
       "description": "Summons David Gries to kill you."
     },
     {
       "name": "Frontier Set",
-      "effect": 0,
+      "effect": 1,
       "description": "Drops you off at the frontier set."
     }
   ],

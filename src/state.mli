@@ -6,6 +6,7 @@ type status =
   | Team
   | Battle
   | Hatchery
+  | Endscreen of bool
 
 (** The various types of status that represent the phases of the game. *)
 
@@ -81,3 +82,7 @@ val to_team : t -> t
 
 val to_hatchery : t -> t
 (** [to_hatchery st] is st with the status changed to hatchery. *)
+
+val to_endscreen : t -> bool -> t
+(** [to_endscreen_win st win] is st with the status changed to Endscreen
+    true if we won the Dijkstra battle and Endscreen false if we lost.*)
