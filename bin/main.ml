@@ -183,8 +183,17 @@ let lose_text () =
   Raylib.draw_rectangle 0 0 windowWidth windowHeight Color.red;
   Raylib.draw_text "Sadge D:" (windowWidth / 2) (windowHeight / 2) 50
     Color.black;
-  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+  Raylib.draw_text "You lost!" (windowWidth / 2)
     ((windowHeight / 2) + 50)
+    50 Color.black;
+  draw_rectangle 0 0 1632 200 (Color.create 0 0 0 255);
+  draw_rectangle 26 20 776 140 (Color.create 255 255 25 255);
+  draw_rectangle 829 20 776 140 (Color.create 255 255 25 255);
+  draw_rectangle 0 800 1632 200 (Color.create 0 0 0 255);
+  draw_rectangle 26 820 776 140 (Color.create 255 255 25 255);
+  draw_rectangle 829 820 776 140 (Color.create 255 255 25 255);
+  Raylib.draw_text "Press enter to continue" (windowWidth / 2)
+    ((windowHeight / 2) + 100)
     50 Color.black
 
 let rec print_numbered_list (list : string list) (num : int) =
