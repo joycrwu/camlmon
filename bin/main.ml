@@ -165,7 +165,7 @@ let draw_battle_text bat () =
 (** not currently functional*)
 let draw_failed_run () =
   Raylib.draw_rectangle 0 0 600 500 (Color.create 100 100 0 0);
-  Raylib.draw_text "You failed to run away" 250 200 10000
+  Raylib.draw_text "You failed to run away" 250 200 100
     (Color.create 0 0 255 0)
 
 let victory_text () =
@@ -381,7 +381,8 @@ let rec battle_wait (st : State.t) bat (team : bool) =
           | Attack x ->
               end_drawing ();
               (bat
-              |> Game.Battle.character_turn x
+              |> Game.Battle.character_turn
+                   (Game.Character.get_action_effect character x)
               |> Game.Battle.enemy_turn
                    (Game.Character.get_action_effect enemy
                       (Random.int 3))
@@ -484,7 +485,6 @@ let move_on_from_hatchery st =
     State.new_level level_with_new_char
       (level_with_new_char |> State.current_level |> Level.next_level)
   in
-  level_start next_level_st;
   next_level_st
 
 let draw_gacha_char char =
@@ -563,7 +563,6 @@ let rec hatchery_wait (st : State.t) (hat : Hatchery.t) =
               (st |> State.current_level |> Level.next_level)
           in
           let new_st = State.to_level st' in
-          level_start new_st;
           new_st
       | Invalid ->
           (* Raylib.draw_text "Try again!" 700 835 50 Color.black; *)
@@ -836,7 +835,6 @@ let rec start_wait st =
       Raylib.draw_text "PRESS ENTER TO START" 540 600 40 Color.black;
       if Raylib.is_key_pressed Key.Enter then (
         end_drawing ();
-        level_start st;
         State.to_level st)
       else (
         end_drawing ();
@@ -845,7 +843,9 @@ let rec start_wait st =
 let rec wait st =
   match State.status st with
   | Start -> wait (start_wait st)
-  | Level -> wait (level_wait st)
+  | Level ->
+      level_start st;
+      wait (level_wait st)
   | _ -> wait st
 
 let main () =

@@ -46,4 +46,4 @@ let partner_check (c : Character.t) (char_list : Character.t list) : int
       (fun x -> x = Character.get_partner c)
       (List.map (fun x -> Character.get_id x) char_list)
   then Character.get_partner_effect c
-  else 0
+  else 1

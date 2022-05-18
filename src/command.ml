@@ -35,9 +35,9 @@ type battle_command =
 
 let battle_input (bat : Battle.t) (character : Character.t) k =
   match k with
-  | Key.One -> Attack (Character.get_action_effect character 0)
-  | Key.Two -> Attack (Character.get_action_effect character 1)
-  | Key.Three -> Attack (Character.get_action_effect character 2)
+  | Key.One -> Attack 0
+  | Key.Two -> Attack 1
+  | Key.Three -> Attack 2
   | Key.R -> Run
   | Key.Q -> Exit
   | _ -> Invalid_input
